@@ -31,10 +31,22 @@ class touchIt implements Plugin{
 	    if($data instanceof Tile and $data->class === TILE_SIGN and ($player = $this->api->player->get($data->data['creator'])) instanceof Player){
 		    $text = $data->getText();
 			if(strtolower($text[0]) === "touchit"){
-			    if(!$this->config->get("allowPlayer") and !$this->api->ban->isOp((($this->config->get("opCheckByLowerName")) ? $player->iusername : $player->username))){
+			    if(!$this->config->get("allowPlayer") and !$this->api->ban->isOp((($this->config->get("opCheckByLowerName")) ? $player->iusername : $player->username))){//check permission
 				    $player->sendChat("[TouchIt] You don't have permission to build teleport sign.");
-					
+					$data->setText("[WARNING]", "---------", "no permission", "to build");
+					return false;
 				}
+				if($this->config->get("checkLevel") and $this->api->level->get($text[2]) === false){//check level
+				    $player->sendChat("[TouchIt] This world has not been loaded.");
+					$player->sendChat("[TouchIt] Please check line 3 on this sign.");
+					$data->setText("[WARNING]", "---------", "has not", "loaded");
+					return false;
+				}
+				$this->sql->exec("INSERT INTO sign(level, toLevel, x, y, z, hasDescription) VALUES ('".$data->level->getName()."', '".$text[2]."', ".$data->x.", ".$data->y.",".$data->z.", ".(($text[1] === "")?"0":"1").")");
+				if($text[1] !== ""){
+				    $id = $this->sql->query("SELECT id FROM sign WHERE hasDescription = 1 AND level = '".$data->level->getName()."' AND toLevel = '".$text[2]."' AND x = ".$data->x." AND y = ".$data->y." AND z = ".$data->z.";");
+				}
+				//insert into database
 			}
 		}
 	}
@@ -56,6 +68,7 @@ class touchIt implements Plugin{
 		    "priority" => 5;
 			"allowPlayer" => false;
 			"opCheckByLowerName" => true;
+			"checkLevel" => true;
 			"enable" => true;
 		));
 	}
