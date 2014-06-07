@@ -31,7 +31,8 @@ class touchIt implements Plugin{
         $query = $this->sql->query("SELECT * FROM sign;");
         
         while(($sign = $query->fetchArray(SQLITE3_ASSOC)) !== false){
-            $tile = $this->api->tile->get(new Position((int) $sign['x'], (int) $sign['y'], (int) $sign['z'], $sign['level']));
+            $tile = $this->api->tile->get(new Position((int) $sign['x'], (int) $sign['y'], (int) $sign['z'], $this->api->level->get($sign['level'])));
+            if($sign instanceof Tile)console("right");//test
             if($sign instanceof Tile and ($level = $this->api->get($sign['toLevel'])) !== false){
                 if((int) $sign['hasDescription'] === 1){
                     $description = $this->sql->query("SELECT description FROM description WHERE id = ".$sign['id'].";")->fetchArray(SQLITE3_ASSOC)['description'];
@@ -41,9 +42,9 @@ class touchIt implements Plugin{
                 $sign->setText("[".$this->config->get("name")."]", (isset($description) ? $description : "To: ".$sign['toLevel']), ($this->config->get("showCount") ? "Peoples count" : $this->config->get("informationLine1")), ($this->config->get("showCount") ? "[".min($count, $this->config->get("maxPeople"))."/".$this->config->get("maxPeople")."]" : $this->config->get("informationLine2")));
                 //set text, if the count of the people in this world are more than the number you set, it will show the number you set.
             }elseif($this->config->get("autoDeleteSign")){
-                $this->db->exec("DELETE FROM sign WHERE id = ".$sign['id']);
+                $this->sql->exec("DELETE FROM sign WHERE id = ".$sign['id']);
                 if((int) $sign['hasDescription'] === 1)
-                    $this->db->exec("DELETE FROM description WHERE id = ".$sign['id']);
+                    $this->sql->exec("DELETE FROM description WHERE id = ".$sign['id']);
                 console("[DEBUG] Can't find sign in database! (ID: ".$sign['id'].")", true, true, 2);
                 console("[DEBUG] This sign has been DELETE!", true, true, 2);
             }else{
@@ -59,17 +60,17 @@ class touchIt implements Plugin{
     public function touchHandler($data, $event){
         $tile = $this->api->tile->get(new Position($data["target"], false, false, $data["target"]->level));
         if($tile instanceof Tile){
-            $query = $this->sql->query("SELECT * FROM sign WHERE level = '".$data["target"]->level->getName()."' AND x = ".$data["target"]->x."' AND y = ".$data["target"]->y."' AND z = ".$data["target"]->z.";")->fetchArray(SQLITE3_ASSOC);//get data
-            if($query !== false){
+            $query = $this->sql->query("SELECT * FROM sign WHERE level = '".$data["target"]->level->getName()."' AND x = ".$data["target"]->x." AND y = ".$data["target"]->y." AND z = ".$data["target"]->z.";");//get data
+            if($query !== false and ($query = $query->fetchArray(SQLITE3_ASSOC)) !== false){
                 if($data['type'] === "break"){//for BREAK
                     if($this->config->get("allowPlayerBreak") and $this->api->ban->isOp((($this->config->get("opCheckByLowerName")) ? $player->iusername : $player->username))){
                         console("[DEBUG] Player: ".$player->username." trying to break teleport sign!", true, true, 2);
                         $data["player"]->sendChat("[TouchIt] You can not break the teleport sign!");
                         return false;
                     }else{
-                        $this->db->exec("DELETE FROM sign WHERE id = ".$query['id']);//delete sign from database
+                        $this->sql->exec("DELETE FROM sign WHERE id = ".$query['id']);//delete sign from database
                         if((int) $query['hasDescription'] === 1)
-                            $this->db->exec("DELETE FROM description WHERE id = ".$query['id']);
+                            $this->sql->exec("DELETE FROM description WHERE id = ".$query['id']);
                         console("[DEBUG] A teleport sign has been delete! (ID: ".$query['id'].")", true, true, 2);
                         $data["player"]->sendChat("[TouchIt] This sign has been delete!");
                         return true;
@@ -123,6 +124,7 @@ class touchIt implements Plugin{
 			$this->config->set("enable", false);
 			return false;
 		}
+		return true;
 	}
 	
 	private function loadCfg(){
@@ -157,6 +159,6 @@ class touchIt implements Plugin{
         $this->config->save();
 	}
 	
-    public function __destruct()$this->sql->close;
+    public function __destruct(){}
 }
 ?>
