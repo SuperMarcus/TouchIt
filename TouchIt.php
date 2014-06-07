@@ -23,23 +23,31 @@ class touchIt implements Plugin{
 		
 		if($this->config->get("enable") and $this->loadDataBase()){
             $this->api->addHandler('player.block.touch', array($this, 'touchHandler'), (int) $this->config->get("priority"));
+            $this->api->addHandler('player.teleport.level', array($this, 'teleportHandler'), (int) $this->config->get("priority"));
 			$this->api->addHandler('tile.update', array($this, 'tileHandler'), (int) $this->config->get("priority"));
 		}
     }
     
     public function updateSign(){
+        unset($this->config);
+        $this->loadCfg();
         $query = $this->sql->query("SELECT * FROM sign;");
         
         while(($sign = $query->fetchArray(SQLITE3_ASSOC)) !== false){
-            $tile = $this->api->tile->get(new Position((int) $sign['x'], (int) $sign['y'], (int) $sign['z'], $this->api->level->get($sign['level'])));
-            if($sign instanceof Tile)console("right");//test
-            if($sign instanceof Tile and ($level = $this->api->get($sign['toLevel'])) !== false){
+            $toLevel = $this->api->level->get($sign['toLevel']);
+            $level = $this->api->level->get($sign['level']);
+            if($level === false and $toLevel === false){
+                console("[DEBUG] Level get Error", true, true, 2);
+                continue;
+            }
+            $tile = $this->api->tile->get(new Position((int) $sign['x'], (int) $sign['y'], (int) $sign['z'], $level));
+            if($tile instanceof Tile){
                 if((int) $sign['hasDescription'] === 1){
                     $description = $this->sql->query("SELECT description FROM description WHERE id = ".$sign['id'].";")->fetchArray(SQLITE3_ASSOC)['description'];
                 }
                 
-                $count = count($this->api->player->getAll($level));//get count
-                $sign->setText("[".$this->config->get("name")."]", (isset($description) ? $description : "To: ".$sign['toLevel']), ($this->config->get("showCount") ? "Peoples count" : $this->config->get("informationLine1")), ($this->config->get("showCount") ? "[".min($count, $this->config->get("maxPeople"))."/".$this->config->get("maxPeople")."]" : $this->config->get("informationLine2")));
+                $count = count($this->api->player->getAll($toLevel));//get count
+                $tile->setText("[".$this->config->get("name")."]", (isset($description) ? $description : "To: ".$sign['toLevel']), ($this->config->get("showCount") ? "Peoples count" : $this->config->get("informationLine1")), ($this->config->get("showCount") ? "[".min($count, $this->config->get("maxPeople"))."/".$this->config->get("maxPeople")."]" : $this->config->get("informationLine2")));
                 //set text, if the count of the people in this world are more than the number you set, it will show the number you set.
             }elseif($this->config->get("autoDeleteSign")){
                 $this->sql->exec("DELETE FROM sign WHERE id = ".$sign['id']);
@@ -57,10 +65,14 @@ class touchIt implements Plugin{
         }
     }
     
+    public function teleportHandler($data, $event){
+        $this->updateSign();
+    }
+    
     public function touchHandler($data, $event){
         $tile = $this->api->tile->get(new Position($data["target"], false, false, $data["target"]->level));
         if($tile instanceof Tile){
-            $query = $this->sql->query("SELECT * FROM sign WHERE level = '".$data["target"]->level->getName()."' AND x = ".$data["target"]->x." AND y = ".$data["target"]->y." AND z = ".$data["target"]->z.";");//get data
+            $query = $this->sql->query("SELECT * FROM sign WHERE level = '".$data["player"]->level->getName()."' AND x = ".(int) $data["target"]->x." AND y = ".(int) $data["target"]->y." AND z = ".(int) $data["target"]->z.";");//get data
             if($query !== false and ($query = $query->fetchArray(SQLITE3_ASSOC)) !== false){
                 if($data['type'] === "break"){//for BREAK
                     if($this->config->get("allowPlayerBreak") and $this->api->ban->isOp((($this->config->get("opCheckByLowerName")) ? $player->iusername : $player->username))){
@@ -77,7 +89,7 @@ class touchIt implements Plugin{
                     }
                 }
                 
-                
+                $data['player']->sendChat("[TouchIt] Teleport to: ".$query['toLevel']);
             }
         }
     }
@@ -98,7 +110,7 @@ class touchIt implements Plugin{
 					$data->setText("[WARNING]", "---------", "has not", "loaded");
 					return false;
 				}
-				$this->sql->exec("INSERT INTO sign(level, toLevel, x, y, z, hasDescription) VALUES ('".$data->level->getName()."', '".$text[2]."', ".$data->x.", ".$data->y.",".$data->z.", ".(($text[1] === "")?"0":"1").")");
+				$this->sql->exec("INSERT INTO sign(level, toLevel, x, y, z, hasDescription) VALUES ('".$data->level->getName()."', '".$text[2]."', ".(int) $data->x.", ".(int) $data->y.",".(int) $data->z.", ".(($text[1] === "")?"0":"1").")");
 				if($text[1] !== ""){
 				    $id = $this->sql->query("SELECT id FROM sign WHERE hasDescription = 1 AND level = '".$data->level->getName()."' AND toLevel = '".$text[2]."' AND x = ".$data->x." AND y = ".$data->y." AND z = ".$data->z.";")->fetchArray(SQLITE3_ASSOC)['id'];
                     $this->sql->exec("INSERT INTO description(id, description) VALUES (".$id.", '".$text[1]."')");
@@ -139,6 +151,7 @@ class touchIt implements Plugin{
             "allowPlayerBreak" => false,
 			"opCheckByLowerName" => true,
             "autoDeleteSign" => true,
+            "safeSpawn" => true,
 			"checkLevel" => true,
 			"enable" => true
 		));
