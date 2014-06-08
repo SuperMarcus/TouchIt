@@ -88,6 +88,7 @@ class touchIt implements Plugin{
 				$output .= "Done!";
 				break;
 		}
+	    return $output;
 	}
     
     public function touchHandler($data, $event){
