@@ -20,15 +20,16 @@ class touchIt implements Plugin{
      
     public function init(){
 	    $this->loadCfg();
-		
 		if($this->config->get("enable") and $this->loadDataBase()){
             $this->api->addHandler('player.block.touch', array($this, 'touchHandler'), (int) $this->config->get("priority"));
             $this->api->addHandler('player.teleport.level', array($this, 'teleportHandler'), (int) $this->config->get("priority"));
 			$this->api->addHandler('tile.update', array($this, 'tileHandler'), (int) $this->config->get("priority"));
+			$this->api->schedule(20 * 10, array($this,"updateSign"), array(true), false);//first update
+			if($this->config->get("useCommand"))$this->api->console->register("touch", "TouchIt command.", array($this, "commandHandler"));
 		}
     }
     
-    public function updateSign(){
+    public function updateSign($isSchedule = false){
         unset($this->config);
         $this->loadCfg();
         $query = $this->sql->query("SELECT * FROM sign;");
@@ -36,12 +37,20 @@ class touchIt implements Plugin{
         while(($sign = $query->fetchArray(SQLITE3_ASSOC)) !== false){
             $toLevel = $this->api->level->get($sign['toLevel']);
             $level = $this->api->level->get($sign['level']);
-            if($level === false and $toLevel === false){
-                console("[DEBUG] Level get Error", true, true, 2);
-                continue;
-            }
+            if($level === false){
+			    console("[DEBUG] TouchIt FROM Level: ".$sign['level']." NOT LOADED!", true, true, 2);
+				continue;
+			}
+			if($toLevel === false){
+			    console("[DEBUG] TouchIt TO Level: ".$sign['toLevel']." NOT LOADED!", true, true, 2);
+				$tile = $this->api->tile->get(new Position((int) $sign['x'], (int) $sign['y'], (int) $sign['z'], $level));
+				if($tile instanceof Tile and $tile->class === TILE_SIGN){
+				    $tile->setText("[".$this->config->get("name")."]", "NOT OPEN", ($this->config->get("showCount") ? "* * *" : $this->config->get("informationLine1")), ($this->config->get("showCount") ? "* * *" : $this->config->get("informationLine2")));//set sign not loaded
+				}
+				continue;
+			}
             $tile = $this->api->tile->get(new Position((int) $sign['x'], (int) $sign['y'], (int) $sign['z'], $level));
-            if($tile instanceof Tile){
+            if($tile instanceof Tile and $tile->class === TILE_SIGN){
                 if((int) $sign['hasDescription'] === 1){
                     $description = $this->sql->query("SELECT description FROM description WHERE id = ".$sign['id'].";")->fetchArray(SQLITE3_ASSOC)['description'];
                 }
@@ -63,15 +72,27 @@ class touchIt implements Plugin{
             unset($count);
             unset($tile);
         }
+		
+		if($isSchedule and $this->config->get("enable") and $this->config->get("autoUpdateSign"))$this->api->schedule(20 * 10, array($this,"updateSign"), array(true), false);//auto updates sign
     }
     
     public function teleportHandler($data, $event){
         $this->updateSign();
     }
+	
+	public function commandHandler($cmd, $params, $issuer, $alias){
+	    $output = "";
+	    switch($params[0]){
+		    case "update":
+			    $this->updateSign();
+				$output .= "Done!";
+				break;
+		}
+	}
     
     public function touchHandler($data, $event){
         $tile = $this->api->tile->get(new Position($data["target"], false, false, $data["target"]->level));
-        if($tile instanceof Tile){
+        if($tile instanceof Tile and $tile->class === TILE_SIGN){
             $query = $this->sql->query("SELECT * FROM sign WHERE level = '".$data["player"]->level->getName()."' AND x = ".(int) $data["target"]->x." AND y = ".(int) $data["target"]->y." AND z = ".(int) $data["target"]->z.";");//get data
             if($query !== false and ($query = $query->fetchArray(SQLITE3_ASSOC)) !== false){
                 if($data['type'] === "break"){//for BREAK
@@ -149,7 +170,7 @@ class touchIt implements Plugin{
 	private function loadCfg(){
 	    $this->config = new Config($this->api->plugin->configPath($this)."config.cnf", CONFIG_CNF, array(
 		    "priority" => 5,
-            "name" => "Touch to teleport",
+            "name" => "Teleport",
             "maxPeople" => 20,
             "showCount" => true,
             "informationLine1" => "Touch Sign",
@@ -158,8 +179,11 @@ class touchIt implements Plugin{
             "allowPlayerBreak" => false,
 			"opCheckByLowerName" => true,
             "autoDeleteSign" => true,
+			"autoUpdateSign" => true,
+			"autoUpdateTime" => 10,
             "safeSpawn" => true,
 			"checkLevel" => true,
+			"useCommand" => true,
 			"enable" => true
 		));
         
@@ -167,13 +191,17 @@ class touchIt implements Plugin{
             console("[WARNING] TouchIt config error: \"name\" Can not be \"".$this->config->get("name")."\" !", true, true, 0);
             $this->config->set("name", "Touch to teleport");
         }
+		
+		if($this->config->get("autoUpdateSign")){
+		    if(!$this->config->exists("autoUpdateTime"))$this->config->set("autoUpdateTime", 10);
+		}elseif($this->config->exists("autoUpdateTime"))$this->config->remove("autoUpdateTime");
         
         if($this->config->get("showCount")){
             $this->config->remove("informationLine1");
             $this->config->remove("informationLine2");
         }else{
-            $this->config->set("informationLine1", "Touch Sign");
-            $this->config->set("informationLine2", "to teleport");
+            if(!$this->config->exists("informationLine1"))$this->config->set("informationLine1", "Touch Sign");
+            if(!$this->config->exists("informationLine2"))$this->config->set("informationLine2", "to teleport");
         }
         
         $this->config->save();
