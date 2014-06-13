@@ -2,7 +2,7 @@
 namespace touchit;
 use pocketmine\plugin\PluginBase;
 
-class touchit extends PluginBase{
+class touchitMain extends PluginBase{
     
 }
 ?>
