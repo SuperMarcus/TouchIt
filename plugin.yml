@@ -6,3 +6,11 @@ author: Marcus
 description: This is a powerful sign teleport plugin.
 website: https://github.com/SuperMarcus/TouchIt
 commands:
+  touchit:
+    description: Command for TouchIt
+    usage: "Usage: /touchit <update/help>"
+    permission: touchit.command.touchit
+permissions:
+  touchit.command.touchit:
+    description: "TouchIt command."
+    default: true
