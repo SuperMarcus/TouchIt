@@ -3,7 +3,6 @@ namespace TouchIt\DataProvider;
 
 use TouchIt\TouchIt;
 use pocketmine\tile\Sign;
-use pocketmine\level\Level;
 use pocketmine\level\Position;
 
 interface Provider{
