@@ -2,6 +2,7 @@ name: TouchIt
 main: touchit\touchitMain
 version: 1.0
 api: [1.0.0]
+load: POSTWORLD
 author: Marcus
 authors: [Marcus]
 description: This is a powerful sign teleport plugin.
