@@ -1,10 +1,10 @@
 <?php
-namespace touchit;
+namespace TouchIt;
 
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 
-class touchitMain extends PluginBase implements Listener, CommandExecutor{
+class TouchIt extends PluginBase implements Listener, CommandExecutor{
     public function onLoad(){
     }
 }
