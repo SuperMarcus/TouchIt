@@ -3,14 +3,19 @@ main: touchit\touchitMain
 version: 1.0
 api: [1.0.0]
 author: Marcus
+authors: [Marcus]
 description: This is a powerful sign teleport plugin.
 website: https://github.com/SuperMarcus/TouchIt
 commands:
   touchit:
     description: Command for TouchIt
     usage: "Usage: /touchit <update/help>"
-    permission: touchit.command.touchit
+    permission: touchit.command
 permissions:
-  touchit.command.touchit:
-    description: "TouchIt command."
-    default: true
+  touchit:
+    description: "TouchIt permission."
+    default: op
+    children:
+      touchit.command:
+        description: "TouchIt commands."
+        default: true
