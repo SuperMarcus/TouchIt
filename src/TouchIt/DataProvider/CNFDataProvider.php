@@ -20,14 +20,6 @@ class CNFDataProvider implements DataProvider{
         $this->parseCnf($path);
     }
     
-    public function showCount(){
-    	return $this->get("showCount", true);
-    }
-    
-    public function getMaxPeople(){
-    	return $this->get("maxPeople", 20);
-    }
-    
     public function save(){
         $content = "#TouchIt Config file\r\n";
 		foreach($this->data as $k => $v){
