@@ -5,7 +5,7 @@ use TouchIt\TouchIt;
 use pocketmine\tile\Sign;
 use pocketmine\level\Position;
 
-interface Provider{
+interface signProvider{
     public function __construct(TouchIt $touchit);     //construct
     public function getSign(Position $pos);            //To get sign from file
     public function isSign(Position $pos);             //Check sign is teleport sign
