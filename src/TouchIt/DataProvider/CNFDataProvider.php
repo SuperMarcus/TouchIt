@@ -118,5 +118,13 @@ class CNFDataProvider implements DataProvider{
             return;
         }
     }
+    
+    public function __toString(){
+    	return print_r($this->data);
+    }
+    
+    public function __invoke($k, $d = false){
+    	return $this->get($k, $d);
+    }
 }
 ?>
