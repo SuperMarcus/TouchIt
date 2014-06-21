@@ -11,6 +11,8 @@ interface Provider{
     public function isSign(Position $pos);             //Check sign is teleport sign
     public function removeSign(Position $pos);         //Remove the sign
     public function addSign(Sign $sign);               //Add sign
+    public function lockProvider();                    //To lock this provider
+    public function unlockProvider();                  //To unlock this provider
     public function close();                           //Close database or save config file
 }
 ?>
