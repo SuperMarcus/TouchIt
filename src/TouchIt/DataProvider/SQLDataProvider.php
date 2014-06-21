@@ -18,6 +18,7 @@ class SQLDataProvider implements Provider{
     }
     
     public function removeSign(Position $pos){
+    	if($this->lock)return false;
     	$sign = $this->database->query("SELECT * FROM sign WHERE level = '".$pos->getLevel->getName()."' AND x = ".(int) $pos->x." AND y = ".(int) $pos->y." AND z = ".(int) $pos->z.";");
     	if(!sign or !($sign instanceof SQLite3Result))return false;
     	$sign = $sign->fetchArray(SQLITE3_ASSOC);
@@ -29,6 +30,7 @@ class SQLDataProvider implements Provider{
     }
     
     public function getSign(Position $pos){
+    	if($this->lock)return false;
         $level = $pos->getLevel();
         if(!$level or ($level instanceof Level) === false)return false;
         $query = $this->sql->query("SELECT * FROM sign WHERE level = '".$data["player"]->level->getName()."' AND x = ".(int) $data["target"]->x." AND y = ".(int) $data["target"]->y." AND z = ".(int) $data["target"]->z.";");//get data
@@ -36,6 +38,7 @@ class SQLDataProvider implements Provider{
     }
     
     public function addSign(Sign $sign){
+    	if($this->lock)return false;
         $text = $sign->getText();
         $level = $sign->getLevel();
         if(!$level or ($level instanceof Level) === false)return false;
