@@ -12,15 +12,24 @@ class CNFDataProvider implements DataProvider{
         $this->lock = false;
         $this->touchit = $touchit;
         $this->path = $path;
+        @mkdir(dirname($path));
         if(!file_exists($path)){
-            $this->lock = true;
+            $this->createCnf();
             return;
         }
         $this->parseCnf($path);
     }
     
+    public function showCount(){
+    	return $this->get("showCount", true);
+    }
+    
+    public function getMaxPeople(){
+    	return $this->get("maxPeople", 20);
+    }
+    
     public function save(){
-        $content = "//TouchIt Config file\r\n";
+        $content = "#TouchIt Config file\r\n";
 		foreach($this->data as $k => $v){
 			if(is_bool($v) === true){
 				$v = $v === true ? "on":"off";
@@ -30,6 +39,50 @@ class CNFDataProvider implements DataProvider{
 			$content .= $k."=".$v."\r\n";
 		}
 		@file_put_contents($this->path);
+    }
+    
+    public function exists($key, $lower = false){
+    	return $lower ? isset($this->data[strtolower($key)]) : isset($this->data[$key]);
+    }
+    
+    public function set($k, $v){
+    	$this->data[$k] = $v;
+    }
+    
+    public function get($k, $d = false){
+    	if($this->exists($k)){
+    		return $this->data[$k];
+    	}
+    	return $d;
+    }
+    
+    public function setIfNotExists($k, $v){
+    	if(!$this->exists($k)){
+    		$this->data[$k] = $v;
+    	}
+    }
+    
+    public function remove($k){
+    	if($this->exists($k)){
+    		unset($this->data[$k]);
+    	}
+    }
+    
+    private function createCnf(){
+    	$this->data = array(
+    		"name" => "Teleport",
+            "maxPeople" => 20,
+            "showCount" => true,
+            "showFull" =>true,
+			"allowPlayerBuild" => false,
+            "allowPlayerBreak" => false,
+			"opCheckByLowerName" => true,
+            "autoDeleteSign" => true,
+            "safeSpawn" => true,
+			"checkLevel" => true,
+			"enable" => true
+    	);
+    	$this->save();
     }
     
     private function parseCnf($path){
@@ -51,6 +104,14 @@ class CNFDataProvider implements DataProvider{
 				}
 				$this->data[$k] = $v;
 			}
+			if($this->data['showCount']){
+				$this->remove("informationLine1");
+				$this->remove("informationLine2");
+			}else{
+				$this->setIfNotExists("informationLine1", "Tap sign");
+				$this->setIfNotExists("informationLine2", "to teleport");
+			}
+			
 			$this->data['maxPeople'] = (int) $this->data['maxPeople'];
         }else{
             $this->lock = true;
