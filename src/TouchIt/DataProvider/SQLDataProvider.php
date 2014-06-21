@@ -3,7 +3,7 @@ namespace TouchIt\DataProvider;
 
 use TouchIt\TouchIt;
 use TouchIt\DataProvider\Provider;
-use TouchIt\Exchange\signReturn;
+use TouchIt\Exchange\signInfo;
 use pocketmine\tile\Sign;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
@@ -17,11 +17,22 @@ class SQLDataProvider implements Provider{
         $this->loadDataBase();
     }
     
+    public function removeSign(Position $pos){
+    	$sign = $this->database->query("SELECT * FROM sign WHERE level = '".$pos->getLevel->getName()."' AND x = ".(int) $pos->x." AND y = ".(int) $pos->y." AND z = ".(int) $pos->z.";");
+    	if(!sign or !($sign instanceof SQLite3Result))return false;
+    	$sign = $sign->fetchArray(SQLITE3_ASSOC);
+    	if(!isset($sign['id']))return false;
+    	if($sign['hasDescription'] == 1){
+    		$this->database->exec("DELETE FROM description WHERE id = ".$sign['id']);
+    	}
+    	return $this->database->exec("DELETE FROM sign WHERE id = ".$sign['id']);
+    }
+    
     public function getSign(Position $pos){
         $level = $pos->getLevel();
         if(!$level or ($level instanceof Level) === false)return false;
         $query = $this->sql->query("SELECT * FROM sign WHERE level = '".$data["player"]->level->getName()."' AND x = ".(int) $data["target"]->x." AND y = ".(int) $data["target"]->y." AND z = ".(int) $data["target"]->z.";");//get data
-        
+        return new signInfo($query, $this->database);
     }
     
     public function addSign(Sign $sign){
