@@ -17,6 +17,14 @@ class SQLDataProvider implements Provider{
         $this->loadDataBase();
     }
     
+    public function unlockProvider(){
+    	$this->lock = false;
+    }
+    
+    public function lockProvider(){
+    	$this->lock = true;
+    }
+    
     public function removeSign(Position $pos){
     	if($this->lock)return false;
     	$sign = $this->database->query("SELECT * FROM sign WHERE level = '".$pos->getLevel->getName()."' AND x = ".(int) $pos->x." AND y = ".(int) $pos->y." AND z = ".(int) $pos->z.";");
