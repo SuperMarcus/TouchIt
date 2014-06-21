@@ -2,13 +2,13 @@
 namespace TouchIt\DataProvider;
 
 use TouchIt\TouchIt;
-use TouchIt\DataProvider\Provider;
+use TouchIt\DataProvider\signProvider;
 use TouchIt\Exchange\signInfo;
 use pocketmine\tile\Sign;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 
-class SQLDataProvider implements Provider{
+class SQLDataProvider implements signProvider{
     private $database, $main, $lock;
     
     public function __construct(TouchIt $touchit){
