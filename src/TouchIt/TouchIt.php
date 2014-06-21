@@ -13,6 +13,7 @@ class TouchIt extends PluginBase implements Listener, CommandExecutor{
     public function onLoad(){
         $this->$config = new CNFDataProvider($this, $this->getDataFolder()."Config.cnf");
         $this->listener = new EventListener($this);
+        $this->getServer()->getPluginManager()->registerEvents($this->listener, $this);
     }
 }
 ?>
