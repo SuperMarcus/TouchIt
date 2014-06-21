@@ -48,5 +48,13 @@ class signOutInfo implements ExchangeInformation{
     public function getId(){
         return $this->data['id'];
     }
+    
+    public function __invoke($k){
+        return $this->get($k);
+    }
+    
+    public function __toString(){
+        return print_r($this->data);
+    }
 }
 ?>
