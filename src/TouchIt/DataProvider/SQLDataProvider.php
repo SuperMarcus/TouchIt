@@ -27,6 +27,7 @@ class SQLDataProvider implements signProvider{
     }
     
     public function getContents(){
+    	if($this->lock)return false;
     	return new SignContentsData($this->database);
     }
     
