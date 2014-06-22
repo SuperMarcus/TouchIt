@@ -36,13 +36,22 @@ class SignData implements ExchangeInformation{
     }
     
     public function getToLevel(){
-        if($this->isToLevelLoaded())return Server::getInstance()->getLevel($this->data['toLevel']);
+        if($this->isToLevelLoaded())return Server::getInstance()->getLevelByName($this->data['toLevel']);
         else return false;
     }
     
     public function getFromLevel(){
-        if($this->isToLevelLoaded())return Server::getInstance()->getLevel($this->data['level']);
+        if($this->isToLevelLoaded())return Server::getInstance()->getLevelByName($this->data['level']);
         else return false;
+    }
+    
+    public function getPosition(){
+        return new Position((int) $this->data['x'], (int) $this->data['y'], (int) $this->data['z'], $this->getFromLevel());
+    }
+    
+    public function getTile(){
+        if(!($level = $this->getFromLevel()))return false;
+        return $level->getTile($this->getPosition());
     }
     
     public function getId(){
