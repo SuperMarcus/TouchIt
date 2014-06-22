@@ -11,12 +11,11 @@ use TouchIt\SignManager;
 class TouchIt extends PluginBase implements Listener, CommandExecutor{
     public $config, $database, $listener, $signManager;
     
-    public function onLoad(){
+    public function onEnable(){
         $this->config = new CNFDataProvider($this, $this->getDataFolder()."Config.cnf");
         $this->database = new SQLDataProvider($this);
         $this->signManager = new SignManager($this, $this->config, $this->database);
         $this->listener = new EventListener($this, $this->signManager);
-        $this->getServer()->getPluginManager()->registerEvents($this->listener, $this);
     }
 }
 ?>
