@@ -5,6 +5,7 @@ use TouchIt\TouchIt;
 use TouchIt\Exchange\signInfo;
 use TouchIt\DataProvider\CNFDataProvider;
 use TouchIt\DataProvider\SQLDataProvider;
+use pocketmine\Server;
 
 class SignManager{
     private $touchit, $config, $database;
@@ -16,6 +17,11 @@ class SignManager{
     }
     
     public function onUpdateEvent(Event $event){
+        $contents = $this->database->getContents();
+        $server = Server::getInstance();
+        while($sign = $contents->getNext()){
+            $tile = $sign->getTile();
+        }
     }
 }
 ?>
