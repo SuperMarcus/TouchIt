@@ -15,8 +15,7 @@ class SignManager{
         $this->database = $database;
     }
     
-    public function onDestroy(){
-        
+    public function onUpdateEvent(Event $event){
     }
 }
 ?>
