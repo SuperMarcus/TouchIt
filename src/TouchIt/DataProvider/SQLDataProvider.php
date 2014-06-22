@@ -3,7 +3,7 @@ namespace TouchIt\DataProvider;
 
 use TouchIt\TouchIt;
 use TouchIt\DataProvider\signProvider;
-use TouchIt\Exchange\signInfo;
+use TouchIt\Exchange\SignData;
 use pocketmine\tile\Sign;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
@@ -42,7 +42,7 @@ class SQLDataProvider implements signProvider{
         $level = $pos->getLevel();
         if(!$level or ($level instanceof Level) === false)return false;
         $query = $this->sql->query("SELECT * FROM sign WHERE level = '".$data["player"]->level->getName()."' AND x = ".(int) $data["target"]->x." AND y = ".(int) $data["target"]->y." AND z = ".(int) $data["target"]->z.";");//get data
-        return new signInfo($query, $this->database);
+        return new SignData($query, $this->database);
     }
     
     public function addSign(Sign $sign){
