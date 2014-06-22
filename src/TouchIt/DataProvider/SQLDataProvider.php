@@ -4,6 +4,7 @@ namespace TouchIt\DataProvider;
 use TouchIt\TouchIt;
 use TouchIt\DataProvider\signProvider;
 use TouchIt\Exchange\SignData;
+use TouchIt\Exchange\SignContentsData;
 use pocketmine\tile\Sign;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
@@ -23,6 +24,10 @@ class SQLDataProvider implements signProvider{
     
     public function lockProvider(){
     	$this->lock = true;
+    }
+    
+    public function getContents(){
+    	return new SignContentsData($this->database);
     }
     
     public function removeSign(Position $pos){
