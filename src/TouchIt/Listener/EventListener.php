@@ -15,7 +15,16 @@ class EventListener implements Listener{
         $this->manager = $manager;
     }
     
-    public function onPlayerJoin(PlayerJoinEvent $event){
+    public function onPlayerLogin(PlayerLoginEvent $event){
+        $this->onUpdateEvent($event);
+    }
+    
+    public function onPlayerRespawn(PlayerRespawnEvent $event){
+        $this->onUpdateEvent($event);
+    }
+    
+    public function onUpdateEvent($event){
+        $this->manager->onUpdateEvent($event);
     }
 }
 ?>
