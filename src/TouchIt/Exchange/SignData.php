@@ -7,7 +7,7 @@ use pocketmine\level\Position;
 use pocketmine\level\Level;
 use pocketmine\Server;
 
-class signOutInfo implements ExchangeInformation{
+class SignData implements ExchangeInformation{
     public $data;
     private $check;
     
