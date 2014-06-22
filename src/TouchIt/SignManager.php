@@ -14,5 +14,9 @@ class SignManager{
         $this->config = $config;
         $this->database = $database;
     }
+    
+    public function onDestroy(){
+        
+    }
 }
 ?>
