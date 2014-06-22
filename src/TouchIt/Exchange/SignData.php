@@ -35,14 +35,14 @@ class SignData implements ExchangeInformation{
         return Server::getInstance()->isLevelLoaded($this->data['level']);
     }
     
-    public function getToLevel(){
+    public function getToLevel($name = false){
         if($this->isToLevelLoaded())return Server::getInstance()->getLevelByName($this->data['toLevel']);
-        else return false;
+        else return $name ? $this->data['toLevel'] : false;
     }
     
-    public function getFromLevel(){
+    public function getFromLevel($name = false){
         if($this->isToLevelLoaded())return Server::getInstance()->getLevelByName($this->data['level']);
-        else return false;
+        else return $name ? $this->data['level'] : false;
     }
     
     public function getPosition(){
