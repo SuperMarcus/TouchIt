@@ -32,6 +32,10 @@ class SignManager{
                 }
                 continue;
             }
+            $tile = $sign->getTile();
+            if($tile instanceof Sign){
+                $data = [];
+            }
         }
     }
 }
