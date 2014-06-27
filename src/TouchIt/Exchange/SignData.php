@@ -22,6 +22,10 @@ class SignData implements ExchangeInformation{
         }else $this->data['hasDescription'] = false;
     }
     
+    public function hasDescription(){
+        return $this->data['hasDescription'];
+    }
+    
     public function getDescription(){
         if($this->data['hasDescription'])return $this->data['description'];
         else return "To: ".$this->data['toLevel'];
