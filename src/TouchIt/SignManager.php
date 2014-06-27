@@ -7,6 +7,7 @@ use TouchIt\DataProvider\CNFDataProvider;
 use TouchIt\DataProvider\SQLDataProvider;
 use TouchIt\Event\UpdateSignEvent;
 use pocketmine\Server;
+use pocketmine\event\Event;
 
 class SignManager{
     private $touchit, $config, $database;
@@ -18,6 +19,10 @@ class SignManager{
     }
     
     public function onUpdateEvent(Event $event){
+        
+    }
+    
+    public function onUpdate(){
         $contents = $this->database->getContents();
         $server = Server::getInstance();
         while($sign = $contents->getNext()){
@@ -49,7 +54,13 @@ class SignManager{
                 $tile->setText($event[0], $event[1], $event[2], $event[3]);
             }else{
                 $this->touchit->getLogger()->debug("[TouchIt] An non-existent sign has been found in database. (ID: ".$sign->getId().")");
-                
+                if($this->config("autoDeleteSign", true)){
+                    $this->database->exec("DELETE FROM sign WHERE id = ".$sign->getId());
+                    if($sign->hasDescription()){
+                        $this->database->exec("DELETE FROM description WHERE id = ".$sign->getId());
+                    }
+                    $contents->delete($sign->getId());
+                }
             }
         }
     }
