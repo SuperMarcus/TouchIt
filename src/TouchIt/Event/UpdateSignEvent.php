@@ -28,7 +28,7 @@ class UpdateSignEvent extends PluginEvent implements Cancellable{
             (is_string($line1) or is_int($line1)) ? $oldData[0] : (string) $line1,
             (is_string($line2) or is_int($line2)) ? $oldData[1] : (string) $line2,
             (is_string($line3) or is_int($line3)) ? $oldData[2] : (string) $line3,
-            (is_string($line4) or is_int($line4)) ? $oldData[3] : (string) $line4,
+            (is_string($line4) or is_int($line4)) ? $oldData[3] : (string) $line4
         ];
     }
 }
