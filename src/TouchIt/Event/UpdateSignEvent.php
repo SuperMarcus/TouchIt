@@ -1,5 +1,5 @@
 <?php
-namespace TouchIt/Event;
+namespace TouchIt\Event;
 
 use pocketmine\event\Event;
 use TouchIt\Exchange\SignData;
