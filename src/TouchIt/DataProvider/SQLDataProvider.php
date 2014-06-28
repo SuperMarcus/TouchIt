@@ -48,6 +48,7 @@ class SQLDataProvider implements signProvider{
         $level = $pos->getLevel();
         if(!$level or ($level instanceof Level) === false)return false;
         $query = $this->sql->query("SELECT * FROM sign WHERE level = '".$data["player"]->level->getName()."' AND x = ".(int) $data["target"]->x." AND y = ".(int) $data["target"]->y." AND z = ".(int) $data["target"]->z.";");//get data
+        if(!($query instanceof \SQLite3Result and $query->fetchArray(SQLITE3_ASSOC) !== false and $query->fetchArray(SQLITE3_ASSOC) !== true))return false;
         return new SignData($query, $this->database);
     }
     
