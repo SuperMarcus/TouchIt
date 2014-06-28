@@ -34,7 +34,11 @@ class SignManager extends Thread{
         $this->update();
     }
     
-    public function onBlockBreak(BlockPlaceEvent $event){
+    public function onBlockPlace(BlockPlaceEvent $event){
+        
+    }
+    
+    public function onBlockBreak(BlockBreakEvent $event){
         if($event->getBlock()->getID() === Block::WALL_SIGN or $event->getBlock()->getID === Block::SIGN_POST){
             if(($sign = $this->database->getSign($event->getBlock()->position)) !== false){
                 if($event->getPlayer()->isOp()){
