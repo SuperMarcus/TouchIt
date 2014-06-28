@@ -16,11 +16,11 @@ class EventListener implements Listener{
     }
     
     public function onBlockPlace(BlockPlaceEvent $event){
-        $this->manager->onBlockPlaceEvent($event);
+        $this->manager->onBlockPlace($event);
     }
     
     public function onBlockBreak(BlockBreakEvent $event){
-        $this->manager->onBlockBreakEvent($event);
+        $this->manager->onBlockBreak($event);
     }
     
     public function onPlayerLogin(PlayerLoginEvent $event){
