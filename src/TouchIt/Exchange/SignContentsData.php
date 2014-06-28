@@ -22,7 +22,7 @@ class SignContentsData implements ExchangeInformation{
     public function getNext(){
         if(!isset($this->data['query'][(++$this->data['now'])]))return false;
         $now = $this->data['query'][$this->data['now']];
-        return new SignData($this->database->query("SELECT * FROM sign WHERE id = ".$this->data['query'][$now['id']].";"), $this->database);
+        return new SignData($this->database->query("SELECT * FROM sign WHERE id = ".$now['id'].";"), $this->database);
     }
     
     public function delete($ID){
