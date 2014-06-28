@@ -10,13 +10,28 @@ use pocketmine\Server;
 use pocketmine\event\Event;
 use pocketmine\block\Block;
 
-class SignManager{
-    private $touchit, $config, $database;
+class SignManager extends Thread{
+    private $touchit, $config, $database, $stop;
     
     public function __construct(TouchIt $touchit, CNFDataProvider &$config, SQLDataProvider &$database){
         $this->touchit = $touchit;
         $this->config = $config;
         $this->database = $database;
+        $this->stop = false;
+        $this->start();
+    }
+    
+    public function run(){
+        if($this->isRunning())return;
+        while(!$this->stop){
+            $this->onUpdate();
+            $this->wait(((int) $this->config("ticks", 10)) * 1000);
+        }
+    }
+    
+    public function stop(){
+        $this->stop = true;
+        $this->update();
     }
     
     public function onBlockBreak(BlockPlaceEvent $event){
@@ -32,6 +47,10 @@ class SignManager{
                 }
             }
         }
+    }
+    
+    public function update(){
+        if($this->isWaiting())$this->notify();
     }
     
     public function onUpdateEvent(Event $event){
