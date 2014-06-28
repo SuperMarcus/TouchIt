@@ -8,6 +8,7 @@ use TouchIt\DataProvider\SQLDataProvider;
 use TouchIt\Event\UpdateSignEvent;
 use pocketmine\Server;
 use pocketmine\event\Event;
+use pocketmine\block\Block;
 
 class SignManager{
     private $touchit, $config, $database;
@@ -16,6 +17,21 @@ class SignManager{
         $this->touchit = $touchit;
         $this->config = $config;
         $this->database = $database;
+    }
+    
+    public function onBlockBreak(BlockPlaceEvent $event){
+        if($event->getBlock()->getID() === Block::WALL_SIGN or $event->getBlock()->getID === Block::SIGN_POST){
+            if(($sign = $this->database->getSign($event->getBlock()->position)) !== false){
+                if($event->getPlayer()->isOp()){
+                    $event->getPlayer()->sendMessage("[TouchIt] This sign has been delete.");
+                    $this->touchit->getLogger()->debug("[TouchIt] A teleport sign has been delete. (ID: ".$sign->getId().")");
+                    $this->database->removeSign($event->getBlock()->position);
+                }else{
+                    $event->getPlayer()->sendMessage("[TouchIt] You can not break this teleport sign.");
+                    $event->setCancelled();
+                }
+            }
+        }
     }
     
     public function onUpdateEvent(Event $event){
