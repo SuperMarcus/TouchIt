@@ -2,37 +2,51 @@
 namespace TouchIt\DataProvider;
 
 use TouchIt\TouchIt;
-use TouchIt\DataProvider\signProvider;
+use TouchIt\DataProvider\Provider;
 use TouchIt\Exchange\SignData;
 use TouchIt\Exchange\SignContentsData;
 use pocketmine\tile\Sign;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 
-class SQLDataProvider implements signProvider{
+class SQLDataProvider implements Provider{
     private $database, $main, $lock;
     
     public function __construct(TouchIt $touchit){
-        $this->lock = false;
+        $this->lock = true;
         $this->main = $touchit;
-        $this->loadDataBase();
     }
     
-    public function unlockProvider(){
+    public function onEnable(){
     	$this->lock = false;
+    	$this->loadDataBase();
     }
     
-    public function lockProvider(){
+    public function onDisable(){
+    	$this->database->close();
+    	unset($this->database);
     	$this->lock = true;
     }
     
+    public function unlock(){
+    	$this->lock = false;
+    }
+    
+    public function lock(){
+    	$this->lock = true;
+    }
+    
+    public function isLocked(){
+    	return (bool) $this->lock;
+    }
+    
     public function getContents(){
-    	if($this->lock)return false;
+    	if($this->isLocked())return false;
     	return new SignContentsData($this->database);
     }
     
     public function removeSign(Position $pos){
-    	if($this->lock)return false;
+    	if($this->isLocked())return false;
     	$sign = $this->database->query("SELECT * FROM sign WHERE level = '".$pos->getLevel->getName()."' AND x = ".(int) $pos->x." AND y = ".(int) $pos->y." AND z = ".(int) $pos->z.";");
     	if(!sign or !($sign instanceof SQLite3Result))return false;
     	$sign = $sign->fetchArray(SQLITE3_ASSOC);
@@ -44,7 +58,7 @@ class SQLDataProvider implements signProvider{
     }
     
     public function getSign(Position $pos){
-    	if($this->lock)return false;
+    	if($this->isLocked())return false;
         $level = $pos->getLevel();
         if(!$level or ($level instanceof Level) === false)return false;
         if($level->getBlock($pos)->getID !== Block::WALL_SIGN or $level->getBlock($pos)->getID !== Block::SIGN_POST)return false;
@@ -54,7 +68,7 @@ class SQLDataProvider implements signProvider{
     }
     
     public function addSign(Sign $sign){
-    	if($this->lock)return false;
+    	if($this->isLocked())return false;
         $text = $sign->getText();
         $level = $sign->getLevel();
         if(!$level or ($level instanceof Level) === false)return false;
@@ -67,6 +81,7 @@ class SQLDataProvider implements signProvider{
     }
     
     private function loadDataBase(){
+    	if($this->isLocked())return;
         if(!extension_loaded("sqlite3")){
             $this->lock = true;
             return;
