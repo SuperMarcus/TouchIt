@@ -10,7 +10,7 @@ use pocketmine\Server;
 use pocketmine\event\Event;
 use pocketmine\block\Block;
 
-class SignManager extends Thread{
+class SignManager extends \Thread{
     private $touchit, $config, $database, $stop;
     
     public function __construct(TouchIt $touchit, CNFDataProvider &$config, SQLDataProvider &$database){
@@ -39,9 +39,11 @@ class SignManager extends Thread{
             if(($sign = $this->database->getSign($event->getBlock()->position)) !== false){
                 if(!$sign->isToLevelLoaded()){
                     $event->getPlayer()->sendMessage("[TouchIt] This world is not open.");
+                }elseif(!$event->getPlayer()->isOp() and (count($sign->getToLevel()->getPlayers()) >== (int) $this->config("maxPeople", 20))){
+                    $event->getPlayer()->sendMessage("[TouchIt] Level is full!");
                 }else{
                     $event->getPlayer()->sendMessage("[TouchIt] Teleporting to ".$sign->getToLevel(true));
-                    $event->getPlayer()->teleport($sign->getToLevel()->getSpawnLocation());//Not teleport??
+                    $event->getPlayer()->teleport($sign->getToLevel()->getSpawnLocation());
                 }
                 $event->setCancelled();
             }
@@ -93,7 +95,7 @@ class SignManager extends Thread{
                     "[".$this->config("name")."]",
                     $sign->getDescription(),
                     ($this->config("showCount", true) ? "Players count" : $this->config("informationLine1", "Tap sign")),
-                    ($this->config("showCount", true) ? "[".count($sign->getToLevel()->getPlayers())."/".$this->config("maxPeople")."]" : $this->config("informationLine2", "to teleport"))
+                    ($this->config("showCount", true) ? "[".min(count($sign->getToLevel()->getPlayers()), (int) $this->config("maxPeople"))."/".$this->config("maxPeople", 20)."]" : $this->config("informationLine2", "to teleport"))
                 )));
                 if($event->isCancelled()){
                     $this->touchit->getLogger()->debug("[TouchIt] An update has been cancelled by event.");
