@@ -24,8 +24,41 @@ class SignManager extends \Thread{
     public function run(){
         if($this->isRunning())return;
         while(!$this->stop){
+            $this->checkNewSign();
             $this->onUpdate();
-            $this->wait(((int) $this->config("ticks", 10)) * 1000);
+            $this->wait(((int) $this->config("ticks", 10)) * 100);
+        }
+    }
+    
+    public function checkNewSign(){
+        if(count($this->check) >== 0){
+            foreach($this->check as $key => $data){
+                $position = $data['position'];
+                if(($tile = $position->getLevel()->getTile($position)) !== false and $tile instanceof Sign){
+                    $text = $tile->getText();
+                    if(trim(strtolower($text[0])) !== "touchit"){
+                        if($text[0] == "" and $text[1] == "" and $text[2] == "" and $text[3] == ""){
+                            continue;
+                        }
+                        unset($this->check[$key]);
+                        continue;
+                    }
+                    if(!Server::getInstance()->isLevelLoaded(trim($text[2])) and $this->config("checkLevel", true)){//To level not loaded
+                        if($data['player']->isOnline()){
+                            $data['player']->sendMessage("[Touchit] Level \"".trim($text[2])."\" is not loaded.");
+                            $tile->setText("[WARNING]", "----------", "Level ".trim($text[2]), "not loaded");
+                        }
+                        unset($this->check[$key]);
+                        continue;
+                    }
+                    if($data['player']->isOnline()){
+                        $data['player']->sendMessage("[Touchit] Done!");
+                    }
+                    $tile->setText("* * *", "* * *", "* * *", "* * *");
+                    $this->database->addSign($tile);
+                    unset($this->check[$key]);
+                }
+            }
         }
     }
     
@@ -46,6 +79,8 @@ class SignManager extends \Thread{
                     $event->getPlayer()->teleport($sign->getToLevel()->getSpawnLocation());
                 }
                 $event->setCancelled();
+            }elseif($event->getPlayer()->isOp() or $this->config("allowPlayerBuild", false)){
+                $this->check[] = ["position" => $event->getBlock()->position, "player" => $event->getPlayer()];//Add to new sign check list. Because new api don't have tile.update.
             }
         }
     }
@@ -53,7 +88,7 @@ class SignManager extends \Thread{
     public function onBlockBreak(BlockBreakEvent $event){
         if($event->getBlock()->getID() === Block::WALL_SIGN or $event->getBlock()->getID === Block::SIGN_POST){
             if(($sign = $this->database->getSign($event->getBlock()->position)) !== false){
-                if($event->getPlayer()->isOp()){
+                if($event->getPlayer()->isOp() or $this->config("allowPlayerBreak", false)){
                     $event->getPlayer()->sendMessage("[TouchIt] This sign has been delete.");
                     $this->touchit->getLogger()->debug("[TouchIt] A teleport sign has been delete. (ID: ".$sign->getId().")");
                     $this->database->removeSign($event->getBlock()->position);
@@ -75,7 +110,6 @@ class SignManager extends \Thread{
     
     public function onUpdate(){
         $contents = $this->database->getContents();
-        $server = Server::getInstance();
         while($sign = $contents->getNext()){
             if(!$sign->isFromLevelLoaded()){
                 $this->touchit->getLogger()->debug("[TouchIt] Teleport sign: ".$sign->getId()." Has not been update. (Level: ".$sign->getFromLevel(true)." Not Loaded)");
