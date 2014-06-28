@@ -41,7 +41,7 @@ class SignManager extends Thread{
                     $event->getPlayer()->sendMessage("[TouchIt] This world is not open.");
                 }else{
                     $event->getPlayer()->sendMessage("[TouchIt] Teleporting to ".$sign->getToLevel(true));
-                    $event->getPlayer()->teleport($sign->getToLevel()->getSpawnLocation());
+                    $event->getPlayer()->teleport($sign->getToLevel()->getSpawnLocation());//Not teleport??
                 }
                 $event->setCancelled();
             }
