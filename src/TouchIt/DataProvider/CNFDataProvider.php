@@ -61,7 +61,7 @@ class CNFDataProvider implements DataProvider{
     }
     
     private function createCnf(){
-    	$this->data = array(
+    	$this->data = [
     		"name" => "Teleport",
             "maxPeople" => 20,
             "showCount" => true,
@@ -70,11 +70,10 @@ class CNFDataProvider implements DataProvider{
             "allowPlayerBreak" => false,
 			"opCheckByLowerName" => true,
             "autoDeleteSign" => true,
-            "safeSpawn" => true,
 			"checkLevel" => true,
 			"ticks" => 10,
 			"enable" => true
-    	);
+    	];
     	$this->save();
     }
     
