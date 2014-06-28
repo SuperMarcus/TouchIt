@@ -35,7 +35,17 @@ class SignManager extends Thread{
     }
     
     public function onBlockPlace(BlockPlaceEvent $event){
-        
+        if($event->getBlock()->getID() === Block::WALL_SIGN or $event->getBlock()->getID === Block::SIGN_POST){
+            if(($sign = $this->database->getSign($event->getBlock()->position)) !== false){
+                if(!$sign->isToLevelLoaded()){
+                    $event->getPlayer()->sendMessage("[TouchIt] This world is not open.");
+                }else{
+                    $event->getPlayer()->sendMessage("[TouchIt] Teleporting to ".$sign->getToLevel(true));
+                    $event->getPlayer()->teleport($sign->getToLevel()->getSpawnLocation());
+                }
+                $event->setCancelled();
+            }
+        }
     }
     
     public function onBlockBreak(BlockBreakEvent $event){
@@ -58,7 +68,7 @@ class SignManager extends Thread{
     }
     
     public function onUpdateEvent(Event $event){
-        
+        $this->update();
     }
     
     public function onUpdate(){
