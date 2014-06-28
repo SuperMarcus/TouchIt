@@ -72,6 +72,7 @@ class CNFDataProvider implements DataProvider{
             "autoDeleteSign" => true,
             "safeSpawn" => true,
 			"checkLevel" => true,
+			"ticks" => 10,
 			"enable" => true
     	);
     	$this->save();
