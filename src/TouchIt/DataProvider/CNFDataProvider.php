@@ -2,25 +2,49 @@
 namespace TouchIt\DataProvider;
 
 use TouchIt\TouchIt;
-use TouchIt\DataProvider\DataProvider;
+use TouchIt\DataProvider\Provider;
 
-class CNFDataProvider implements DataProvider{
+class CNFDataProvider implements Provider{
     private $touchit, $lock, $path;
     public $data, $file;
     
     public function __construct(TouchIt $touchit, $path){
-        $this->lock = false;
+        $this->lock = true;
         $this->touchit = $touchit;
         $this->path = $path;
         @mkdir(dirname($path));
-        if(!file_exists($path)){
+    }
+    
+    public function lock(){
+    	$this->lock = true;
+    }
+    
+    public function unlock(){
+    	$this->lock = false;
+    }
+    
+    public function isLocked(){
+    	return (bool) $this->lock;
+    }
+    
+    public function onEnable(){
+    	$this->unlock();
+    	if(!file_exists($this->path)){
             $this->createCnf();
             return;
         }
-        $this->parseCnf($path);
+        $this->parseCnf($this->path);
+    }
+    
+    public function onDisable(){
+    	$this->save();
+    	$this->lock();
+    	unset($this->file);
+    	unset($this->data);
     }
     
     public function save(){
+    	if($this->isLocked())return;
         $content = "#TouchIt Config file\r\n";
 		foreach($this->data as $k => $v){
 			if(is_bool($v) === true){
@@ -34,14 +58,17 @@ class CNFDataProvider implements DataProvider{
     }
     
     public function exists($key, $lower = false){
+    	if($this->isLocked())return false;
     	return $lower ? isset($this->data[strtolower($key)]) : isset($this->data[$key]);
     }
     
     public function set($k, $v){
+    	if($this->isLocked())return;
     	$this->data[$k] = $v;
     }
     
     public function get($k, $d = false){
+    	if($this->isLocked())return $d;
     	if($this->exists($k)){
     		return $this->data[$k];
     	}
@@ -49,18 +76,21 @@ class CNFDataProvider implements DataProvider{
     }
     
     public function setIfNotExists($k, $v){
+    	if($this->isLocked())return;
     	if(!$this->exists($k)){
     		$this->data[$k] = $v;
     	}
     }
     
     public function remove($k){
+    	if($this->isLocked())return;
     	if($this->exists($k)){
     		unset($this->data[$k]);
     	}
     }
     
     private function createCnf(){
+    	if($this->isLocked())return;
     	$this->data = [
     		"name" => "Teleport",
             "maxPeople" => 20,
@@ -78,6 +108,7 @@ class CNFDataProvider implements DataProvider{
     }
     
     private function parseCnf($path){
+    	if($this->isLocked())return;
         $this->file = @file_get_contents($this->path);
         if(preg_match_all('/([a-zA-Z0-9\-_\.]*)=([^\r\n]*)/u', $content, $matches) > 0){ //false or 0 matches
 			foreach($matches[1] as $i => $k){
