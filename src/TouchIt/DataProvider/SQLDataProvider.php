@@ -58,7 +58,7 @@ class SQLDataProvider implements signProvider{
         $text = $sign->getText();
         $level = $sign->getLevel();
         if(!$level or ($level instanceof Level) === false)return false;
-        $this->database->exec("INSERT INTO sign(level, toLevel, x, y, z, hasDescription) VALUES ('".$level->getName()."', '".$text[2]."', ".(int) $sign->x.", ".(int) $sign->y.",".(int) $sign->z.", ".(($text[1] === "")?"0":"1").")");//Write to DataBase
+        $this->database->exec("INSERT INTO sign(level, toLevel, x, y, z, hasDescription) VALUES ('".$level->getName()."', '".trim($text[2])."', ".(int) $sign->x.", ".(int) $sign->y.",".(int) $sign->z.", ".(($text[1] === "")?"0":"1").")");//Write to DataBase
         if($text[1] !== ""){//Write description
 			$id = $this->database->query("SELECT id FROM sign WHERE hasDescription = 1 AND level = '".$level->getName()."' AND toLevel = '".$text[2]."' AND x = ".$sign->x." AND y = ".$sign->y." AND z = ".$sign->z.";")->fetchArray(SQLITE3_ASSOC)['id'];
             $this->database->exec("INSERT INTO description(id, description) VALUES (".$id.", '".$text[1]."')");
