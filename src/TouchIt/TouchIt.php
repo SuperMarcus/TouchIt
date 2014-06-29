@@ -17,5 +17,10 @@ class TouchIt extends PluginBase implements Listener, CommandExecutor{
         $this->signManager = new SignManager($this, $this->config, $this->database);
         $this->listener = new EventListener($this, $this->signManager);
     }
+    
+    public function onDisable(){
+        $this->config->onDisable();
+        $this->database->onDisable();
+    }
 }
 ?>
