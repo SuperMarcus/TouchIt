@@ -21,10 +21,32 @@ class SignManager extends \Thread{
     }
     
     public function onCommand(CommandSender $sender, Command $command, $label, array $args){
-        switch($args[0]){
+        switch(strtolower($args[0])){
             case "update":
                 $this->update();
                 $sender->sendMessage("[TouchIt] Updating...");
+                return true;
+            case "max":
+            case "maxpeople":
+            case "maxplayer":
+            case "maxplayers":
+                if(!isset($args[1]) or trim($args[1]) = "")break;
+                elseif(preg_match("[1-1000]", trim($args[1]) < 1){
+                    $sender->sendMessage("[TouchIt] Invalid value.");
+                    return true;
+                }elseif((int) trim($args[1]) > (int) Server::getInstance()->getMaxPlayers()){
+                    $sender->sendMessage("[TouchIt] Value must be less than server max players.");
+                }else{
+                    $this->config->set("maxPeople", (int) trim($args[1]));
+                    $sender->sendMessage("[TouchIt] Max players per world set to ".trim($args[1]).".");
+                }
+                return true;
+            case "name":
+            case "title":
+            case "line1":
+                if(!isset($args[1]) or trim($args[1]) = "")break;
+                $sender->sendMessage("[TouchIt] Sign title set to ".trim($args[1]).".");
+                $this->update();
                 return true;
         }
         return false
