@@ -18,7 +18,6 @@ class SignManager extends \Thread{
         $this->config = $config;
         $this->database = $database;
         $this->stop = false;
-        $this->start();
     }
     
     public function run(){
