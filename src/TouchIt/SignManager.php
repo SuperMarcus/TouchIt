@@ -20,6 +20,16 @@ class SignManager extends \Thread{
         $this->stop = false;
     }
     
+    public function onCommand(CommandSender $sender, Command $command, $label, array $args){
+        switch($args[0]){
+            case "update":
+                $this->update();
+                $sender->sendMessage("[TouchIt] Updating...");
+                return true;
+        }
+        return false
+    }
+    
     public function run(){
         if($this->isRunning())return;
         while(!$this->stop){
