@@ -5,7 +5,7 @@ use TouchIt\TouchIt;
 use TouchIt\DataProvider\Provider;
 
 class CNFDataProvider implements Provider{
-    private $touchit, $lock, $path;
+    private $touchit, $lock, $path, $intList;
     public $data, $file;
     
     public function __construct(TouchIt $touchit, $path){
@@ -102,6 +102,7 @@ class CNFDataProvider implements Provider{
             "autoDeleteSign" => true,
 			"checkLevel" => true,
 			"ticks" => 10,
+			"createTimeout" => 90,
 			"enable" => true
     	];
     	$this->save();
@@ -136,6 +137,8 @@ class CNFDataProvider implements Provider{
 			}
 			
 			$this->data['maxPeople'] = (int) $this->data['maxPeople'];
+			$this->data['ticks'] = (int) $this->data['ticks'];
+			$this->data['createTimeout'] = (int) $this->data['createTimeout'];
         }else{
             $this->lock = true;
             return;
