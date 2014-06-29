@@ -20,7 +20,7 @@ class SignManager extends \Thread{
         $this->stop = false;
     }
     
-    public function onCommand(CommandSender $sender, Command $command, $label, array $args){
+    public function onCommand($sender, $command, $label, $args){
         switch(strtolower($args[0])){
             case "update":
                 $this->update();
