@@ -143,33 +143,31 @@ class SignManager extends \Thread{
     public function onUpdate(){
         $contents = $this->database->getContents();
         while($sign = $contents->getNext()){
-            if(!$sign->isFromLevelLoaded()){
+            $event = new UpdateSignEvent($this->touchit, $sign, array(
+                "[".$this->config("name")."]",
+                $sign->getDescription(),
+                ($this->config("showCount", true) ? "Players count" : $this->config("informationLine1", "Tap sign")),
+                ($this->config("showCount", true) ? "[".min(count($sign->getToLevel()->getPlayers()), (int) $this->config("maxPeople"))."/".$this->config("maxPeople", 20)."]" : $this->config("informationLine2", "to teleport"))
+            ));
+            if(!$sign->isFromLevelLoaded()){//sign's level not loaded.
                 $this->touchit->getLogger()->debug("[TouchIt] Teleport sign: ".$sign->getId()." Has not been update. (Level: ".$sign->getFromLevel(true)." Not Loaded)");
                 continue;
-            }
-            if(!$sign->isToLevelLoaded()){
+            }elseif(!$sign->isToLevelLoaded()){//target level not loaded
                 $this->touchit->getLogger()->debug("[TouchIt] Teleport sign: ".$sign->getId()." Updated with an error. (Target level: ".$sign->getToLevel(true)." Not Loaded)");
-                $tile = $sign->getTile();
-                if($tile instanceof Sign){
-                    $tile->setText("[".$this->config->get("name", "Teleport")."]", "NOT OPEN", ($this->config->get("showCount", false) ? "* * *" : $this->config->get("informationLine1", "Choose")), ($this->config->get("showCount", false) ? "* * *" : $this->config->get("informationLine2", "onther level")));
-                }
-                continue;
+                $event->setText("[".$this->config->get("name", "Teleport")."]", "NOT OPEN", ($this->config->get("showCount", false) ? "* * *" : $this->config->get("informationLine1", "Choose")), ($this->config->get("showCount", false) ? "* * *" : $this->config->get("informationLine2", "onther level")));
+            }elseif(count($sign->getToLevel()->getPlayers()) >= (int) $this->config("maxPeople", 20)){//player full
+                $event->setText("[".$this->config("name", "Teleport")."]", "Level is full!", $this->config("informationLine1", "-----------"), $this->config($this->config("informationLine2", "* * *")));
             }
-            $tile = $sign->getTile();
-            if($tile instanceof Sign){
-                Server::getInstance()->getPluginManager()->callEvent($event = new UpdateSignEvent($this->touchit, $sign, array(
-                    "[".$this->config("name")."]",
-                    $sign->getDescription(),
-                    ($this->config("showCount", true) ? "Players count" : $this->config("informationLine1", "Tap sign")),
-                    ($this->config("showCount", true) ? "[".min(count($sign->getToLevel()->getPlayers()), (int) $this->config("maxPeople"))."/".$this->config("maxPeople", 20)."]" : $this->config("informationLine2", "to teleport"))
-                )));
-                if($event->isCancelled()){
+            
+            if(($tile = $sign->getTile()) instanceof Sign){
+                Server::getInstance()->getPluginManager()->callEvent($event);
+                if($event->isCancelled()){//this event could be cancelled
                     $this->touchit->getLogger()->debug("[TouchIt] An update has been cancelled by event.");
                     continue;
                 }
                 $text = $event->getText();
-                $tile->setText($event[0], $event[1], $event[2], $event[3]);
-            }else{
+                $tile->setText($text[0], $text[1], $text[2], $text[3]);
+            }else{//tile could not be found. removed?
                 $this->touchit->getLogger()->debug("[TouchIt] An non-existent sign has been found in database. (ID: ".$sign->getId().")");
                 if($this->config("autoDeleteSign", true)){
                     $this->database->exec("DELETE FROM sign WHERE id = ".$sign->getId());
