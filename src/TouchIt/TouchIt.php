@@ -34,6 +34,6 @@ class TouchIt extends PluginBase implements CommandExecutor{
     
     public function onCommand(CommandSender $sender, Command $command, $label, array $args){
         return $this->signManager->onCommand(CommandSender $sender, Command $command, $label, array $args);
-	}
+    }
 }
 ?>
