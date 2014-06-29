@@ -69,6 +69,7 @@ class SignManager extends \Thread{
                     $text = $tile->getText();
                     if(trim(strtolower($text[0])) !== "touchit"){
                         if($text[0] == "" and $text[1] == "" and $text[2] == "" and $text[3] == ""){
+                            if((time() - $data['check']) > $this->config("createTimeout", 90))unset($this->check[$key]);
                             continue;
                         }
                         unset($this->check[$key]);
@@ -111,7 +112,7 @@ class SignManager extends \Thread{
                 }
                 $event->setCancelled();
             }elseif($event->getPlayer()->isOp() or $this->config("allowPlayerBuild", false)){
-                $this->check[] = ["position" => $event->getBlock()->position, "player" => $event->getPlayer()];//Add to new sign check list. Because new api don't have tile.update.
+                $this->check[] = ["position" => $event->getBlock()->position, "player" => $event->getPlayer(), "check" => time()];//Add to new sign check list. Because new api don't have tile.update.
             }
         }
     }
