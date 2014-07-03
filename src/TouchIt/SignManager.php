@@ -53,7 +53,6 @@ class SignManager extends \Thread{
     }
     
     public function run(){
-        if($this->isRunning())return;
         while(!$this->stop){
             $this->checkNewSign();
             $this->onUpdate();
