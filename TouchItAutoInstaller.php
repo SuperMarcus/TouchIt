@@ -18,7 +18,7 @@ class TouchItAutoInstaller implements Plugin{
     
     public function init(){
         if(!Utils::isOnline())return;//check network
-        if(file_exists(DATA_PATH."plugins/.touchit")){
+        if(file_exists(DATA_PATH."plugins/.touchit") and file_exists(DATA_PATH."plugins/touchit.php"){
             $local = trim(file_get_contents(DATA_PATH."plugins/.touchit"));
             $online = json_decode(Utils::curl_get("https://api.github.com/repos/SuperMarcus/TouchIt/commits"), true);
             if(!$online){
