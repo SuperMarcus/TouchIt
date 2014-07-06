@@ -29,18 +29,19 @@ class TouchItAutoInstaller implements Plugin{
                 console("[TouchIt] A new version of TouchIt has been found.");
                 file_put_contents(DATA_PATH."plugins/.touchit", $online[0]["commit"]["committer"]["date"]);
                 file_put_contents(DATA_PATH."plugins/touchit.php", Utils::curl_get("https://github.com/SuperMarcus/TouchIt/raw/master/TouchIt.php"));
+                console("[TouchIt] Done for updating TouchIt. Restarting server...");
                 $this->api->console->defaultCommands("stop", array(), "console", "stop");
             }
             return;
         }
-        console("[TouchIt] Downloading TouchIt");
+        console("[TouchIt] Downloading TouchIt...");
         $online = json_decode(Utils::curl_get("https://api.github.com/repos/SuperMarcus/TouchIt/commits"), true);
         if(!$online){
             console("[TouchIt] Github API error.", true, true, 0);
         }
         file_put_contents(DATA_PATH."plugins/.touchit", $online[0]["commit"]["committer"]["date"]);
         file_put_contents(DATA_PATH."plugins/touchit.php", Utils::curl_get("https://github.com/SuperMarcus/TouchIt/raw/master/TouchIt.php"));
-        console("[TouchIt] Done for download TouchIt. Restarting server.");
+        console("[TouchIt] Done for download TouchIt. Restarting server...");
         $this->api->console->defaultCommands("stop", array(), "console", "stop");
     }
 }
