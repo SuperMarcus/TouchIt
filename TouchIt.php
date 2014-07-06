@@ -4,7 +4,7 @@
 __PocketMine Plugin__
 name=TouchIt
 description=A sign portal system.
-version=1.1
+version=1.2
 apiversion=12,13
 author=Marcus
 class=touchIt
