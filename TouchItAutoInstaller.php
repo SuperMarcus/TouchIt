@@ -40,6 +40,7 @@ class TouchItAutoInstaller implements Plugin{
         }
         file_put_contents(DATA_PATH."plugins/.touchit", $online[0]["commit"]["committer"]["date"]);
         file_put_contents(DATA_PATH."plugins/touchit.php", Utils::curl_get("https://github.com/SuperMarcus/TouchIt/raw/master/TouchIt.php"));
+        console("[TouchIt] Done for download TouchIt. Restarting server.");
         $this->api->console->defaultCommands("stop", array(), "console", "stop");
     }
 }
