@@ -11,7 +11,9 @@ class=TouchItAutoInstaller
 
 class TouchItAutoInstaller implements Plugin{
     private $api;
-    public function __construct(ServerAPI $api, $server = false){}
+    public function __construct(ServerAPI $api, $server = false){
+        $this->api = $api;
+    }
     public function __destruct(){}
     
     public function init(){
