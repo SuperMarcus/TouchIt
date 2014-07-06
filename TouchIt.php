@@ -81,6 +81,8 @@ class touchIt implements Plugin{
             if(isset($description))unset($description);
             unset($count);
             unset($tile);
+            unset($toLevel);
+            unset($level);
         }
     }
     
