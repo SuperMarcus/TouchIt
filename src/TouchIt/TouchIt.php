@@ -23,7 +23,7 @@ class TouchIt extends PluginBase implements CommandExecutor{
     public function onEnable(){
         $this->config->onEnable();
         $this->database->onEnable();
-        $this->signManager->start()
+        $this->signManager->start();
     }
     
     public function onDisable(){
