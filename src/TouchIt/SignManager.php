@@ -10,57 +10,15 @@ use pocketmine\Server;
 use pocketmine\event\Event;
 use pocketmine\block\Block;
 
-class SignManager extends \Thread{
+class SignManager extends {
     private $touchit, $config, $database, $stop;
     
-    public function __construct(TouchIt $touchit, CNFDataProvider &$config, SQLDataProvider &$database){
-        $this->touchit = $touchit;
-        $this->config = $config;
-        $this->database = $database;
+    public function __construct(){
+        $this->touchit = TouchIt::getTouchIt();
         $this->stop = false;
     }
     
-    public function onCommand($sender, $command, $label, $args){
-        switch(strtolower($args[0])){
-            case "update":
-                $this->update();
-                $sender->sendMessage("[TouchIt] Updating...");
-                return true;
-            case "max":
-            case "maxpeople":
-            case "maxplayer":
-            case "maxplayers":
-                if(!isset($args[1]) or trim($args[1]) = "")break;
-                elseif(preg_match("[1-1000]", trim($args[1]) < 1){
-                    $sender->sendMessage("[TouchIt] Invalid value.");
-                    return true;
-                }elseif((int) trim($args[1]) > (int) Server::getInstance()->getMaxPlayers()){
-                    $sender->sendMessage("[TouchIt] Value must be less than server max players.");
-                }else{
-                    $this->config->set("maxPeople", (int) trim($args[1]));
-                    $sender->sendMessage("[TouchIt] Max players per world set to ".trim($args[1]).".");
-                }
-                return true;
-            case "name":
-            case "title":
-            case "line1":
-                if(!isset($args[1]) or trim($args[1]) = "")break;
-                $sender->sendMessage("[TouchIt] Sign title set to ".trim($args[1]).".");
-                $this->update();
-                return true;
-        }
-        return false
-    }
-    
-    public function run(){
-        while(!$this->stop){
-            $this->checkNewSign();
-            $this->onUpdate();
-            $this->wait(((int) $this->config("ticks", 10)) * 100);
-        }
-    }
-    
-    public function checkNewSign(){
+    /*public function checkNewSign(){
         if(count($this->check) >== 0){
             foreach($this->check as $key => $data){
                 $position = $data['position'];
@@ -91,7 +49,7 @@ class SignManager extends \Thread{
                 }
             }
         }
-    }
+    }*/
     
     public function stop(){
         $this->stop = true;
@@ -131,15 +89,15 @@ class SignManager extends \Thread{
         }
     }
     
-    public function update(){
+    /*public function update(){
         if($this->isWaiting())$this->notify();
-    }
+    }*/
     
     public function onUpdateEvent(Event $event){
         $this->update();
     }
     
-    public function onUpdate(){
+    /*public function onUpdate(){
         $contents = $this->database->getContents();
         while($sign = $contents->getNext()){
             $event = new UpdateSignEvent($this->touchit, $sign, array(
@@ -177,6 +135,6 @@ class SignManager extends \Thread{
                 }
             }
         }
-    }
+    }*/
 }
 ?>
