@@ -2,10 +2,6 @@
 namespace TouchIt;
 
 use pocketmine\plugin\PluginBase;
-use pocketmine\command\CommandExecutor;
-use pocketmine\utils\TextFormat;
-use pocketmine\command\CommandSender;
-use pocketmine\command\Command;
 use TouchIt\DataProvider\CNFDataProvider;
 use TouchIt\DataProvider\Provider;
 use TouchIt\DataProvider\SQLDataProvider;
