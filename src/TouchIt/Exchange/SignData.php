@@ -43,6 +43,10 @@ class SignData implements ExchangeInformation{
         return new Position((int) $this->data['x'], (int) $this->data['y'], (int) $this->data['z'], $this->getLevel());
     }
     
+    public function getId(){
+        return ((string) $this->data['x']).((string) $this->data['y']).((string) $this->data['z']).((string) $this->data['signLevel']);
+    }
+    
     public function getTile(){
         if(!($level = $this->getLevel()))return false;
         return $level->getTile($this->getPosition());
