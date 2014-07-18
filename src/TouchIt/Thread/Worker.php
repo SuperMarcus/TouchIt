@@ -21,7 +21,7 @@ abstract class Worker extends \Thread{
     public final function run(){
         $this->setKillStop();
         $this->pool->startThread($this->getCurrentThreadId(), get_class($this));
-        while($this->onRun() === true){
+        while(@$this->onRun() === true){
             usleep(300);//to save cpu
         }
         $this->pool->stopThread($this->getCurrentThreadId());
