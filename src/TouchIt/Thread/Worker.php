@@ -21,7 +21,9 @@ abstract class Worker extends \Thread{
     public final function run(){
         $this->setKillStop();
         $this->pool->startThread($this->getCurrentThreadId(), get_class($this));
-        $this->onRun();
+        while($this->onRun() === true){
+            usleep(300);//to save cpu
+        }
         $this->pool->stopThread($this->getCurrentThreadId());
     }
     
@@ -30,6 +32,7 @@ abstract class Worker extends \Thread{
         usleep(70);
         if($this->isRunning() and $this->kill){
             $this->kill();
+            $this->pool->stopThread($this->getCurrentThreadId());
         }
     }
     
