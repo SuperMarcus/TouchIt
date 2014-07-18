@@ -11,57 +11,41 @@ class SignData implements ExchangeInformation{
     public $data;
     private $check;
     
-    public function __construct($query, \SQLite3 $database){
-        $this->check = false;
-        if(!$query or $query instanceof \SQLite3Result)return;
-        $this->data = $query->fetchArray(SQLITE3_ASSOC);
-        if(!$this->data or !is_array($this->data))return;
-        if($this->data['hasDescription'] == 1){
-            $this->data['hasDescription'] = true;
-            $this->data['description'] = $database->query("SELECT description FROM description WHERE id = ".$this->data['id'].";")->fetchArray(SQLITE3_ASSOC)['description'];
-        }else $this->data['hasDescription'] = false;
-    }
-    
-    public function hasDescription(){
-        return $this->data['hasDescription'];
+    public function __construct($data){
+        $this->data = $data;
     }
     
     public function getDescription(){
-        if($this->data['hasDescription'])return $this->data['description'];
-        else return "To: ".$this->data['toLevel'];
+        return $this->data['description'];
     }
     
-    public function isToLevelLoaded(){
-        return Server::getInstance()->isLevelLoaded($this->data['toLevel']);
+    public function isTargetLevelLoaded(){
+        return Server::getInstance()->isLevelLoaded($this->data['targetLevel']);
     }
     
     public function isFromLevelLoaded(){
-        return Server::getInstance()->isLevelLoaded($this->data['level']);
+        return Server::getInstance()->isLevelLoaded($this->data['signLevel']);
     }
     
-    public function getToLevel($name = false){
-        if($name)return $this->data['toLevel'];
-        if($this->isToLevelLoaded())return Server::getInstance()->getLevelByName($this->data['toLevel']);
+    public function getTargetLevel($name = false){
+        if($name)return $this->data['targetLevel'];
+        if($this->isTargetLevelLoaded())return Server::getInstance()->getLevelByName($this->data['targetLevel']);
         else return false;
     }
     
-    public function getFromLevel($name = false){
-        if($name)return $this->data['level'];
-        if($this->isToLevelLoaded())return Server::getInstance()->getLevelByName($this->data['level']);
+    public function getLevel($name = false){
+        if($name)return $this->data['signLevel'];
+        if($this->isToLevelLoaded())return Server::getInstance()->getLevelByName($this->data['signLevel']);
         else return false;
     }
     
     public function getPosition(){
-        return new Position((int) $this->data['x'], (int) $this->data['y'], (int) $this->data['z'], $this->getFromLevel());
+        return new Position((int) $this->data['x'], (int) $this->data['y'], (int) $this->data['z'], $this->getLevel());
     }
     
     public function getTile(){
-        if(!($level = $this->getFromLevel()))return false;
+        if(!($level = $this->getLevel()))return false;
         return $level->getTile($this->getPosition());
-    }
-    
-    public function getId(){
-        return $this->data['id'];
     }
 }
 ?>
