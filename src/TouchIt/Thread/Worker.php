@@ -27,6 +27,10 @@ abstract class Worker extends \Thread{
         $this->pool->stopThread($this->getCurrentThreadId());
     }
     
+    public final function getPool(){
+        return $this->pool;
+    }
+    
     public final function stopThread(){
         $this->onStop();
         usleep(70);
