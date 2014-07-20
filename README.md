@@ -1,7 +1,7 @@
 TouchIt
 =======
 
-This is a sign portal system.
+This is a multifunctional sign system.
 
 WARNING
 ------
