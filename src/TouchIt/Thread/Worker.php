@@ -40,12 +40,12 @@ abstract class Worker extends \Thread{
         }
     }
     
-    public final function startThread(){
-        $this->start();
+    public final function setPool(Pool $pool){
+        $this->pool = $pool;
     }
     
-    public final function __construct(Pool $pool){
-        $this->pool = $pool;
+    public final function startThread(){
+        $this->start();
     }
 }
 ?>
