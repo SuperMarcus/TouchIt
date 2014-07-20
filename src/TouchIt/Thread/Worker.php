@@ -25,6 +25,8 @@ abstract class Worker extends \Thread{
             usleep(300);//to save cpu
         }
         $this->pool->stopThread($this->getCurrentThreadId());
+        $this->pool->removeThread(get_class($this));
+        exit(0);
     }
     
     public final function getPool(){
