@@ -40,8 +40,9 @@ abstract class Worker extends \Thread{
         }
     }
     
-    public final function setPool(Pool $pool){
+    public final function submitThread(Pool $pool){
         $this->pool = $pool;
+        return get_class($this);
     }
     
     public final function startThread(){
