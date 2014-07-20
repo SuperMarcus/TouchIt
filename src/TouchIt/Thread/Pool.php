@@ -5,14 +5,25 @@ use TouchIt\Pool\Worker;
 use TouchIt\TouchIt;
 
 class Pool implements Countable{
-    private $workers, $working;
+    private $workers, $working, $isEnable;
     
     public function __construct(){
         $this->workers = [];
         $this->working = [];
     }
     
+    /**
+     * Submit a worker to pool
+     * 
+     * @param Worker $worker
+     */
+    public function submitWorker(Worker $worker){
+        $this->workers[$worker->submitThread($this)] = $worker;
+        if($this->isEnable)$worker->startThread();
+    }
+    
     public function onEnable(){
+        $this->isEnable = true;
         foreach($this->workers as $worker){
             $worker->startThread();
         }
@@ -22,7 +33,18 @@ class Pool implements Countable{
         }
     }
     
+    public function removeThread($description){
+        if(isset($this->working[$description])){
+            if(isset($this->workers[$description])){
+                $this->workers[$description]->stopThread();
+            }
+        }
+        unset($this->workers[$description]);
+        unset($this->working[$description]);
+    }
+    
     public function onDisable(){
+        $this->isEnable = false;
         foreach($this->workers as $worker){
             $worker->stopThread();
         }
@@ -32,13 +54,14 @@ class Pool implements Countable{
         }
     }
     
-    public function getThreadDescription($id){
-        if(isset($this->working[$id]))return $this->working[$id];
+    public function getThreadId(string $class){
+        if(isset($this->working[$class]))return $this->working[$class];
         else return null;
     }
     
     public function startThread($id, $description = false){
-        $this->working[$id] = $description;
+        if(isset($this->workers[$description]))$this->working[$description] = $id;
+        else TouchIt::getTouchIt()->getLogger()->debug("[TouchIt] Could not start an none-register thread. (Thread ID: ".$id." , Thread: ".(string) $description.")");
     }
     
     public function stopThread($id){
