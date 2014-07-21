@@ -1,1 +1,2 @@
-CREATE TABLE sign
+CREATE TABLE sign (
+)
