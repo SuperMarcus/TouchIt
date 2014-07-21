@@ -8,93 +8,139 @@ use TouchIt\Exchange\SignContentsData;
 use pocketmine\tile\Sign;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
+use pocketmine\Server;
 
 class SQLDataProvider implements Provider{
-    private $database, $main, $lock;
+    private $database;
     
-    public function __construct(TouchIt $touchit){
-        $this->lock = true;
-        $this->main = $touchit;
+    public function __construct(){}
+    
+    public function create(Sign $sign){
+    	$text = $sign->getText();
+    	if(substr($text[3], 0, 1) === "/"){
+    		
+    	}
+    }
+    
+    public function exists(Position $pos){
+    	$query = $this->database->query("SELECT * FROM index WHERE id = ".$this->getId($pos));
+    	if($data instanceof \SQLite3Result){
+    		$id = $data->fetchArray(SQLITE3_ASSOC);
+    		return isset($id['id']) and $id['id'] === $this->getId($pos);
+    	}
+    	return false;
+    }
+    
+    public function remove(Position $pos){
+    	if($this->exists($pos)){
+    		$data = $this->database->query("SELECT * FROM index WHERE id = ".$this->getId($pos));
+    		if($data instanceof \SQLite3Result){
+    			$data = $data->fetchArray(SQLITE3_ASSOC);
+    			if(isset($data['id'] and $data['id'] === $this->getId($pos))){
+    				switch((int) $data['type']){
+    					case TouchIt::SIGN_TELEPORT:
+    					    return $this->database->exec("DELETE FROM index WHERE id = ".$this->getId($pos)) and $this->database->exec("DELETE FROM teleport WHERE id = ".$this->getId($pos));
+    					    break;
+    					case TouchIt::SIGN_COMMAND:
+    						return $this->database->exec("DELETE FROM index WHERE id = ".$this->getId($pos)) and $this->database->exec("DELETE FROM command WHERE id = ".$this->getId($pos));
+    						break;
+    					default:
+    						return $this->database->exec("DELETE FROM index WHERE id = ".$this->getId($pos));
+    				}
+    			}
+    		}
+    	}
+    	return false;
+    }
+    
+    public function getAll(){
+    	$query = $this->database->query("SELECT * FROM index WHERE id = ".$this->getId($pos).";");
+    	$result = [];
+    	if($query instanceof \SQLite3Result){
+    		while($data = $query->fetchArray(SQLITE3_ASSOC)){
+    			$level = Server::getInstance()->getLevelByName($data['level']);
+    			if(!$level)continue;
+    			$vector = explode("_", $data['id']);
+    			$info = $this->get(new Position((int) $vector[0], (int) $vector[1], (int) $vector[2], $level));
+    			if($info !== null)$result[] = $info;
+    			unset($info);
+    			unset($vector);
+    			unset($level);
+    		}
+    	}
+    	return $result;
+    }
+    
+    public function get(Position $pos){
+    	if(!($pos->getLevel() instanceof Level))return null;
+    	
+    	$query = $this->database->query("SELECT * FROM index WHERE id = ".$this->getId($pos).";");
+    	if($query instanceof \SQLite3Result){
+    		$data = $query->fetchArray(SQLITE3_ASSOC);
+    		$query->finalize();
+    		unset($query);
+    		if(isset($data['id']) and $data['id'] === $this->getId($pos)){
+    			switch((int) $data['type']){
+    				case TouchIt::SIGN_TELEPORT:
+    					$query = $this->database->query("SELECT * FROM teleport WHERE id = ".$this->getId($pos).";");
+    					unset($data);
+    					if($query instanceof \SQLite3Result){
+    						$data = $query->fetchArray(SQLITE3_ASSOC);
+    					    if(isset($data['id']) and $data['id'] === $this->getId($pos)){
+    					    	return [
+    					    		"type" => TouchIt::SIGN_TELEPORT,
+    					    		"position" => $pos,
+    					    		"target" => $data['target'],
+    					    		"level" => $data['level'],
+    					    		"description" => $data['description']
+    					    	];
+    					    }
+    					}
+    					break;
+    				case TouchIt::SIGN_COMMAND:
+    					$query = $this->database->query("SELECT * FROM command WHERE id = ".$this->getId($pos).";");
+    					unset($data);
+    					if($query instanceof \SQLite3Result){
+    						$data = $query->fetchArray(SQLITE3_ASSOC);
+    						if(isset($data['id']) and $data['id'] === $this->getId($pos)){
+    					    	return [
+    					    		"type" => TouchIt::SIGN_COMMAND,
+    					    		"position" => $pos,
+    					    		"command" => $data['command'],
+    					    		"description" => $data['description']
+    					    	];
+    					    }
+    					}
+    					break;
+    				case TouchIt::SIGN_BOARDCASE:
+    					return ["type" => TouchIt::SIGN_BOARDCASE];
+    					break;
+    			}
+    		}
+    	}
+    	return null;
     }
     
     public function onEnable(){
-    	$this->lock = false;
     	$this->loadDataBase();
     }
     
     public function onDisable(){
     	$this->database->close();
     	unset($this->database);
-    	$this->lock = true;
     }
     
-    public function unlock(){
-    	$this->lock = false;
-    }
-    
-    public function lock(){
-    	$this->lock = true;
-    }
-    
-    public function isLocked(){
-    	return (bool) $this->lock;
-    }
-    
-    public function getContents(){
-    	if($this->isLocked())return false;
-    	return new SignContentsData($this->database);
-    }
-    
-    public function removeSign(Position $pos){
-    	if($this->isLocked())return false;
-    	$sign = $this->database->query("SELECT * FROM sign WHERE level = '".$pos->getLevel->getName()."' AND x = ".(int) $pos->x." AND y = ".(int) $pos->y." AND z = ".(int) $pos->z.";");
-    	if(!sign or !($sign instanceof SQLite3Result))return false;
-    	$sign = $sign->fetchArray(SQLITE3_ASSOC);
-    	if(!isset($sign['id']))return false;
-    	if($sign['hasDescription'] == 1){
-    		$this->database->exec("DELETE FROM description WHERE id = ".$sign['id']);
-    	}
-    	return $this->database->exec("DELETE FROM sign WHERE id = ".$sign['id']);
-    }
-    
-    public function getSign(Position $pos){
-    	if($this->isLocked())return false;
-        $level = $pos->getLevel();
-        if(!$level or ($level instanceof Level) === false)return false;
-        if($level->getBlock($pos)->getID !== Block::WALL_SIGN or $level->getBlock($pos)->getID !== Block::SIGN_POST)return false;
-        $query = $this->sql->query("SELECT * FROM sign WHERE level = '".$data["player"]->level->getName()."' AND x = ".(int) $data["target"]->x." AND y = ".(int) $data["target"]->y." AND z = ".(int) $data["target"]->z.";");//get data
-        if(!($query instanceof \SQLite3Result and $query->fetchArray(SQLITE3_ASSOC) !== false and $query->fetchArray(SQLITE3_ASSOC) !== true))return false;
-        return new SignData($query, $this->database);
-    }
-    
-    public function addSign(Sign $sign){
-    	if($this->isLocked())return false;
-        $text = $sign->getText();
-        $level = $sign->getLevel();
-        if(!$level or ($level instanceof Level) === false)return false;
-        $this->database->exec("INSERT INTO sign(level, toLevel, x, y, z, hasDescription) VALUES ('".$level->getName()."', '".trim($text[2])."', ".(int) $sign->x.", ".(int) $sign->y.",".(int) $sign->z.", ".(($text[1] === "")?"0":"1").")");//Write to DataBase
-        if($text[1] !== ""){//Write description
-			$id = $this->database->query("SELECT id FROM sign WHERE hasDescription = 1 AND level = '".$level->getName()."' AND toLevel = '".$text[2]."' AND x = ".$sign->x." AND y = ".$sign->y." AND z = ".$sign->z.";")->fetchArray(SQLITE3_ASSOC)['id'];
-            $this->database->exec("INSERT INTO description(id, description) VALUES (".$id.", '".$text[1]."')");
-		}
-		return true;
+    private function getId(Position $pos){
+    	return $pos->getFloorX()."_".$pos->getFloorY()."_".$pos->getFloorZ()."_".$pos->getLevel()->getName();
     }
     
     private function loadDataBase(){
-    	if($this->isLocked())return;
-        if(!extension_loaded("sqlite3")){
-            $this->lock = true;
-            return;
-        }
-        if($this->main->isPhar()){
-            @mkdir($this->main->getFile().DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR);
-            $this->database = new \SQLite3($this->main->getFile().DIRECTORY_SEPARATOR."data".DIRECTORY_SEPARATOR, SQLITE3_OPEN_READWRITE|SQLITE3_OPEN_CREATE);
-        }else{
-            @mkdir($this->main->getDataFolder());
-            $this->database = new \SQLite3($this->main->getDataFolder(), SQLITE3_OPEN_READWRITE|SQLITE3_OPEN_CREATE);
-        }
-        $this->database->exec("CREATE TABLE IF NOT EXISTS sign(id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, level TEXT NOT NULL, toLevel TEXT NOT NULL, x INTEGER NOT NULL, y INTEGER NOT NULL, z INTEGER NOT NULL, hasDescription INTEGER DEFAULT 0)");
-        $this->database->exec("CREATE TABLE IF NOT EXISTS description(id INTEGER PRIMARY KEY NOT NULL, description STRING NOT NULL)");
+    	if(file_exists(TouchIt::getTouchIt()->getDataFolder()."data.db")){
+    		$this->database = new \SQLite3(TouchIt::getTouchIt()->getDataFolder()."data.db", SQLITE3_OPEN_READWRITE|SQLITE3_OPEN_CREATE);
+    		$this->database->exec(stream_get_contents(TouchIt::getTouchIt()->getResource("database/sqlite3.sql")));
+    	}else{
+    		$this->database = new \SQLite3(TouchIt::getTouchIt()->getDataFolder()."data.db", SQLITE3_OPEN_READWRITE);
+    	}
     }
 }
 ?>
