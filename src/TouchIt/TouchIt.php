@@ -10,8 +10,8 @@ use TouchIt\SignManager;
 
 class TouchIt extends PluginBase{
     const SIGN_TELEPORT = 0;
-	const SIGN_COMMAND = 1;
-	const SIGN_BOARDCASE = 2;
+    const SIGN_COMMAND = 1;
+    const SIGN_BOARDCASE = 2;
 	
     private $objects;
     
