@@ -17,9 +17,19 @@ class SQLDataProvider implements Provider{
     
     public function create(Sign $sign){
     	$text = $sign->getText();
-    	if(substr($text[3], 0, 1) === "/"){
-    		
+    	$type = 0;
+    	if(substr(trim($text[2]), 0, 1) === "/"){
+    		$type = TouchIt::SIGN_COMMAND;
+    		$command = substr(trim($text[2]), 1).trim($text[3]);
+    		$this->database->exec("INSERT INTO command (id, command, description) VALUES ('".$this->getId($sign)."', '".$command."', '".((trim($text[1]) === "") ? "Tap to run command." : trim($text[1]))."')");
+    	}elseif(trim($text[1]) === "" and trim($text[2]) === "" and trim($text[3]) === ""){
+    	    $type = TouchIt::SIGN_BOARDCASE;
+    	}else{
+    	    $type = TouchIt::SIGN_TELEPORT;
+    	    $this->database->exec("INSERT INTO teleport (id, level, target, description) VALUES ('".$this->getId($sign)."', '".$sign->getLevel()->getName()."', '".trim($text[2])."', '".((trim($text[3]) === "") ? "To: ".trim($text[2]) : trim($text[3]))."')");
     	}
+    	$this->database->exec("INSERT INTO index (id, type) VALUES ('".$this->getId($sign)."', ".$type.")");
+    	return $type;
     }
     
     public function exists(Position $pos){
