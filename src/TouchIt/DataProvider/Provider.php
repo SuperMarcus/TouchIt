@@ -48,7 +48,7 @@ interface Provider{
      */
     public function create(Sign $sign);
     
-    /** Load method */
+    /** preload method */
     public function onEnable();
     public function onDisable();
 }
