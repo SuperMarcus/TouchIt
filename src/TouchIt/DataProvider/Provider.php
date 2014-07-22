@@ -40,8 +40,11 @@ interface Provider{
     
     /**
      * Use to add sign to database or filesystem
+     * This method will return the type of this sign
      * 
      * @param Sign $sign
+     * 
+     * @return int
      */
     public function create(Sign $sign);
     
