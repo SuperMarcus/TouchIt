@@ -2,25 +2,25 @@
 # Pyramid development team 2014
 
 # The title
-name=Teleport
+name: Teleport
 
 # Maximum number of persons in one level
-maxPeople=20
+maxPeople: 20
 
 # Switch on this option to show count on sign
-showCount=on
+showCount: true
 
 # Switch on this option to show a warning when some level is full
-showFull=on
+showFull: true
 
 # Switch on this option to allow none-op player to build touchit sign
-allowPlayerBuild=off
+allowPlayerBuild: false
 
 # Switch on this option to allow none-op player break touchit sign
-allowPlayerBreak=off
+allowPlayerBreak: false
 
 # Check level is loaded when building the teleport sign
-checkLevel=on
+checkLevel: true
 
 # For the time between place and write the sign
-createTimeout=40
+createTimeout: 40
