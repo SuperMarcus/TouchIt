@@ -2,7 +2,7 @@
 namespace TouchIt;
 
 use pocketmine\plugin\PluginBase;
-use TouchIt\DataProvider\CNFDataProvider;
+use TouchIt\ConfigAccessor;
 use TouchIt\DataProvider\Provider;
 use TouchIt\DataProvider\SQLDataProvider;
 use TouchIt\Listener\EventListener;
@@ -31,7 +31,7 @@ class TouchIt extends PluginBase{
     public function onLoad(){
         $this->objects = [//The providers and managers
             "manager" => new SignManager(),
-            "config" => new Config($this->getDataFolder()."Config.cnf"),
+            "config" => new ConfigAccessor($this->getDataFolder()."Config.cnf"),
             "data" => new SQLDataProvider(),
             "listener" => new EventListener()
         ];
