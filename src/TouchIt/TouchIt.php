@@ -15,6 +15,8 @@ class TouchIt extends PluginBase{
 	
     private $objects;
     
+    public static $lang = [];//TouchIt language profile
+    
     /** @var SignManager */
     public static $manager;
     /** @var Provider */
@@ -29,7 +31,7 @@ class TouchIt extends PluginBase{
     public function onLoad(){
         $this->objects = [//The providers and managers
             "manager" => new SignManager(),
-            "config" => new CNFDataProvider($this->getDataFolder()."Config.cnf"),
+            "config" => new Config($this->getDataFolder()."Config.cnf"),
             "data" => new SQLDataProvider(),
             "listener" => new EventListener()
         ];
@@ -38,6 +40,8 @@ class TouchIt extends PluginBase{
         self::$configProvider = $this->objects["config"];
         self::$dataProvider = $this->objects["data"];
         self::$listener = $this->objects["listener"];
+        
+        self::$lang = $this->["config"]->getLang();
         
         self::$main = $this;
     }
@@ -68,6 +72,13 @@ class TouchIt extends PluginBase{
      */
     public static function getConfigProvider(){
         return self::$configProvider;
+    }
+    
+    /**
+     * @return []
+     */
+    public static function getLang(){
+        return self::$lang;
     }
     
     /**
