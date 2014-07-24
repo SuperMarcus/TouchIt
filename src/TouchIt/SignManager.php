@@ -2,58 +2,31 @@
 namespace TouchIt;
 
 use TouchIt\TouchIt;
-use TouchIt\Exchange\signInfo;
-use TouchIt\DataProvider\CNFDataProvider;
-use TouchIt\DataProvider\SQLDataProvider;
-use TouchIt\Event\UpdateSignEvent;
+use TouchIt\DataProvider\Provider;
 use pocketmine\Server;
 use pocketmine\event\Event;
 use pocketmine\block\Block;
+use pocketmine\tile\Sign;
 
 class SignManager extends {
     private $touchit, $config, $database, $stop;
     
+    private $updates;
+    
     public function __construct(){
         $this->touchit = TouchIt::getTouchIt();
         $this->stop = false;
+        $this->isChoosing = false;
     }
     
-    /*public function checkNewSign(){
-        if(count($this->check) >== 0){
-            foreach($this->check as $key => $data){
-                $position = $data['position'];
-                if(($tile = $position->getLevel()->getTile($position)) !== false and $tile instanceof Sign){
-                    $text = $tile->getText();
-                    if(trim(strtolower($text[0])) !== "touchit"){
-                        if($text[0] == "" and $text[1] == "" and $text[2] == "" and $text[3] == ""){
-                            if((time() - $data['check']) > $this->config("createTimeout", 90))unset($this->check[$key]);
-                            continue;
-                        }
-                        unset($this->check[$key]);
-                        continue;
-                    }
-                    if(!Server::getInstance()->isLevelLoaded(trim($text[2])) and $this->config("checkLevel", true)){//To level not loaded
-                        if($data['player']->isOnline()){
-                            $data['player']->sendMessage("[Touchit] Level \"".trim($text[2])."\" is not loaded.");
-                            $tile->setText("[WARNING]", "----------", "Level ".trim($text[2]), "not loaded");
-                        }
-                        unset($this->check[$key]);
-                        continue;
-                    }
-                    if($data['player']->isOnline()){
-                        $data['player']->sendMessage("[Touchit] Done!");
-                    }
-                    $tile->setText("* * *", "* * *", "* * *", "* * *");
-                    $this->database->addSign($tile);
-                    unset($this->check[$key]);
-                }
-            }
-        }
-    }*/
+    public function addToUpdate($level){
+        $this->updates[] = $level;
+    }
     
-    public function stop(){
-        $this->stop = true;
-        $this->update();
+    public function needUpdates(){
+        $return = $this->updates;
+        $this->updates = [];
+        return $return;
     }
     
     public function onBlockPlace(BlockPlaceEvent $event){
@@ -88,53 +61,5 @@ class SignManager extends {
             }
         }
     }
-    
-    /*public function update(){
-        if($this->isWaiting())$this->notify();
-    }*/
-    
-    public function onUpdateEvent(Event $event){
-        $this->update();
-    }
-    
-    /*public function onUpdate(){
-        $contents = $this->database->getContents();
-        while($sign = $contents->getNext()){
-            $event = new UpdateSignEvent($this->touchit, $sign, array(
-                "[".$this->config("name")."]",
-                $sign->getDescription(),
-                ($this->config("showCount", true) ? "Players count" : $this->config("informationLine1", "Tap sign")),
-                ($this->config("showCount", true) ? "[".min(count($sign->getToLevel()->getPlayers()), (int) $this->config("maxPeople"))."/".$this->config("maxPeople", 20)."]" : $this->config("informationLine2", "to teleport"))
-            ));
-            if(!$sign->isFromLevelLoaded()){//sign's level not loaded.
-                $this->touchit->getLogger()->debug("[TouchIt] Teleport sign: ".$sign->getId()." Has not been update. (Level: ".$sign->getFromLevel(true)." Not Loaded)");
-                continue;
-            }elseif(!$sign->isToLevelLoaded()){//target level not loaded
-                $this->touchit->getLogger()->debug("[TouchIt] Teleport sign: ".$sign->getId()." Updated with an error. (Target level: ".$sign->getToLevel(true)." Not Loaded)");
-                $event->setText("[".$this->config->get("name", "Teleport")."]", "NOT OPEN", ($this->config->get("showCount", false) ? "* * *" : $this->config->get("informationLine1", "Choose")), ($this->config->get("showCount", false) ? "* * *" : $this->config->get("informationLine2", "onther level")));
-            }elseif(count($sign->getToLevel()->getPlayers()) >= (int) $this->config("maxPeople", 20)){//player full
-                $event->setText("[".$this->config("name", "Teleport")."]", "Level is full!", $this->config("informationLine1", "-----------"), $this->config($this->config("informationLine2", "* * *")));
-            }
-            
-            if(($tile = $sign->getTile()) instanceof Sign){
-                Server::getInstance()->getPluginManager()->callEvent($event);
-                if($event->isCancelled()){//this event could be cancelled
-                    $this->touchit->getLogger()->debug("[TouchIt] An update has been cancelled by event.");
-                    continue;
-                }
-                $text = $event->getText();
-                $tile->setText($text[0], $text[1], $text[2], $text[3]);
-            }else{//tile could not be found. removed?
-                $this->touchit->getLogger()->debug("[TouchIt] An non-existent sign has been found in database. (ID: ".$sign->getId().")");
-                if($this->config("autoDeleteSign", true)){
-                    $this->database->exec("DELETE FROM sign WHERE id = ".$sign->getId());
-                    if($sign->hasDescription()){
-                        $this->database->exec("DELETE FROM description WHERE id = ".$sign->getId());
-                    }
-                    $contents->delete($sign->getId());
-                }
-            }
-        }
-    }*/
 }
 ?>
