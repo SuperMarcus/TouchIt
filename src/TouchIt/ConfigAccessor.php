@@ -6,17 +6,6 @@ use TouchIt\TouchIt;
 class ConfigAccessor implements arrayaccess{
     private $data;
     
-    private static $valtype = [
-    	"maxPeople" => "intval",
-    	"createTimeout" => "intval",
-    	"showCount" => "boolval",
-    	"showFull" => "boolval",
-    	"allowPlayerBuild" => "boolval",
-    	"allowPlayerBreak" => "boolval",
-    	"autoDeleteSign" => "boolval",
-    	"checkLevel" => "boolval"
-    ];
-    
     public function __construct(){
     	$this->analyzeFile();
     }
