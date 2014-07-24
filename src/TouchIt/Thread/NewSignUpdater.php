@@ -29,9 +29,14 @@ class NewSignUpdater extends Worker{
                     if(!Server::getInstance()->isLevelLoaded(trim($text[3])) and TouchIt::getConfigProvider()->get("checkLevel", true)){
                         $this->creater->sendMessage("[TouchIt] The level you set is not loaded.");
                     }
+                    TouchIt::getDataProvider()->create($tile);
+                    $this->creater->sendMessage("[TouchIt] Your sign has been create.");
+                    $tile->setText("[TouchIt]", "------------", "Waiting...", "-TouchIt 2014-");
                 }else{
                     $this->creater->sendMessage("[TouchIt] You are not allowed to build this sign.");
                 }
+            }else{
+                $tile->setText("[WARNING]", "------------", "Player offline", "-TouchIt 2014-");
             }
         }
         return false;
