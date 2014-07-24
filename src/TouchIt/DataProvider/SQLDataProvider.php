@@ -15,9 +15,9 @@ class SQLDataProvider implements Provider{
     
     public function __construct(){}
     
-    public function getByLevel($levelName){
+    public function getByTargetLevel($levelName){
         $result = [];
-        $query = $this->database->query("SELECT * FROM index WHERE level = ".$levelName.";");
+        $query = $this->database->query("SELECT * FROM teleport WHERE target = ".$levelName.";");
         if($data instanceof \SQLite3Result){
             while($value = $data->fetchArray(SQLITE3_ASSOC)){
                 $level = Server::getInstance()->getLevelByName($data['level']);
