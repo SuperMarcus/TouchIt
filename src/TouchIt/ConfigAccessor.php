@@ -30,14 +30,6 @@ class ConfigAccessor implements arrayaccess{
         else return $default;
     }
     
-    public function set($offset, $value){
-        $this->data[$offset] = $value;
-    }
-    
-    public function remove($offset){
-        unset($this->data[$offset]);
-    }
-    
     private function analyzeFile(){
     	if(!file_exists(TouchIt::getTouchIt()->getDataFolder()."config.yml")){
     		file_put_contents(TouchIt::getTouchIt()->getDataFolder()."config.yml", stream_get_contents(TouchIt::getTouchIt()->getResource("preconfig.yml")));
@@ -46,10 +38,6 @@ class ConfigAccessor implements arrayaccess{
     }
     
     /** Magic methods */
-    public function __get($name){
-        return $this->get($name);
-    }
-    
     public function __set($name, $value){
         $this->set($name, $value);
     }
@@ -58,25 +46,16 @@ class ConfigAccessor implements arrayaccess{
         return $this->exists($name);
     }
     
-    public function __unset($name){
-        return $this->remove($name);
-    }
-    
     /** Method of ArrayAccess */
     public function offsetGet($offset){
         return $this->get($offset);
     }
     
-    public function offsetUnset($offset){
-        $this->remove($offset);
-    }
-    
-    public function offsetSet($offset, $value){
-        $this->set($offset, $value);
-    }
-    
     public function offsetExists($offset){
         return $this->exists($offset);
     }
+    
+    public function offsetUnset($offset){}//Main config only can change by user
+    public function offsetSet($offset, $value){}//Main config only can change by user
 }
 ?>
