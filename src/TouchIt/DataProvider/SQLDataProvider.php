@@ -15,6 +15,24 @@ class SQLDataProvider implements Provider{
     
     public function __construct(){}
     
+    public function getByLevel($levelName){
+        $result = [];
+        $query = $this->database->query("SELECT * FROM index WHERE level = ".$levelName.";");
+        if($data instanceof \SQLite3Result){
+            while($value = $data->fetchArray(SQLITE3_ASSOC)){
+                $level = Server::getInstance()->getLevelByName($data['level']);
+    			if(!$level)continue;
+    			$vector = explode("_", $data['id']);
+    			$info = $this->get(new Position((int) $vector[0], (int) $vector[1], (int) $vector[2], $level));
+    			if($info !== null)$result[] = $info;
+    			unset($info);
+    			unset($vector);
+    			unset($level);
+            }
+        }
+        return $result;
+    }
+    
     public function create(Sign $sign){
     	$text = $sign->getText();
     	$type = 0;
