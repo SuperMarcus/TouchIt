@@ -75,10 +75,25 @@ class TouchIt extends PluginBase{
     }
     
     /**
-     * @return []
+     * @return string
      */
-    public static function getLang(){
-        return self::$lang;
+    public static function getLang($key){
+        $id = explode(".", $key);
+        $lang = self::$lang;
+        while(count($id) > 0){
+        	$key = array_shift($id);
+        	if(isset($lang[$key])){
+        		$lang = $lang[$key];
+        	}else{
+        		trigger_error("Could not find lang: ".$key." in language profile.", E_USER_ERROR);
+        		return "Language profile error.";
+        	}
+        }
+        if(is_array($lang)){
+        	trigger_error("Could not return an array of lang: ".$key.".", E_USER_ERROR);
+        	return "Language profile error.";
+        }
+        return (string) $lang;
     }
     
     /**
