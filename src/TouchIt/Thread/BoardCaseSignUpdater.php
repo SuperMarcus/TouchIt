@@ -16,7 +16,11 @@ class BoardCaseSignUpdater extends Worker{
                 $pos = $sign['position'];
                 $tile = $pos->getLevel()->getTile($pos);
                 if($tile instanceof Sign){
-                    $massage = TouchIt::getManager()->getAnnouncement();
+                    $message = str_split(TouchIt::getManager()->getAnnouncement(), 15);
+                    if(count($message) > 3){
+                        $message[3] = substr($message[2], 0, -3)."...";
+                        $tile->setText(TouchIt::getLang("update.boardcase.title"), ($message[0], isset($message[1]) ? $message[1] : ""), (isset($message[2]) ? $message[2] : ""));
+                    }
                 }
             }
         }
