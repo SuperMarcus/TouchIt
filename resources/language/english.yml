@@ -20,3 +20,5 @@ update:
       permission: "You don't have permission to build this sign"
       offline: "Player offline"
     create: "This sign has been create"
+  boardcase:
+    title: "Announcement"
