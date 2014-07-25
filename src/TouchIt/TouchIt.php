@@ -6,6 +6,7 @@ use TouchIt\ConfigAccessor;
 use TouchIt\DataProvider\Provider;
 use TouchIt\DataProvider\SQLDataProvider;
 use TouchIt\Listener\MainListener;
+use TouchIt\Listener\UpdateListener;
 use TouchIt\SignManager;
 
 class TouchIt extends PluginBase{
@@ -33,7 +34,8 @@ class TouchIt extends PluginBase{
             "manager" => new SignManager(),
             "config" => new ConfigAccessor($this->getDataFolder()."Config.cnf"),
             "data" => new SQLDataProvider(),
-            "listener" => new MainListener
+            "listener" => new MainListener,
+            "updatelistener" => new UpdateListener
         ];
         
         self::$manager = $this->objects["manager"];
@@ -44,6 +46,10 @@ class TouchIt extends PluginBase{
         self::$lang = $this->["config"]->getLang();
         
         self::$main = $this;
+        
+        $this->getServer()->getPluginManager()->registerEvents($this->objects["listener"]);
+        $this->getServer()->getPluginManager()->registerEvents($this->objects["updatelistener"]);
+        //Auto register all the events
     }
     
     /**
