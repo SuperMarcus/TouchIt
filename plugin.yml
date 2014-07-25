@@ -5,18 +5,37 @@ api: [1.0.0]
 load: POSTWORLD
 author: Marcus
 authors: [Marcus]
-description: This is a powerful sign teleport plugin.
+description: "This is a powerful sign teleport plugin."
 website: https://github.com/SuperMarcus/TouchIt
-commands:
-  touchit:
-    description: Command for TouchIt
-    usage: "Usage: /touchit <update/help>"
-    permission: touchit.command
+
+# TODO: Commands
+
 permissions:
   touchit:
     description: "TouchIt permission."
-    default: op
+    default: notop
     children:
-      touchit.command:
+      command:
         description: "TouchIt commands."
-        default: true
+        default: notop
+        children:
+          touchit:
+            description: "TouchIt main commands."
+            default: notop
+            children:
+              update:
+                description: "TouchIt manual updates commands."
+                default: op
+      sign:
+        description: "TouchIt sign action permission."
+        default: notop
+        children:
+          build:
+            description: "Build sign permission."
+            default: op
+          break:
+            description: "Destroy sign permission."
+            default: op
+          touch:
+            description: "Use touchit permission."
+            default: notop
