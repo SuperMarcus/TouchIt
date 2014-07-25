@@ -29,7 +29,7 @@ class TeleportSignUpdater extends Worker{
                             }elseif(count($target->getPlayers()) >= TouchIt::getConfigProvider()->get("maxPeople", 20)){
                                 $tile->setText("[".$config['name']."]", TouchIt::getLang("update.level.limit.line2"), TouchIt::getLang("update.level.limit.line3"), TouchIt::getLang("update.level.limit.line4"));
                             }else{
-                                $tile->setText("[".$config['name']."]", $sign['description'], TouchIt::getLang("update.level.limit.line3"), min(count($target->getPlayers()), "[".TouchIt::getConfigProvider()->get("maxPeople", 20))."/".TouchIt::getConfigProvider()->get("maxPeople", 20)."]");
+                                $tile->setText("[".$config['name']."]", $sign['description'], TouchIt::getLang("update.level.default"), min(count($target->getPlayers()), "[".TouchIt::getConfigProvider()->get("maxPeople", 20))."/".TouchIt::getConfigProvider()->get("maxPeople", 20)."]");
                             }
                         }
                     }
