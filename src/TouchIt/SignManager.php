@@ -8,7 +8,7 @@ use pocketmine\event\Event;
 use pocketmine\block\Block;
 use pocketmine\tile\Sign;
 
-class SignManager extends {
+class SignManager{
     private $touchit, $config, $database, $stop;
     
     private $updates;
@@ -23,10 +23,16 @@ class SignManager extends {
         $this->updates[] = $level;
     }
     
-    public function needUpdates(){
-        $return = $this->updates;
-        $this->updates = [];
-        return $return;
+    public function needUpdates($type){
+        $signs = [];
+        switch($type){
+            case TouchIt::SIGN_TELEPORT:
+                $signs = $this->updates;
+                $this->updates = [];
+            default:
+                $signs = TouchIt::getDataProvider()->getByType($type);
+        }
+        return $signs;
     }
     
     public function onBlockPlace(BlockPlaceEvent $event){
