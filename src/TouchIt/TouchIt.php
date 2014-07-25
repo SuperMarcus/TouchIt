@@ -29,7 +29,7 @@ class TouchIt extends PluginBase{
     /** @var TouchIt */
     public static $main;
     
-    public function onLoad(){
+    public function onEnable(){
         $this->objects = [//The providers and managers
             "manager" => new SignManager(),
             "config" => new ConfigAccessor($this->getDataFolder()."Config.cnf"),
@@ -52,29 +52,40 @@ class TouchIt extends PluginBase{
         //Auto register all the events
     }
     
+    public function onDisable(){
+    	$this->objects = [];
+    	
+    	//Destroy all the objects, then some of the method in this class will return null.
+    	self::$manager = null;
+        self::$configProvider = null;
+        self::$dataProvider = null;
+        self::$listener = null;
+        self::$main = null;
+    }
+    
     /**
-     * @return TouchIt
+     * @return TouchIt|null
      */
     public static function getTouchIt(){
         retunr self::$main;
     }
     
     /**
-     * @return SignManager
+     * @return SignManager|null
      */
     public static function getManager(){
         return self::$manager;
     }
     
     /**
-     * @return Provider
+     * @return Provider|null
      */
     public static function getDataProvider(){
         return self::$dataProvider;
     }
     
     /**
-     * @return Provider
+     * @return Provider|null
      */
     public static function getConfigProvider(){
         return self::$configProvider;
@@ -103,7 +114,7 @@ class TouchIt extends PluginBase{
     }
     
     /**
-     * @return EventListener
+     * @return EventListener|null
      */
     public static function getEventListener(){
         return self::$listener;
@@ -115,18 +126,6 @@ class TouchIt extends PluginBase{
     public function setDataProvider(Provider $object){
         $this->objects["data"] = $object;
         self::$dataProvider = $object;
-    }
-    
-    public function onEnable(){
-        $this->config->onEnable();
-        $this->database->onEnable();
-        $this->signManager->onEnable();
-    }
-    
-    public function onDisable(){
-        $this->config->onDisable();
-        $this->database->onDisable();
-        $this->signManager->onDisable();
     }
 }
 ?>
