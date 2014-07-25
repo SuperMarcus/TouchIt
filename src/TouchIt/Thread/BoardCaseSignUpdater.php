@@ -24,7 +24,7 @@ class BoardCaseSignUpdater extends Worker{
                 }
             }
         }
-        return $this->stop;
+        return true;
     }
 }
 ?>
