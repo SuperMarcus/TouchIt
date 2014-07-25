@@ -43,7 +43,7 @@ class TouchIt extends PluginBase{
         self::$dataProvider = $this->objects["data"];
         self::$listener = $this->objects["listener"];
         
-        self::$lang = $this->["config"]->getLang();
+        self::$lang = $this->objects["config"]->getLang();
         
         self::$main = $this;
         
