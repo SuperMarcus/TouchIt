@@ -15,14 +15,32 @@ class SQLDataProvider implements Provider{
     
     public function __construct(){}
     
-    public function getByTargetLevel($levelName){
+    public function getByTarget(string $level){
         $result = [];
         $query = $this->database->query("SELECT * FROM teleport WHERE target = ".$levelName.";");
-        if($data instanceof \SQLite3Result){
-            while($value = $data->fetchArray(SQLITE3_ASSOC)){
-                $level = Server::getInstance()->getLevelByName($data['level']);
+        if($query instanceof \SQLite3Result){
+            while($value = $query->fetchArray(SQLITE3_ASSOC)){
+                $level = Server::getInstance()->getLevelByName($value['level']);
     			if(!$level)continue;
-    			$vector = explode("_", $data['id']);
+    			$vector = explode("_", $value['id']);
+    			$info = $this->get(new Position((int) $vector[0], (int) $vector[1], (int) $vector[2], $level));
+    			if($info !== null)$result[] = $info;
+    			unset($info);
+    			unset($vector);
+    			unset($level);
+            }
+        }
+        return $result;
+    }
+    
+    public function getByType(int $type){
+        $result = [];
+        $query = $this->database->query("SELECT * FROM index WHERE type = ".$type.";");
+        if($query instanceof \SQLite3Result){
+            while($value = $query->fetchArray(SQLITE3_ASSOC)){
+    			$vector = explode("_", $value['id']);
+    			$level = Server::getInstance()->getLevelByName($value[3]);
+    			if(!$level)continue;
     			$info = $this->get(new Position((int) $vector[0], (int) $vector[1], (int) $vector[2], $level));
     			if($info !== null)$result[] = $info;
     			unset($info);
@@ -141,7 +159,7 @@ class SQLDataProvider implements Provider{
     					}
     					break;
     				case TouchIt::SIGN_BOARDCASE:
-    					return ["type" => TouchIt::SIGN_BOARDCASE];
+    					return ["type" => TouchIt::SIGN_BOARDCASE, "position" => $pos];
     					break;
     			}
     		}
@@ -169,6 +187,17 @@ class SQLDataProvider implements Provider{
     	}else{
     		$this->database = new \SQLite3(TouchIt::getTouchIt()->getDataFolder()."data.db", SQLITE3_OPEN_READWRITE);
     	}
+    }
+    
+    private function INT_STRING($type){
+        switch($type){
+            case TouchIt::SIGN_TELEPORT:
+                return "teleport";
+            case TouchIt::SIGN_COMMAND:
+                return "command";
+            default:
+                return null;
+        }
     }
 }
 ?>
