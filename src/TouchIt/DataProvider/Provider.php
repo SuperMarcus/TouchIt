@@ -16,6 +16,25 @@ interface Provider{
     public function get(Position $pos);
     
     /**
+     * Use to get signs by level
+     * Only works for teleport sign
+     * 
+     * @param string $level
+     * 
+     * @return []
+     */
+    public function getByTarget(string $level);
+    
+    /**
+     * Use to get sign by type
+     * 
+     * @param int $type
+     * 
+     * @return []
+     */
+    public function getByType(int $type);
+    
+    /**
      * Use to get all the sign from database or filesystem
      * 
      * @return []
