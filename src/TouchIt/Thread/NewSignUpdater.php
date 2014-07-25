@@ -25,18 +25,18 @@ class NewSignUpdater extends Worker{
         if(trim($text[0]) === "" and trim($text[1]) === "" and trim($text[2]) === "" and trim($text[3]) === "")return true;
         elseif(strtolower(trim($text[0])) === "touchit"){
             if($this->creater instanceof Player and $this->creater->isOnline()){
-                if(TouchIt::getConfigProvider()->get("AllowPlayerBuild") or $this->creater->isOp()){
+                if(TouchIt::getConfigProvider()->get("AllowPlayerBuild") or $this->creater->hasPermission("touchit.sign.build")){
                     if(!Server::getInstance()->isLevelLoaded(trim($text[3])) and TouchIt::getConfigProvider()->get("checkLevel", true)){
-                        $this->creater->sendMessage("[TouchIt] The level you set is not loaded.");
+                        $this->creater->sendMessage("[TouchIt] ".TouchIt::getLang("update.new.warning.level"));
                     }
                     TouchIt::getDataProvider()->create($tile);
-                    $this->creater->sendMessage("[TouchIt] Your sign has been create.");
-                    $tile->setText("[TouchIt]", "------------", "Waiting...", "-TouchIt 2014-");
+                    $this->creater->sendMessage("[TouchIt] ".TouchIt::getLang("update.new.create"));
+                    $tile->setText("[TouchIt]", "------------", TouchIt::getLang("update.new.wait"), "-TouchIt 2014-");
                 }else{
-                    $this->creater->sendMessage("[TouchIt] You are not allowed to build this sign.");
+                    $this->creater->sendMessage("[TouchIt] ".TouchIt::getLang("update.new.warning.permission"));
                 }
             }else{
-                $tile->setText("[WARNING]", "------------", "Player offline", "-TouchIt 2014-");
+                $tile->setText("[".TouchIt::getLang("update.new.warning.title")."]", "------------", $tile->setText("[".TouchIt::getLang("update.new.warning.offline"), "-TouchIt 2014-");
             }
         }
         return false;
