@@ -67,7 +67,7 @@ class TouchIt extends PluginBase{
      * @return TouchIt|null
      */
     public static function getTouchIt(){
-        retunr self::$main;
+        return self::$main;
     }
     
     /**
