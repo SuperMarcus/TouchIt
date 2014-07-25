@@ -1,0 +1,22 @@
+# language profile for touchit
+# Copyright Marcus 2014
+
+update:
+  level:
+    notloaded:
+      line2: "NOT OPEN"
+      line3: "Join onther"
+      line4: "world"
+    limit:
+      line2: "This level"
+      line3: "is full"
+      line4: "Join onther"
+    default: "Players count"
+  new:
+    wait: "Loading..."
+    warning:
+      title: "WARNING"
+      level: "The level you set is not loaded"
+      permission: "You don't have permission to build this sign"
+      offline: "Player offline"
+    create: "This sign has been create"
