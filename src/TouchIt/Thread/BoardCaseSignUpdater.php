@@ -24,6 +24,10 @@ class BoardCaseSignUpdater extends Worker{
                 }
             }
         }
+        
+        //Sleep for next updates.
+        sleep((int) TouchIt::getConfigProvider()->get("announcementUpdateInterval", 15));
+        
         return true;
     }
 }
