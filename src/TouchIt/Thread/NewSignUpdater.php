@@ -29,8 +29,12 @@ class NewSignUpdater extends Worker{
                     if(!Server::getInstance()->isLevelLoaded(trim($text[3])) and TouchIt::getConfigProvider()->get("checkLevel", true)){
                         $this->creater->sendMessage("[TouchIt] ".TouchIt::getLang("update.new.warning.level"));
                     }
-                    TouchIt::getDataProvider()->create($tile);
+                    $type = TouchIt::getDataProvider()->create($tile);
                     $this->creater->sendMessage("[TouchIt] ".TouchIt::getLang("update.new.create"));
+                    if($type === TouchIt::SIGN_COMMAND){
+                        $tile->setText("[".TouchIt::getLang("update.new.command.title")."]", TouchIt::getLang("update.new.command.default.line2"), TouchIt::getLang("update.new.command.default.line3"), "/".trim($text[2]).(trim($text[3]) === "" ? "" : trim($text[3])));
+                        return false;
+                    }
                     $tile->setText("[TouchIt]", "------------", TouchIt::getLang("update.new.wait"), "-TouchIt 2014-");
                 }else{
                     $this->creater->sendMessage("[TouchIt] ".TouchIt::getLang("update.new.warning.permission"));
