@@ -5,7 +5,7 @@ use pocketmine\plugin\PluginBase;
 use TouchIt\ConfigAccessor;
 use TouchIt\DataProvider\Provider;
 use TouchIt\DataProvider\SQLDataProvider;
-use TouchIt\Listener\EventListener;
+use TouchIt\Listener\MainListener;
 use TouchIt\SignManager;
 
 class TouchIt extends PluginBase{
@@ -23,7 +23,7 @@ class TouchIt extends PluginBase{
     public static $configProvider;
     /** @var Provider */
     public static $dataProvider;
-    /** @var EventListener */
+    /** @var MainListener */
     public static $listener;
     /** @var TouchIt */
     public static $main;
@@ -33,7 +33,7 @@ class TouchIt extends PluginBase{
             "manager" => new SignManager(),
             "config" => new ConfigAccessor($this->getDataFolder()."Config.cnf"),
             "data" => new SQLDataProvider(),
-            "listener" => new EventListener()
+            "listener" => new MainListener
         ];
         
         self::$manager = $this->objects["manager"];
