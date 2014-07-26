@@ -32,6 +32,8 @@ class TouchIt extends PluginBase{
     public function onEnable(){
     	self::$main = $this;
     	
+    	@mkdir(TouchIt::getTouchIt()->getDataFolder());
+    	
         $this->objects = [//The providers and managers
             "manager" => new SignManager(),
             "config" => new ConfigAccessor($this->getDataFolder()."Config.cnf"),
