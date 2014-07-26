@@ -1,6 +1,7 @@
 # language profile for touchit
 # Copyright Marcus 2014
 
+# The message for reate the sign
 update:
   level:
     notloaded:
@@ -27,3 +28,15 @@ update:
         line3: "to run command"
   boardcase:
     title: "Announcement"
+
+# The message for all the sign action
+sign:
+  boardcase:
+    title: "Announcement"
+    unavailable: "No announcement available."
+  teleport:
+    notopen: "This world is not open yet."
+    running: "Teleporting to "
+  destroy:
+    done: "This sign has been destroy."
+    permission: "You don't have permission to break this sign."
