@@ -3,12 +3,10 @@ namespace TouchIt;
 
 use TouchIt\TouchIt;
 
-class ConfigAccessor implements arrayaccess{
+class ConfigAccessor implements \arrayaccess{
     private $data;
     
-    public function __construct(){
-    	$this->analyzeFile();
-    }
+    public function __construct(){}
     
     public function exists($offset){
         return isset($this->data[$offset]);
@@ -26,7 +24,7 @@ class ConfigAccessor implements arrayaccess{
         else return $default;
     }
     
-    private function analyzeFile(){
+    public function analyzeFile(){
     	if(!file_exists(TouchIt::getTouchIt()->getDataFolder()."config.yml")){
     		file_put_contents(TouchIt::getTouchIt()->getDataFolder()."config.yml", stream_get_contents(TouchIt::getTouchIt()->getResource("preconfig.yml")));
     	}
