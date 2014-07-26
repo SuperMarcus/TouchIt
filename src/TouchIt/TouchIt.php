@@ -53,6 +53,8 @@ class TouchIt extends PluginBase{
     }
     
     public function onDisable(){
+    	$this->objects['manager']->onDisable();
+    	
     	$this->objects = [];
     	
     	//Destroy all the objects, then some of the method in this class will return null.
