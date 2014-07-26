@@ -1,5 +1,5 @@
 <?php
-namespace TouchIt;
+namespace TouchIt\Thread;
 
 use TouchIt\TouchIt;
 use TouchIt\Thread\Worker;
