@@ -1,5 +1,5 @@
 <?php
-namespace TouchIt\DataProvider
+namespace TouchIt\DataProvider;
 
 use TouchIt\TouchIt;
 use pocketmine\level\Position;
