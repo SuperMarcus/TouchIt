@@ -13,10 +13,22 @@ class ConfigAccessor implements \arrayaccess{
     }
     
     public function getLang(){
-        if(TouchIt::getTouchIt()->getResource("language/".strtolower($this->get("Language", "english"))).".yml" !== null){
-            return @yaml_parse(stream_get_contents(TouchIt::getTouchIt()->getResource("language/".strtolower($this->get("Language", "english"))).".yml"));
+        $fp = TouchIt::getTouchIt()->getResource("language/".strtolower($this->get("Language", "english")).".yml");
+        $contents = [];
+        if(!$fp){
+            @fclose($fp);
+            $fp = TouchIt::getTouchIt()->getResource("language/english.yml");
         }
-        return @yaml_parse(stream_get_contents(TouchIt::getTouchIt()->getResource("language/english.yml")));
+        while(!feof($fp)){
+            $line = fgets($fp);
+            if($line{0} === "#" or trim($line) === "")continue;
+            $pos = strpos("=", $line);
+            if($pos !== false){
+                $contents[trim(substr($line, 0, $pos - 1))] = trim(substr($line, $pos + 1));
+            }
+        }
+        @fclose($fp);
+        return $contents;
     }
     
     public function get($offset, $default = null){
