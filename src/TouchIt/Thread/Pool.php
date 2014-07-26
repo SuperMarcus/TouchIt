@@ -10,6 +10,7 @@ class Pool implements Countable{
     public function __construct(){
         $this->workers = [];
         $this->working = [];
+        $this->isEnable = false;
     }
     
     /**
