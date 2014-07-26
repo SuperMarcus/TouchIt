@@ -3,6 +3,9 @@ namespace TouchIt;
 
 use TouchIt\TouchIt;
 use TouchIt\DataProvider\Provider;
+use TouchIt\Thread\Pool;
+use TouchIt\Thread\BoardCaseSignUpdater;
+use TouchIt\Thread\TeleportSignUpdater;
 use pocketmine\Server;
 use pocketmine\event\Event;
 use pocketmine\block\Block;
@@ -13,6 +16,8 @@ use pocketmine\level\Level;
 class SignManager{
     private $touchit, $config, $database, $stop;
     
+    public $pool;
+    
     private $updates, $announcement, $bcoffset;
     
     public function __construct(){
@@ -21,6 +26,15 @@ class SignManager{
         $this->isChoosing = false;
         $this->announcement = "";
         $this->nextAnnouncement();
+        $this->initPool();
+    }
+    
+    private function initPool(){
+        TouchIt::getTouchIt()->getLogger()->info("[TouchIt] ".TouchIt::getLang("thread.start"));
+        $this->pool = new Pool();
+        $this->pool->submitWorker(new BoardCaseSignUpdater());
+        $this->pool->submitWorker(new TeleportSignUpdater());
+        $this->pool->onEnable();
     }
     
     public function onDisable(){
