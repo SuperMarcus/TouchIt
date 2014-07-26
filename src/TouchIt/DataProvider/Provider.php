@@ -1,7 +1,7 @@
 <?php
 namespace TouchIt\DataProvider
 
-use TouchIt\TouchIt
+use TouchIt\TouchIt;
 use pocketmine\level\Position;
 use pocketmine\tile\Sign;
 
