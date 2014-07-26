@@ -1,5 +1,5 @@
 <?php
-namespace TouchIt\Listener
+namespace TouchIt\Listener;
 
 use pocketmine\event\Listener;
 use pocketmine\event\block\BlockBreakEvent;
