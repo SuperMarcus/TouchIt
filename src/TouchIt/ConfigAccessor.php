@@ -13,11 +13,11 @@ class ConfigAccessor implements \arrayaccess{
     }
     
     public function getLang(){
-        $fp = TouchIt::getTouchIt()->getResource("language/".strtolower($this->get("Language", "english")).".yml");
+        $fp = TouchIt::getTouchIt()->getResource("language/".strtolower($this->get("Language", "english")).".lang");
         $contents = [];
         if(!$fp){
             @fclose($fp);
-            $fp = TouchIt::getTouchIt()->getResource("language/english.yml");
+            $fp = TouchIt::getTouchIt()->getResource("language/english.lang");
         }
         while(!feof($fp)){
             $line = fgets($fp);
