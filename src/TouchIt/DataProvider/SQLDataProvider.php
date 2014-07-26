@@ -82,7 +82,7 @@ class SQLDataProvider implements Provider{
     		$data = $this->database->query("SELECT * FROM index WHERE id = ".$this->getId($pos));
     		if($data instanceof \SQLite3Result){
     			$data = $data->fetchArray(SQLITE3_ASSOC);
-    			if(isset($data['id'] and $data['id'] === $this->getId($pos))){
+    			if(isset($data['id']) and $data['id'] === $this->getId($pos)){
     				switch((int) $data['type']){
     					case TouchIt::SIGN_TELEPORT:
     					    return $this->database->exec("DELETE FROM index WHERE id = ".$this->getId($pos)) and $this->database->exec("DELETE FROM teleport WHERE id = ".$this->getId($pos));
