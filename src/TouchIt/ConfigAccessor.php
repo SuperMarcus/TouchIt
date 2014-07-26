@@ -22,9 +22,9 @@ class ConfigAccessor implements \arrayaccess{
         while(!feof($fp)){
             $line = fgets($fp);
             if($line{0} === "#" or trim($line) === "")continue;
-            $pos = strpos("=", $line);
+            $pos = strpos($line, "=");
             if($pos !== false){
-                $contents[trim(substr($line, 0, $pos - 1))] = trim(substr($line, $pos + 1));
+                $contents[trim(substr($line, 0, $pos))] = trim(substr($line, $pos + 1));
             }
         }
         @fclose($fp);
