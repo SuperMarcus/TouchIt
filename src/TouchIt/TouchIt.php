@@ -30,6 +30,8 @@ class TouchIt extends PluginBase{
     public static $main;
     
     public function onEnable(){
+    	self::$main = $this;
+    	
         $this->objects = [//The providers and managers
             "manager" => new SignManager(),
             "config" => new ConfigAccessor($this->getDataFolder()."Config.cnf"),
@@ -44,8 +46,6 @@ class TouchIt extends PluginBase{
         self::$listener = $this->objects["listener"];
         
         self::$lang = $this->objects["config"]->getLang();
-        
-        self::$main = $this;
         
         $this->objects['config']->analyzeFile();
         $this->objects['manager']->onEnable();
