@@ -14,17 +14,16 @@ use pocketmine\utils\TextFormat;
 use pocketmine\level\Level;
 
 class SignManager{
-    private $touchit, $config, $database, $stop;
-    
     public $pool;
-    
     private $updates, $announcement, $bcoffset;
     
     public function __construct(){
-        $this->touchit = TouchIt::getTouchIt();
         $this->stop = false;
         $this->isChoosing = false;
         $this->announcement = "";
+    }
+    
+    public function onEnable(){
         $this->nextAnnouncement();
         $this->initPool();
     }
