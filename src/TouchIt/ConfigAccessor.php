@@ -16,7 +16,7 @@ class ConfigAccessor implements arrayaccess{
     
     public function getLang(){
         if(TouchIt::getTouchIt()->getResource("language/".strtolower($this->get("Language", "english"))).".yml" !== null){
-            return @yaml_parse(stream_get_contents(TouchIt::getTouchIt()->getResource("language/".strtolower($this->get("Language", "english"))).".yml")));
+            return @yaml_parse(stream_get_contents(TouchIt::getTouchIt()->getResource("language/".strtolower($this->get("Language", "english"))).".yml"));
         }
         return @yaml_parse(stream_get_contents(TouchIt::getTouchIt()->getResource("language/english.yml")));
     }
