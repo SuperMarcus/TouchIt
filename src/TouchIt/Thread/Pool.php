@@ -4,7 +4,7 @@ namespace TouchIt\Thread;
 use TouchIt\Thread\Worker;
 use TouchIt\TouchIt;
 
-class Pool implements Countable{
+class Pool implements \countable{
     private $workers, $working, $isEnable;
     
     public function __construct(){
