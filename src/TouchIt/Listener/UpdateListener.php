@@ -1,5 +1,5 @@
 <?php
-namespace TouchIt\Linstener;
+namespace TouchIt\Listener;
 
 use TouchIt\TouchIt;
 use pocketmine\event\player\PlayerLoginEvent;
