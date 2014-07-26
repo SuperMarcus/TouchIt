@@ -1,7 +1,7 @@
 # language profile for touchit
 # Copyright Marcus 2014
 
-# The message for reate the sign
+# Message for create the sign
 update:
   level:
     notloaded:
@@ -29,7 +29,7 @@ update:
   boardcase:
     title: "Announcement"
 
-# The message for all the sign action
+# Message for all the sign action
 sign:
   boardcase:
     title: "Announcement"
@@ -40,3 +40,7 @@ sign:
   destroy:
     done: "This sign has been destroy."
     permission: "You don't have permission to break this sign."
+
+# Message for thread information
+thread:
+  start: "Starting thread..."
