@@ -47,6 +47,9 @@ class TouchIt extends PluginBase{
         
         self::$main = $this;
         
+        $this->objects['config']->analyzeFile();
+        $this->objects['manager']->onEnable();
+        
         $this->getServer()->getPluginManager()->registerEvents($this->objects["listener"]);
         $this->getServer()->getPluginManager()->registerEvents($this->objects["updatelistener"]);
         //Auto register all the events
