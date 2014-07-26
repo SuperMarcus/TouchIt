@@ -12,6 +12,7 @@ class BoardCaseSignUpdater extends Worker{
         $updates = TouchIt::getManager()->needUpdates(TouchIt::SIGN_BOARDCASE);
         
         if(count($updates) > 0){
+            TouchIt::getManager()->nextAnnouncement();
             foreach($updates as $sign){
                 $pos = $sign['position'];
                 $tile = $pos->getLevel()->getTile($pos);
