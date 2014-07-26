@@ -1,7 +1,7 @@
 <?php
 namespace TouchIt\Thread;
 
-use TouchIt\Pool\Worker;
+use TouchIt\Thread\Worker;
 use TouchIt\TouchIt;
 
 class Pool implements Countable{
