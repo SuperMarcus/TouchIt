@@ -4,6 +4,10 @@
 # The title
 name: Teleport
 
+# TouchIt language
+# Only support English now
+Language: English
+
 # Maximum number of persons in one level
 maxPeople: 20
 
