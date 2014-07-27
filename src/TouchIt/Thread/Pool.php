@@ -3,6 +3,7 @@ namespace TouchIt\Thread;
 
 use TouchIt\Thread\Worker;
 use TouchIt\TouchIt;
+use pocketmine\utils\MainLogger;
 
 class Pool implements \countable{
     private $workers, $working, $isEnable;
@@ -30,7 +31,7 @@ class Pool implements \countable{
         }
         usleep(20);
         if(count($this->workers) <= 0){
-            TouchIt::getTouchIt()->getLogger()->debug("[TouchIt] None thread has been start.");
+            MainLogger::getLogger()->debug("[TouchIt] No thread has been start.");
         }
     }
     
@@ -51,7 +52,7 @@ class Pool implements \countable{
         }
         usleep(50);
         if(count($this->working) > 0){
-            TouchIt::getTouchIt()->getLogger()->debug("[TouchIt] There's some thread still working.");
+            MainLogger::getLogger()->debug("There's some thread still working.");
         }
     }
     
@@ -62,14 +63,14 @@ class Pool implements \countable{
     
     public function startThread($id, $description = false){
         if(isset($this->workers[$description]))$this->working[$description] = $id;
-        else TouchIt::getTouchIt()->getLogger()->debug("[TouchIt] Could not start an none-register thread. (Thread ID: ".$id." , Thread: ".(string) $description.")");
+        else MainLogger::getLogger()->debug("Could not start an none-register thread. (Thread ID: ".$id." , Thread: ".(string) $description.")");
     }
     
     public function stopThread($id){
         if(isset($this->working[$id])){
             unset($this->working[$id]);
         }else{
-            TouchIt::getTouchIt()->getLogger()->debug("[TouchIt] An none-register thread has just stop. Thread ID: ".$id);
+            MainLogger::getLogger()->debug("An none-register thread has just stop. Thread ID: ".$id);
         }
     }
     
