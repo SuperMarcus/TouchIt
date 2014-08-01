@@ -34,3 +34,4 @@ sign.destroy.permission=You don't have permission to break this sign.
 
 # Message for thread information
 thread.start=Starting thread...
+thread.notenough=The number of threads you set is not enough. Make it bigger.
