@@ -16,7 +16,7 @@ class TouchIt extends PluginBase{
 	
     private $objects;
     
-    public static $lang = [];//TouchIt language profile
+    public $lang = [];//TouchIt language profile
     
     /** @var SignManager */
     public static $manager;
@@ -47,7 +47,7 @@ class TouchIt extends PluginBase{
         self::$dataProvider = $this->objects["data"];
         self::$listener = $this->objects["listener"];
         
-        self::$lang = $this->objects["config"]->getLang();
+        $this->lang = $this->objects["config"]->getLang();
         
         $this->objects['config']->analyzeFile();
         $this->objects['manager']->onEnable();
@@ -55,6 +55,11 @@ class TouchIt extends PluginBase{
         $this->getServer()->getPluginManager()->registerEvents($this->objects["listener"]);
         $this->getServer()->getPluginManager()->registerEvents($this->objects["updatelistener"]);
         //Auto register all the events
+    }
+    
+    public function findLang($key){
+    	if(isset($this->lang[$key]))return $this->lang[$key];
+        return "Language profile error";
     }
     
     public function onDisable(){
@@ -102,8 +107,7 @@ class TouchIt extends PluginBase{
      * @return string
      */
     public static function getLang($key){
-        if(isset(self::$lang[$key]))return self::$lang[$key];
-        return "Language profile error";
+        return self::$main->findLang($key);
     }
     
     /**
