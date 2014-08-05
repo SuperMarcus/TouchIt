@@ -18,16 +18,16 @@ class ThreadManager extends \Thread{
     private $check_thread;
     
     /** @var Provider */
-    private $provider;
+    public $provider;
     
     /** @var PluginLogger */
-    private $logger;
+    public $logger;
     
     /** @var TouchIt */
-    private $plugin;
+    public $plugin;
     
     /** @var ConfigAccessor */
-    private $config;
+    public $config;
     
     public function __construct(TouchIt $plugin, PluginLogger $logger, Provider $provider, ConfigAccessor $config){
         $this->plugin = $plugin;
