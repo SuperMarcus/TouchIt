@@ -27,7 +27,12 @@ class CheckThread extends \Thread{
                             $info[0]->release();
                         }else{
                             if($this->thread_manager->config->get("checkLevel", true) and !$this->thread_manager->plugin->getServer()->isLevelLoaded(trim($text[2]))){
-                                $info[0]->get()->setText("[".$this->thread_manager->plugin->findLang("update.new.warning.title")."]", );
+                                $info[0]->get()->setText("[".$this->thread_manager->plugin->findLang("update.new.warning.title")."]", "--------------", $this->thread_manager->plugin->findLang("update.new.warning.level.line3")." ".trim($text[2]), $this->thread_manager->plugin->findLang("update.new.warning.level.line4"));
+                                $info[0]->release();
+                            }else{
+                                $info[0]->get()->setText("[Teleport]", $this->thread_manager->plugin->findLang("update.new.wait"), $this->thread_manager->plugin->findLang("update.new.wait.to")." ".$text[1], "- TouchIt -");
+                                $this->thread_manager->provider->create($info[0]->get());
+                                $info[0]->release();
                             }
                         }
                     }
