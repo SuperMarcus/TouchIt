@@ -7,6 +7,8 @@ use TouchIt\TouchIt;
 use TouchIt\Thread\Thread;
 use TouchIt\DataProvider\Provider;
 use TouchIt\ConfigAccessor;
+use TouchIt\Thread\UpdateThread;
+use TouchIt\Thread\CheckThread;
 
 class ThreadManager extends \Thread{
     private $isenable;
