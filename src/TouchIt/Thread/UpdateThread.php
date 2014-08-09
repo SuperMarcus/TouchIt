@@ -12,7 +12,9 @@ class UpdateThread extends \Thread{
         while(count($this->signs) > 0){
             $sign = @array_shift($this->signs);
             $tile = $sign['position']->getLevel()->getTile($sign['position']);
+            
         }
+        exit(0);
     }
     
     public function __construct(ThreadManager $thread_manager){
