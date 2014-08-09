@@ -39,6 +39,7 @@ class CheckThread extends \Thread{
                 }
             }
         }
+        exit(0);
     }
     
     public function __construct(ThreadManager $thread_manager){
