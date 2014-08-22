@@ -1,0 +1,4 @@
+$server = $thread_manager->plugin->getServer();
+if($server->isLevelLoaded($sign['target'])){
+
+}

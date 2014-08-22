@@ -12,9 +12,11 @@ use TouchIt\Thread\CheckThread;
 
 class ThreadManager extends \Thread{
     private $isenable;
+
+    private $types;
     
     /** @var UpdateThread[] */
-    private $update_thread;
+    private $update_threads;
     
     /** @var CheckThread */
     private $check_thread;
@@ -37,6 +39,7 @@ class ThreadManager extends \Thread{
         $this->provider = $provider;
         $this->config = $config;
         $this->isenable = false;
+        $this->types = $plugin->getTypes();
     }
     
     public function submitNewSign(Sign $tile){
@@ -62,14 +65,24 @@ class ThreadManager extends \Thread{
         /** --- Start thread --- */
         $this->logger->info($this->plugin->findLang("thread.start"));
         $this->check_thread = new CheckThread($this);
-        $this->update_thread = [];
+        $this->update_threads = [];
         if(($thread = $this->config->get("thread", 3)) <= 1){
             $this->logget->warning($this->plugin->findLang("thread.warning.notenough"));
             $thread = 3;
         }
         while($thread > 0){
-            $this->update_thread[] = new UpdateThread($this);
+            $update_thread = new UpdateThread($this);
+            $update_thread->setTypes($this->types);
+            $this->update_threads[] = $update_thread;
             $thread--;
+        }
+        unset($thread);
+        foreach($this->config->getProcessUnit() as $id, $unit){
+            if(is_callable($unit)){
+                foreach($this->update_threads as $thread){
+                    $thread->addUnit($unit, $id);
+                }
+            }
         }
         
         /** --- Main process --- */
@@ -78,14 +91,14 @@ class ThreadManager extends \Thread{
             $this->check_thread->join();
             $updates = $this->provider->getAll();
             while(count($updates) > 0){
-                foreach($this->update_thread as $thread){
+                foreach($this->update_threads as $thread){
                     $thread->submit(@array_shift($updates));
                 }
             }
-            foreach($this->update_thread as $thread){
+            foreach($this->update_threads as $thread){
                 $thread->start(PTHREADS_INHERIT_ALL & ~PTHREADS_INHERIT_CLASSES);
             }
-            foreach($this->update_thread as $thread){
+            foreach($this->update_threads as $thread){
                 $thread->join();
             }
             unset($updates);

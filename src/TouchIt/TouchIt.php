@@ -13,6 +13,12 @@ class TouchIt extends PluginBase{
     const SIGN_TELEPORT = 0;
     const SIGN_COMMAND = 1;
     const SIGN_BOARDCASE = 2;
+
+    public $types = [
+        0 => "SIGN_TELEPORT",
+        1 => "SIGN_COMMAND",
+        2 => "SIGN_BOARDCASE"
+    ];
 	
     private $objects;
     
@@ -36,7 +42,7 @@ class TouchIt extends PluginBase{
     	
         $this->objects = [//The providers and managers
             "manager" => new SignManager(),
-            "config" => new ConfigAccessor($this->getDataFolder()."Config.cnf"),
+            "config" => new ConfigAccessor($this->getDataFolder()."config.cnf", $this),
             "data" => new SQLDataProvider(),
             "listener" => new MainListener,
             "updatelistener" => new UpdateListener
@@ -102,8 +108,9 @@ class TouchIt extends PluginBase{
     public static function getConfigProvider(){
         return self::$configProvider;
     }
-    
+
     /**
+     * @param $key
      * @return string
      */
     public static function getLang($key){
@@ -116,13 +123,20 @@ class TouchIt extends PluginBase{
     public static function getEventListener(){
         return self::$listener;
     }
-    
+
     /**
      * @param Provider $object
      */
     public function setDataProvider(Provider $object){
         $this->objects["data"] = $object;
         self::$dataProvider = $object;
+    }
+
+    /**
+     * @return array
+     */
+    public function getTypes(){
+        return $this->types;
     }
 }
 ?>

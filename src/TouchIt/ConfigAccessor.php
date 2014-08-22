@@ -5,19 +5,39 @@ use TouchIt\TouchIt;
 
 class ConfigAccessor implements \arrayaccess{
     private $data;
+
+    private $path;
+
+    /** @var TouchIt */
+    private $plugin;
     
-    public function __construct(){}
+    public function __construct($path, TouchIt $plugin){
+        $this->plugin = $plugin;
+        $this->path = $path;
+    }
     
     public function exists($offset){
         return isset($this->data[$offset]);
     }
+
+    public function getProcessUnit(){
+        $callbacks = [];
+        foreach($this->plugin->getTypes() as $id => $type){
+            $stream = $this->plugin->getResource("callbacks/process_".strtolower($type).".callable");
+            if(!$stream){
+                @fclose($stream);
+                throw new \ErrorException("Unable to find TouchIt process unit: 'callbacks/process_".strtolower($type).".callable' id: ".$id." Make sure you got the full version of TouchIt.");
+            }
+            $callbacks[$id] = @create_function('$sign, $tile, $thread_manager', @stream_get_contents($stream));
+        }
+    }
     
     public function getLang(){
-        $fp = TouchIt::getTouchIt()->getResource("language/".strtolower($this->get("Language", "english")).".lang");
+        $fp = $this->plugin->getResource("language/".strtolower($this->get("Language", "english")).".lang");
         $contents = [];
         if(!$fp){
             @fclose($fp);
-            $fp = TouchIt::getTouchIt()->getResource("language/english.lang");
+            $fp = $this->plugin->getResource("language/english.lang");
         }
         while(!feof($fp)){
             $line = fgets($fp);
@@ -37,10 +57,10 @@ class ConfigAccessor implements \arrayaccess{
     }
     
     public function analyzeFile(){
-    	if(!file_exists(TouchIt::getTouchIt()->getDataFolder()."config.yml")){
-    		file_put_contents(TouchIt::getTouchIt()->getDataFolder()."config.yml", stream_get_contents(TouchIt::getTouchIt()->getResource("preconfig.yml")));
+    	if(!file_exists($this->path)){
+    		file_put_contents($this->path, stream_get_contents($this->plugin->getResource("preconfig.yml")));
     	}
-    	$this->data = @yaml_parse(file_get_contents(TouchIt::getTouchIt()->getDataFolder()."config.yml"));
+    	$this->data = @yaml_parse(file_get_contents($this->path));
     }
     
     /** Magic methods */
