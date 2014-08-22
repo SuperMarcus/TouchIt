@@ -8,7 +8,16 @@ name: Teleport
 # Only support English now
 Language: English
 
-# Maximum number of persons in one level
+# Server's main world
+# If people in this world is more than 'Maximum number of people in one level' player still can teleport to that level
+# If you don't need this change it-to an none-exists level
+DefaultLevel: world
+
+# If you are using 'MainLevel' unit maybe you need to change this option
+# Switch on this option to show people's count if target level is the main level of your server
+ShowCountInMainLevel: true
+
+# Maximum number of people in one level
 maxPeople: 20
 
 # Switch on this option to show count on sign

@@ -9,6 +9,9 @@ update.level.limit.line2=This level
 update.level.limit.line3=is full
 update.level.limit.line4=join onther
 update.level.default=Players count
+update.level.main=Main world
+update.level.main.tap=tap to get back
+update.level.people=People
 
 update.new.wait=Loading...
 update.new.warning.title=WARNING
