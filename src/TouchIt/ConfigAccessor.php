@@ -29,6 +29,7 @@ class ConfigAccessor implements \arrayaccess{
                 throw new \ErrorException("Unable to find TouchIt process unit: 'callbacks/process_".strtolower($type).".callable' id: ".$id." Make sure you got the full version of TouchIt.");
             }
             $callbacks[$id] = @create_function('$sign, $tile, $thread_manager', @stream_get_contents($stream));
+            @fclose($stream);
         }
     }
     
