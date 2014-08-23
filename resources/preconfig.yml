@@ -33,10 +33,10 @@ allowPlayerBuild: false
 allowPlayerBreak: false
 
 # Check level is loaded when building the teleport sign
-checkLevel: true
+CheckLevel: true
 
 # For the time between place and write the sign
-createTimeout: 40
+CreateTimeout: 40
 
 # The time interval between updates the announcement
 announcementUpdateInterval: 15

@@ -7,68 +7,59 @@ use pocketmine\tile\Sign;
 
 interface Provider{
     /**
-     * Use to get sign from database or filesystem
-     * 
-     * @param Position $pos
-     * 
-     * @return null|array
+     * Get sign from provider
+     * @param $x
+     * @param $y
+     * @param $z
+     * @param $level
+     * @return array
      */
-    public function get(Position $pos);
-    
+    public function get($x, $y, $z, $level);
+
     /**
-     * Use to get signs by level
-     * Only works for teleport sign
-     * 
-     * @param string $level
-     * 
-     * @return []
-     */
-    public function getByTarget(string $level);
-    
-    /**
-     * Use to get sign by type
-     * 
-     * @param int $type
-     * 
-     * @return []
-     */
-    public function getByType(int $type);
-    
-    /**
-     * Use to get all the sign from database or filesystem
-     * 
-     * @return []
+     * Get all the sign
+     * @return array
      */
     public function getAll();
-    
+
     /**
-     * Use to remove sign from database or filesystem
-     * 
-     * @param Position $pos
+     * Remove a sign
+     * @param $x
+     * @param $y
+     * @param $z
+     * @param $level
      */
-    public function remove(Position $pos);
-    
+    public function remove($x, $y, $z, $level);
+
     /**
-     * Use to check sign
-     * 
-     * @param Position $pos
-     * 
+     * Check the sign exists or not
+     * @param $x
+     * @param $y
+     * @param $z
+     * @param $level
      * @return bool
      */
-    public function exists(Position $pos);
-    
+    public function exists($x, $y, $z, $level);
+
     /**
-     * Use to add sign to database or filesystem
-     * This method will return the type of this sign
-     * 
-     * @param Sign $sign
-     * 
-     * @return int
+     * Add a new sign
+     * @param $type
+     * @param $data
+     * @param $x
+     * @param $y
+     * @param $z
+     * @param $level
      */
-    public function create(Sign $sign);
-    
-    /** preload method */
+    public function create($type, $data, $x, $y, $z, $level);
+
+    /**
+     * Internal method
+     */
     public function onEnable();
+
+    /**
+     * Internal method
+     */
     public function onDisable();
 }
 ?>

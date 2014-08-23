@@ -34,7 +34,10 @@ class TouchIt extends PluginBase{
     public static $listener;
     /** @var TouchIt */
     public static $main;
-    
+
+    /**
+     * Call when enable
+     */
     public function onEnable(){
     	self::$main = $this;
     	
@@ -62,12 +65,19 @@ class TouchIt extends PluginBase{
         $this->getServer()->getPluginManager()->registerEvents($this->objects["updatelistener"], $this);
         //Auto register all the events
     }
-    
+
+    /**
+     * @param $key
+     * @return string
+     */
     public function findLang($key){
     	if(isset($this->lang[$key]))return $this->lang[$key];
         return "Language profile error";
     }
-    
+
+    /**
+     * Call when disable
+     */
     public function onDisable(){
     	$this->objects['manager']->onDisable();
     	
@@ -82,6 +92,7 @@ class TouchIt extends PluginBase{
     }
     
     /**
+     * Do not use this method if not necessary
      * @return TouchIt|null
      */
     public static function getTouchIt(){

@@ -1,23 +1,34 @@
 <?php
 namespace TouchIt\Thread;
 
-use TouchIt\ThreadManager;
+use TouchIt\Thread\ThreadManager;
 use pocketmine\tile\Sign;
 
 class CheckThread extends \Thread{
-    private $thread_manager, $tiles;
+    /** @var ThreadManager  */
+    private $thread_manager;
+
+    /** @var \WeakRef[] */
+    private $tiles;
     
     public function run(){
         $next_check = [];
         while($this->check(null, 3) > 0){
             $info = $this->check(null, 2);
-            if($info === null or (time() - $info[1]) > $this->thread_manager->config->get("createTimeout", 60))break;
+            if($info === null or (time() - $info[1]) > $this->thread_manager->config->get("CreateTimeout", 60))break;
             if(!$info[0]->valid())continue;
             $info[0]->acquire();
-            $tile = $ref[0]->get();
+            $tile = $info[0]->get();
             if($tile instanceof Sign){
                 $text = $tile->getText();
-                if($text[0] === "" and $text[1] === "" and $text[2] === "" and $text[3] === ""){
+                foreach($this->check_unit as $unit){
+                    if(is_callable($unit)){
+                        if(true === @call_user_func($unit, $text, $tile, $this->thread_manager)){
+                            break;
+                        }
+                    }
+                }
+                /*if($text[0] === "" and $text[1] === "" and $text[2] === "" and $text[3] === ""){
                     $next_check[] = $tile;
                     $info[0]->release();
                 }else{
@@ -36,26 +47,27 @@ class CheckThread extends \Thread{
                             }
                         }
                     }
-                }
+                }*/
             }
         }
         exit(0);
     }
     
-    public function __construct(ThreadManager $thread_manager){
+    public function __construct(ThreadManager $thread_manager, array $unit){
         $this->thread_manager = $thread_manager;
+        $this->check_unit = $unit;
     }
     
     protected function check($tile, $action = 0){
         switch($action){
             case 0:
                 if(!($tile instanceof Sign))break;
-                $this->tile[] = [(new \WeakRef($tile)), time()];
+                $this->tiles[] = [(new \WeakRef($tile)), time()];
                 break;
             case 1:
-                return @array_shift($this->tile);
+                return @array_shift($this->tiles);
             case 2:
-                return count($this->tile);
+                return count($this->tiles);
         }
     }
 }

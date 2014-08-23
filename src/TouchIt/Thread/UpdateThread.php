@@ -10,7 +10,10 @@ class UpdateThread extends \Thread{
     private $callbacks;
 
     private $types = null;
-    
+
+    /**
+     * Process
+     */
     public function run(){
         while(count($this->signs) > 0){
             $sign = @array_shift($this->signs);
@@ -32,10 +35,21 @@ class UpdateThread extends \Thread{
         $this->signs = [];
     }
 
+    /**
+     * Use to add process unit (*.callable)
+     * @param callable $unit
+     * @param $id
+     */
     public function addUnit(callable $unit, $id){
         $this->callbacks[$id] = $unit;
     }
 
+    /**
+     * Init TouchIt supported sign list
+     * Only call this method once!
+     * @param array $types
+     * @throws \ErrorException
+     */
     public function setTypes(array $types){
         if($this->types === null){
             $this->types === $types;
@@ -43,7 +57,12 @@ class UpdateThread extends \Thread{
             throw new \ErrorException("Duplicate assignment is not allowed.");
         }
     }
-    
+
+    /**
+     * Internal use
+     * Add sign to process list
+     * @param null $sign
+     */
     public function submit($sign = null){
         if(is_array($sign)){
             $this->signs[] = $sign;

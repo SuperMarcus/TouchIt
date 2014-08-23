@@ -3,183 +3,140 @@ namespace TouchIt\DataProvider;
 
 use TouchIt\TouchIt;
 use TouchIt\DataProvider\Provider;
-use TouchIt\Exchange\SignData;
-use TouchIt\Exchange\SignContentsData;
-use pocketmine\tile\Sign;
-use pocketmine\level\Level;
-use pocketmine\level\Position;
-use pocketmine\Server;
 
-class SQLDataProvider implements Provider{
+class SQLDataProvider implements Provider extends \Thread{
+    /** @var \SQLite3 */
     private $database;
+
+    /** @var TouchIt */
+    private $plugin;
+
+    private $enable;
+    private $write;
     
-    public function __construct(){}
-    
-    public function getByTarget(string $level){
-        $result = [];
-        $query = $this->database->query("SELECT * FROM teleport WHERE target = ".$levelName.";");
+    public function __construct(TouchIt $plugin){
+        $this->plugin = $plugin;
+        $this->write = [];
+    }
+
+    /**
+     * Write an new log
+     * @param $type
+     * @param $data
+     * @param $x
+     * @param $y
+     * @param $z
+     * @param $level
+     */
+    public function create($type, $data, $x, $y, $z, $level){
+        $this->write[] = "INSERT INTO sign VALUES ('".position2string($x, $y, $z, $level)."', ".$type.", '".json_decode($data)."')";
+        $this->notify();
+    }
+
+    /**
+     * Check the log exists or not
+     * @param $x
+     * @param $y
+     * @param $z
+     * @param $level
+     * @return bool
+     */
+    public function exists($x, $y, $z, $level){
+        $query = $this->database->query("SELECT position FROM sign WHERE position = '".position2string($x, $y, $z, $level)."'");
         if($query instanceof \SQLite3Result){
-            while($value = $query->fetchArray(SQLITE3_ASSOC)){
-                $level = Server::getInstance()->getLevelByName($value['level']);
-    			if(!$level)continue;
-    			$vector = explode("_", $value['id']);
-    			$info = $this->get(new Position((int) $vector[0], (int) $vector[1], (int) $vector[2], $level));
-    			if($info !== null)$result[] = $info;
-    			unset($info);
-    			unset($vector);
-    			unset($level);
+            while(($array = $query->fetchArray(SQLITE3_ASSOC))){
+                if($array['position'] === position2string($x, $y, $z, $level)){
+                    return true;
+                }
             }
         }
-        return $result;
+        return false;
     }
-    
-    public function getByType(int $type){
-        $result = [];
-        $query = $this->database->query("SELECT * FROM index WHERE type = ".$type.";");
-        if($query instanceof \SQLite3Result){
-            while($value = $query->fetchArray(SQLITE3_ASSOC)){
-    			$vector = explode("_", $value['id']);
-    			$level = Server::getInstance()->getLevelByName($value[3]);
-    			if(!$level)continue;
-    			$info = $this->get(new Position((int) $vector[0], (int) $vector[1], (int) $vector[2], $level));
-    			if($info !== null)$result[] = $info;
-    			unset($info);
-    			unset($vector);
-    			unset($level);
-            }
-        }
-        return $result;
+
+    /**
+     * Delete log from database
+     * @param $x
+     * @param $y
+     * @param $z
+     * @param $level
+     */
+    public function remove($x, $y, $z, $level){
+        $this->write[] = "DELETE FROM sign WHERE position = '".position2string($x, $y, $z, $level)."'";
+        $this->notify();
     }
-    
-    public function create(Sign $sign){
-    	$text = $sign->getText();
-    	$type = 0;
-    	if(substr(trim($text[2]), 0, 1) === "/"){
-    		$type = TouchIt::SIGN_COMMAND;
-    		$command = substr(trim($text[2]), 1).trim($text[3]);
-    		$this->database->exec("INSERT INTO command (id, command, description) VALUES ('".$this->getId($sign)."', '".$command."', '".((trim($text[1]) === "") ? "Tap to run command." : trim($text[1]))."')");
-    	}elseif(trim($text[1]) === "" and trim($text[2]) === "" and trim($text[3]) === ""){
-    	    $type = TouchIt::SIGN_BOARDCASE;
-    	}else{
-    	    $type = TouchIt::SIGN_TELEPORT;
-    	    $this->database->exec("INSERT INTO teleport (id, level, target, description) VALUES ('".$this->getId($sign)."', '".$sign->getLevel()->getName()."', '".trim($text[2])."', '".((trim($text[3]) === "") ? "To: ".trim($text[2]) : trim($text[3]))."')");
-    	}
-    	$this->database->exec("INSERT INTO index (id, type) VALUES ('".$this->getId($sign)."', ".$type.")");
-    	return $type;
-    }
-    
-    public function exists(Position $pos){
-    	$query = $this->database->query("SELECT * FROM index WHERE id = ".$this->getId($pos));
-    	if($data instanceof \SQLite3Result){
-    		$id = $data->fetchArray(SQLITE3_ASSOC);
-    		return isset($id['id']) and $id['id'] === $this->getId($pos);
-    	}
-    	return false;
-    }
-    
-    public function remove(Position $pos){
-    	if($this->exists($pos)){
-    		$data = $this->database->query("SELECT * FROM index WHERE id = ".$this->getId($pos));
-    		if($data instanceof \SQLite3Result){
-    			$data = $data->fetchArray(SQLITE3_ASSOC);
-    			if(isset($data['id']) and $data['id'] === $this->getId($pos)){
-    				switch((int) $data['type']){
-    					case TouchIt::SIGN_TELEPORT:
-    					    return $this->database->exec("DELETE FROM index WHERE id = ".$this->getId($pos)) and $this->database->exec("DELETE FROM teleport WHERE id = ".$this->getId($pos));
-    					    break;
-    					case TouchIt::SIGN_COMMAND:
-    						return $this->database->exec("DELETE FROM index WHERE id = ".$this->getId($pos)) and $this->database->exec("DELETE FROM command WHERE id = ".$this->getId($pos));
-    						break;
-    					default:
-    						return $this->database->exec("DELETE FROM index WHERE id = ".$this->getId($pos));
-    				}
-    			}
-    		}
-    	}
-    	return false;
-    }
-    
+
+    /**
+     * return all the logs
+     * @return array
+     */
     public function getAll(){
-    	$query = $this->database->query("SELECT * FROM index WHERE id = ".$this->getId($pos).";");
-    	$result = [];
-    	if($query instanceof \SQLite3Result){
-    		while($data = $query->fetchArray(SQLITE3_ASSOC)){
-    			$level = Server::getInstance()->getLevelByName($data['level']);
-    			if(!$level)continue;
-    			$vector = explode("_", $data['id']);
-    			$info = $this->get(new Position((int) $vector[0], (int) $vector[1], (int) $vector[2], $level));
-    			if($info !== null)$result[] = $info;
-    			unset($info);
-    			unset($vector);
-    			unset($level);
-    		}
-    	}
-    	return $result;
+        $resule = [];
+        $query = $this->database->query("SELECT * FROM sign");
+        if($query instanceof \SQLite3Result){
+            while(($array = $query->fetchArray(SQLITE3_ASSOC))){
+                $resule[] = ["position" => string2position($array['position']), "type" => $array['type'], "data" => $array['data']];
+            }
+        }
+        return $resule;
     }
-    
-    public function get(Position $pos){
-    	if(!($pos->getLevel() instanceof Level))return null;
-    	
-    	$query = $this->database->query("SELECT * FROM index WHERE id = ".$this->getId($pos).";");
-    	if($query instanceof \SQLite3Result){
-    		$data = $query->fetchArray(SQLITE3_ASSOC);
-    		$query->finalize();
-    		unset($query);
-    		if(isset($data['id']) and $data['id'] === $this->getId($pos)){
-    			switch((int) $data['type']){
-    				case TouchIt::SIGN_TELEPORT:
-    					$query = $this->database->query("SELECT * FROM teleport WHERE id = ".$this->getId($pos).";");
-    					unset($data);
-    					if($query instanceof \SQLite3Result){
-    						$data = $query->fetchArray(SQLITE3_ASSOC);
-    					    if(isset($data['id']) and $data['id'] === $this->getId($pos)){
-    					    	return [
-    					    		"type" => TouchIt::SIGN_TELEPORT,
-    					    		"position" => $pos,
-    					    		"target" => $data['target'],
-    					    		"level" => $data['level'],
-    					    		"description" => $data['description']
-    					    	];
-    					    }
-    					}
-    					break;
-    				case TouchIt::SIGN_COMMAND:
-    					$query = $this->database->query("SELECT * FROM command WHERE id = ".$this->getId($pos).";");
-    					unset($data);
-    					if($query instanceof \SQLite3Result){
-    						$data = $query->fetchArray(SQLITE3_ASSOC);
-    						if(isset($data['id']) and $data['id'] === $this->getId($pos)){
-    					    	return [
-    					    		"type" => TouchIt::SIGN_COMMAND,
-    					    		"position" => $pos,
-    					    		"command" => $data['command'],
-    					    		"description" => $data['description']
-    					    	];
-    					    }
-    					}
-    					break;
-    				case TouchIt::SIGN_BOARDCASE:
-    					return ["type" => TouchIt::SIGN_BOARDCASE, "position" => $pos];
-    					break;
-    			}
-    		}
-    	}
-    	return null;
+
+    /**
+     * Get log from database
+     * @param $x
+     * @param $y
+     * @param $z
+     * @param $level
+     * @return array|null
+     */
+    public function get($x, $y, $z, $level){
+        $resule = null;
+        $query = $this->database->query("SELECT * FROM sign WHERE position = '".position2string($x, $y, $z, $level)."'");
+        if($query instanceof \SQLite3Result){
+            $array = $query->fetchArray(SQLITE3_ASSOC);
+            $resule = ["position" => string2position($array['position']), "type" => $array['type'], "data" => $array['data']];
+        }
+        return $resule;
     }
-    
+
+    /**
+     * Call when need to load database
+     */
     public function onEnable(){
     	$this->loadDataBase();
+        $this->enable = true;
+        $this->start(PTHREADS_INHERIT_ALL & ~PTHREADS_INHERIT_CLASSES);
     }
-    
+
+    /**
+     * Call when need to close database
+     */
     public function onDisable(){
-    	$this->database->close();
-    	unset($this->database);
+        $this->enable = false;
+        $this->join();
     }
-    
-    private function getId(Position $pos){
-    	return $pos->getFloorX()."_".$pos->getFloorY()."_".$pos->getFloorZ()."_".$pos->getLevel()->getName();
+
+    /**
+     * Database writing thread
+     * @throws \ErrorException
+     */
+    public function run(){
+        while($this->enable){
+            if(count($this->write) > 0){
+                foreach($this->write as $action){
+                    if(!$this->database->exec((string) $action)){
+                        throw new \ErrorException("Unable to write TouchIt database. Make sure you've got enough permissions.");
+                    }
+                }
+            }
+            $this->wait();
+        }
+        $this->database->close();
+        exit(0);
     }
-    
+
+    /**
+     * Internal use
+     */
     private function loadDataBase(){
     	if(file_exists(TouchIt::getTouchIt()->getDataFolder()."data.db")){
     		$this->database = new \SQLite3(TouchIt::getTouchIt()->getDataFolder()."data.db", SQLITE3_OPEN_READWRITE|SQLITE3_OPEN_CREATE);
@@ -188,16 +145,27 @@ class SQLDataProvider implements Provider{
     		$this->database = new \SQLite3(TouchIt::getTouchIt()->getDataFolder()."data.db", SQLITE3_OPEN_READWRITE);
     	}
     }
-    
-    private function INT_STRING($type){
-        switch($type){
-            case TouchIt::SIGN_TELEPORT:
-                return "teleport";
-            case TouchIt::SIGN_COMMAND:
-                return "command";
-            default:
-                return null;
-        }
+
+    /**
+     * Get database string by position
+     * @param $x
+     * @param $y
+     * @param $z
+     * @param $level
+     * @return string
+     */
+    private function position2string($x, $y, $z, $level){
+        return $x."-".$y."-".$z."-".$level;
+    }
+
+    /**
+     * Get position by database string
+     * @param $string
+     * @return array
+     */
+    private function string2position($string){
+        $array = explode("-", $string);
+        return ["x" => intval($array[0]), "y" => intval($array[1]), "z" => intval($array[2]), "level" => $array[3]];
     }
 }
 ?>
