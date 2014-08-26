@@ -1,8 +1,6 @@
 <?php
 namespace TouchIt;
 
-use TouchIt\TouchIt;
-
 class ConfigAccessor implements \arrayaccess{
     private $data;
 
@@ -22,42 +20,6 @@ class ConfigAccessor implements \arrayaccess{
      */
     public function exists($offset){
         return isset($this->data[$offset]);
-    }
-
-    /**
-     * @return array
-     * @throws \ErrorException
-     */
-    public function getProcessUnit(){
-        $callbacks = [];
-        foreach($this->plugin->getTypes() as $id => $type){
-            $stream = $this->plugin->getResource("callbacks/process_".strtolower($type).".callable");
-            if(!$stream){
-                @fclose($stream);
-                throw new \ErrorException("Unable to find TouchIt process unit: 'callbacks/process_".strtolower($type).".callable' id: ".$id." Make sure you got the full version of TouchIt.");
-            }
-            $callbacks[$id] = @create_function('$sign, $tile, $thread_manager', @stream_get_contents($stream));
-            @fclose($stream);
-        }
-        return $callbacks;
-    }
-
-    /**
-     * @return array
-     * @throws \ErrorException
-     */
-    public function getCheckUnit(){
-        $callbacks = [];
-        foreach($this->plugin->getTypes() as $type){
-            $stream = $this->plugin->getResource("callbacks/check_".strtolower($type).".callable");
-            if(!$stream){
-                @fclose($stream);
-                throw new \ErrorException("Unable to find TouchIt check unit: 'callbacks/check_".strtolower($type).".callable' id: ".$id." Make sure you got the full version of TouchIt.");
-            }
-            $callbacks[] = @create_function('$text, $tile, $thread_manager', @stream_get_contents($stream));
-            @fclose($stream);
-        }
-        return $callbacks;
     }
 
     /**
@@ -108,9 +70,7 @@ class ConfigAccessor implements \arrayaccess{
      * @param $name
      * @param $value
      */
-    public function __set($name, $value){
-        $this->set($name, $value);
-    }
+    public function __set($name, $value){}
 
     /**
      * @param $name

@@ -2,67 +2,48 @@
 namespace TouchIt;
 
 use pocketmine\plugin\PluginBase;
-use TouchIt\ConfigAccessor;
 use TouchIt\DataProvider\Provider;
 use TouchIt\DataProvider\SQLDataProvider;
 use TouchIt\Listener\MainListener;
 use TouchIt\Listener\UpdateListener;
-use TouchIt\SignManager;
 
 class TouchIt extends PluginBase{
-    const SIGN_TELEPORT = 0;
-    const SIGN_COMMAND = 1;
-    const SIGN_BOARDCASE = 2;
-
-    public $types = [
-        0 => "SIGN_TELEPORT",
-        1 => "SIGN_COMMAND",
-        2 => "SIGN_BOARDCASE"
-    ];
-	
     private $objects;
     
     public $lang = [];//TouchIt language profile
-    
-    /** @var SignManager */
-    public static $manager;
-    /** @var Provider */
-    public static $configProvider;
-    /** @var Provider */
-    public static $dataProvider;
-    /** @var MainListener */
-    public static $listener;
-    /** @var TouchIt */
-    public static $main;
+
+    /** @var null|SignManager */
+    private $manager = null;
+
+    /** @var null|Listener[] */
+    private $listener = null;
+
+    /** @var null|Provider */
+    private $provider = null;
+
+    /** @var null|UnitLoader */
+    private $unit_loader = null;
 
     /**
      * Call when enable
      */
     public function onEnable(){
-    	self::$main = $this;
-    	
-    	@mkdir(TouchIt::getTouchIt()->getDataFolder());
-    	
-        $this->objects = [//The providers and managers
-            "manager" => new SignManager(),
-            "config" => new ConfigAccessor($this->getDataFolder()."config.cnf", $this),
-            "data" => new SQLDataProvider(),
-            "listener" => new MainListener,
-            "updatelistener" => new UpdateListener
-        ];
+    	@mkdir($this->getDataFolder());
+
+        $this->unit_loader = new UnitLoader($this);
+        $this->provider = new SQLDataProvider($this);
+        $this->manager = new SignManager($this, $this->provider, $this->unit_loader);
+        $this->listener = [new MainListener($this->manager, $this), new UpdateListener($this->manager)];
+
+        $this->getConfig()->analyzeFile();
         
-        self::$manager = $this->objects["manager"];
-        self::$configProvider = $this->objects["config"];
-        self::$dataProvider = $this->objects["data"];
-        self::$listener = $this->objects["listener"];
-        
-        $this->lang = $this->objects["config"]->getLang();
-        
-        $this->objects['config']->analyzeFile();
-        $this->objects['manager']->onEnable();
-        
-        $this->getServer()->getPluginManager()->registerEvents($this->objects["listener"], $this);
-        $this->getServer()->getPluginManager()->registerEvents($this->objects["updatelistener"], $this);
+        $this->lang = $this->getConfig()->getLang();
+
+        $this->manager->onEnable();
+
+        foreach($this->listener as $listener){
+            $this->getServer()->getPluginManager()->registerEvents($listener, $this);
+        }
         //Auto register all the events
     }
 
@@ -79,75 +60,39 @@ class TouchIt extends PluginBase{
      * Call when disable
      */
     public function onDisable(){
-    	$this->objects['manager']->onDisable();
-    	
-    	$this->objects = [];
-    	
-    	//Destroy all the objects, then some of the method in this class will return null.
-    	self::$manager = null;
-        self::$configProvider = null;
-        self::$dataProvider = null;
-        self::$listener = null;
-        self::$main = null;
+        $this->manager->onDisable();
+        $this->provider->onDisable();
     }
-    
-    /**
-     * Do not use this method if not necessary
-     * @return TouchIt|null
-     */
-    public static function getTouchIt(){
-        return self::$main;
-    }
-    
-    /**
-     * @return SignManager|null
-     */
-    public static function getManager(){
-        return self::$manager;
-    }
-    
-    /**
-     * @return Provider|null
-     */
-    public static function getDataProvider(){
-        return self::$dataProvider;
-    }
-    
-    /**
-     * @return Provider|null
-     */
-    public static function getConfigProvider(){
-        return self::$configProvider;
+
+    public function saveDefaultConfig(){
+        $this->reloadConfig();
     }
 
     /**
-     * @param $key
-     * @return string
+     * Re-analyze config
      */
-    public static function getLang($key){
-        return self::$main->findLang($key);
-    }
-    
-    /**
-     * @return EventListener|null
-     */
-    public static function getEventListener(){
-        return self::$listener;
+    public function reloadConfig(){
+        $this->config = new ConfigAccessor($this->getDataFolder()."config.cnf", $this);
+        $this->config->analyzeFile();
     }
 
     /**
-     * @param Provider $object
+     * Same as reloadConfig();
      */
-    public function setDataProvider(Provider $object){
-        $this->objects["data"] = $object;
-        self::$dataProvider = $object;
+    public function saveConfig(){
+        $this->reloadConfig();
     }
 
     /**
-     * @return array
+     * @return ConfigAccessor
      */
-    public function getTypes(){
-        return $this->types;
+    public function getConfig(){
+        if($this->config instanceof ConfigAccessor){
+            return $this->config;
+        }else{
+            $this->reloadConfig();
+            return $this->getConfig();
+        }
     }
 }
 ?>

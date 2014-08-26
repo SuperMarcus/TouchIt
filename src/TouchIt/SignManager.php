@@ -1,116 +1,51 @@
 <?php
 namespace TouchIt;
 
-use TouchIt\TouchIt;
 use TouchIt\DataProvider\Provider;
-use TouchIt\Thread\Pool;
-use TouchIt\Thread\BoardCaseSignUpdater;
-use TouchIt\Thread\TeleportSignUpdater;
 use pocketmine\Server;
-use pocketmine\event\Event;
 use pocketmine\block\Block;
 use pocketmine\tile\Sign;
 use pocketmine\utils\TextFormat;
 use pocketmine\level\Level;
 
 class SignManager{
-    public $pool;
-    private $updates, $announcement, $bcoffset;
+    /** @var TouchIt */
+    private $plugin;
+
+    /** @var Provider */
+    private $provider;
+
+    /** @var UnitLoader */
+    private $unit;
+
+    /** @var ConfigAccessor */
+    private $config;
     
-    public function __construct(){
-        $this->stop = false;
-        $this->isChoosing = false;
-        $this->announcement = "";
+    public function __construct(TouchIt $plugin, Provider $provider, UnitLoader $unit){
+        $this->plugin = $plugin;
+        $this->provider = $provider;
+        $this->unit = $unit;
+        $this->config = $plugin->getConfig();//This call will load config ^_^
     }
     
     public function onEnable(){
-        $this->nextAnnouncement();
-        $this->initPool();
-    }
-    
-    private function initPool(){
-        TouchIt::getTouchIt()->getLogger()->info("[TouchIt] ".TouchIt::getLang("thread.start"));
-        $this->pool = new Pool();
-        $this->pool->submitWorker(new BoardCaseSignUpdater());
-        $this->pool->submitWorker(new TeleportSignUpdater());
-        $this->pool->onEnable();
+
     }
     
     public function onDisable(){
-        $this->announcement = "";
+
+    }
+
+    public function onUpdate(){
+
+    }
+
+    public function onPlayerTouch($block, $player){
+
     }
     
-    public function addToUpdate($level){
-        $this->updates[] = $level;
-    }
-    
-    public function needUpdates($type){
-        $signs = [];
-        switch($type){
-            case TouchIt::SIGN_TELEPORT:
-                $signs = $this->updates;
-                $this->updates = [];
-            default:
-                $signs = TouchIt::getDataProvider()->getByType($type);
-        }
-        return $signs;
-    }
-    
-    public function getAnnouncement(){
-        return $this->announcement;
-    }
-    
-    public function nextAnnouncement(){
-        if(!($fp = @fopen(TouchIt::getTouchIt()->getDataFolder()."announcement.txt", "r+"))){
-            @fclose($fp);
-            if($this->announcement == "")$this->announcement = TouchIt::getLang("sign.boardcase.unavailable");
-            return;
-        }
-        if($this->bcoffset !== 0){
-            fseek($fp, $this->bcoffset);
-            if(feof($fp)){
-                fseek($fp, 0);
-            }
-        }
-        $this->announcement = fgets($fp);
-        $this->bcoffset = ftell($fp);
-        @fclose($fp);
-    }
-    
-    public function onBlockPlace(BlockPlaceEvent $event){
-        if($event->getBlock()->getID() === Block::WALL_SIGN or $event->getBlock()->getID === Block::SIGN_POST){
-            if(TouchIt::getDataProvider()->exists($event->getBlock())){
-                $info = TouchIt::getDataProvider()->get($event->getBlock());
-                switch($info['type']){
-                    case TouchIt::SIGN_TELEPORT:
-                        if(($target = Server::getInstance()->getLevelByName($info['target'])) !== null and $target instanceof Level){
-                            $event->getPlayer()->sendMessage(TextFormat::DARK_GREEN."[TouchIt] ".TouchIt::getLang("sign.teleport.running").$target->getName());
-                            $event->getPlayer()->teleport($target->getSpawnLocation());
-                        }else{
-                            $event->getPlayer()->sendMessage(TextFormat::YELLOW."[TouchIt] ".TouchIt::getLang("sign.teleport.notopen"));
-                        }
-                    case TouchIt::SIGN_BOARDCASE:
-                        $event->getPlayer()->sendMessage(TextFormat::GOLD."[".TouchIt::getLang("sign.boardcase.title")."] ".$this->getAnnouncement());
-                    case TouchIt::SIGN_COMMAND:
-                        Server::getInstance()->dispatchCommand($event->getPlayer(), $info['command']);
-                }
-                $event->setCancelled();
-            }
-        }
-    }
-    
-    public function onBlockBreak(BlockBreakEvent $event){
-        if($event->getBlock()->getID() === Block::WALL_SIGN or $event->getBlock()->getID === Block::SIGN_POST){
-            if(TouchIt::getDataProvider()->exists($event->getBlock())){
-                if($event->getPlayer()->hasPermission("touchit.sign.break")){
-                    TouchIt::getDataProvider()->remove($event->getBlock());
-                    $event->getPlayer()->sendMessage(TextFormat::DARK_GREEN."[TouchIt] ".TouchIt::getLang("sign.destroy.done"));
-                }else{
-                    $event->getPlayer()->sendMessage(TextFormat::RED."[TouchIt] ".TouchIt::getLang("sign.destroy.permission"));
-                    $event->setCancelled();
-                }
-            }
-        }
+    public function onBlockBreak($event){
+
     }
 }
 ?>

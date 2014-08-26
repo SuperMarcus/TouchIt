@@ -2,9 +2,8 @@
 namespace TouchIt\DataProvider;
 
 use TouchIt\TouchIt;
-use TouchIt\DataProvider\Provider;
 
-class SQLDataProvider implements Provider extends \Thread{
+class SQLDataProvider extends Provider{
     /** @var \SQLite3 */
     private $database;
 
@@ -29,7 +28,7 @@ class SQLDataProvider implements Provider extends \Thread{
      * @param $level
      */
     public function create($type, $data, $x, $y, $z, $level){
-        $this->write[] = "INSERT INTO sign VALUES ('".position2string($x, $y, $z, $level)."', ".$type.", '".json_decode($data)."')";
+        $this->write[] = "INSERT INTO sign VALUES ('".$this->position2string($x, $y, $z, $level)."', ".$type.", '".json_decode($data)."')";
         $this->notify();
     }
 
@@ -42,10 +41,10 @@ class SQLDataProvider implements Provider extends \Thread{
      * @return bool
      */
     public function exists($x, $y, $z, $level){
-        $query = $this->database->query("SELECT position FROM sign WHERE position = '".position2string($x, $y, $z, $level)."'");
+        $query = $this->database->query("SELECT position FROM sign WHERE position = '".$this->position2string($x, $y, $z, $level)."'");
         if($query instanceof \SQLite3Result){
             while(($array = $query->fetchArray(SQLITE3_ASSOC))){
-                if($array['position'] === position2string($x, $y, $z, $level)){
+                if($array['position'] === $this->position2string($x, $y, $z, $level)){
                     return true;
                 }
             }
@@ -61,7 +60,7 @@ class SQLDataProvider implements Provider extends \Thread{
      * @param $level
      */
     public function remove($x, $y, $z, $level){
-        $this->write[] = "DELETE FROM sign WHERE position = '".position2string($x, $y, $z, $level)."'";
+        $this->write[] = "DELETE FROM sign WHERE position = '".$this->position2string($x, $y, $z, $level)."'";
         $this->notify();
     }
 
@@ -74,7 +73,7 @@ class SQLDataProvider implements Provider extends \Thread{
         $query = $this->database->query("SELECT * FROM sign");
         if($query instanceof \SQLite3Result){
             while(($array = $query->fetchArray(SQLITE3_ASSOC))){
-                $resule[] = ["position" => string2position($array['position']), "type" => $array['type'], "data" => $array['data']];
+                $resule[] = ["position" => $this->string2position($array['position']), "type" => $array['type'], "data" => $array['data']];
             }
         }
         return $resule;
@@ -90,10 +89,10 @@ class SQLDataProvider implements Provider extends \Thread{
      */
     public function get($x, $y, $z, $level){
         $resule = null;
-        $query = $this->database->query("SELECT * FROM sign WHERE position = '".position2string($x, $y, $z, $level)."'");
+        $query = $this->database->query("SELECT * FROM sign WHERE position = '".$this->position2string($x, $y, $z, $level)."'");
         if($query instanceof \SQLite3Result){
             $array = $query->fetchArray(SQLITE3_ASSOC);
-            $resule = ["position" => string2position($array['position']), "type" => $array['type'], "data" => $array['data']];
+            $resule = ["position" => $this->string2position($array['position']), "type" => $array['type'], "data" => $array['data']];
         }
         return $resule;
     }

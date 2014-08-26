@@ -1,8 +1,8 @@
 <?php
 namespace TouchIt\Thread;
 
-use TouchIt\Thread\ThreadManager;
 use pocketmine\tile\Sign;
+use pocketmine\math\Vector3;
 
 class UpdateThread extends \Thread{
     private $thread_manager;
@@ -17,12 +17,14 @@ class UpdateThread extends \Thread{
     public function run(){
         while(count($this->signs) > 0){
             $sign = @array_shift($this->signs);
-            $tile = $sign['position']->getLevel()->getTile($sign['position']);
-            if($tile instanceof Sign){
-                if(isset($this->callbacks[$sign['types']])){//Call unit
-                    $callback = $this->callbacks[$sign['types']];
-                    if(is_callable($callback)){
-                        @call_user_func($callback, $sign, $tile, $this->thread_manager);
+            $level = $this->thread_manager->plugin->getServer()->getLevelByName($sign['position']['level']);
+            if($level and ($tile = $level->getTile(new Vector3($sign['position']['x'], $sign['position']['y'], $sign['position']['z']))) instanceof Sign){
+                if($tile instanceof Sign){
+                    if(isset($this->callbacks[$sign['types']])){//Call unit
+                        $callback = $this->callbacks[$sign['types']];
+                        if(is_callable($callback)){
+                            @call_user_func($callback, $sign, $tile, $this->thread_manager);
+                        }
                     }
                 }
             }

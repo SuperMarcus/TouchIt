@@ -1,0 +1,9 @@
+{
+    "name": "teleport",
+    "type": 0,
+    "file": {
+        "check.callback": 0,
+        "process.callback": 1,
+        "touch.callback": 2
+    }
+}

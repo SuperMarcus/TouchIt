@@ -1,7 +1,7 @@
 <?php
 namespace TouchIt\Listener;
 
-use TouchIt\TouchIt;
+use TouchIt\SignManager;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
@@ -10,12 +10,17 @@ use pocketmine\event\entity\EntityLevelChangeEvent;
 
 /** This listener is used for update sign */
 class UpdateListener implements Listener{
+    private $manager;
+
+    public function __construct(SignManager $manager){
+        $this->manager = $manager;
+    }
     /**
      * Update when player join the game
      * @param PlayerLoginEvent $event
      */
     public function onPlayerLogin(PlayerLoginEvent $event){
-        TouchIt::getManager()->addToUpdate($event->getPlayer()->getLevel()->getName());
+
     }
 
     /**
@@ -23,7 +28,7 @@ class UpdateListener implements Listener{
      * @param PlayerQuitEvent $event
      */
     public function onPlayerQuit(PlayerQuitEvent $event){
-        TouchIt::getManager()->addToUpdate($event->getPlayer()->getLevel()->getName());
+
     }
 
     /**
@@ -31,10 +36,7 @@ class UpdateListener implements Listener{
      * @param PlayerRespawnEvent $event
      */
     public function onPlayerRespawn(PlayerRespawnEvent $event){
-        TouchIt::getManager()->addToUpdate($event->getRespawnPosition()->getLevel()->getName());
-        //Respawn level
-        TouchIt::getManager()->addToUpdate($event->getPlayer()->getLevel()->getName());
-        //Origin level
+
     }
 
     /**
@@ -42,12 +44,7 @@ class UpdateListener implements Listener{
      */
     //Update when player has been teleport between two level
     public function onPlayerLevelChange(EntityLevelChangeEvent $event){
-        if($event->getEntity() instanceof Player){
-            TouchIt::getManager()->addToUpdate($event->getOrigin()->getName());
-            //Origin level
-            TouchIt::getManager()->addToUpdate($event->getTarget()->getName());
-            //Target level
-        }
+
     }
 }
 ?>
