@@ -3,7 +3,9 @@ namespace TouchIt\Listener;
 
 use pocketmine\event\Listener;
 use pocketmine\event\block\BlockBreakEvent;
-use pocketmine\event\block\PlayerInteractEvent;
+use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\block\SignChangeEvent;
 use pocketmine\tile\Sign;
 use TouchIt\SignManager;
 use TouchIt\TouchIt;
@@ -22,9 +24,24 @@ class MainListener implements Listener{
      * @param PlayerInteractEvent $event
      */
     public function onPlayerInteract(PlayerInteractEvent $event){
-        if($event->getBlock()->getLevel()->getTile($event->getBlock()) instanceof Sign){
-            $event->setCancelled();
-            $this->manager->onPlayerTouch($event->getBlock(), $event->getPlayer());
+        $block = $event->getBlock();
+        if($block instanceof SignPost or $block instanceof WallSign){
+            $this->manager->onPlayerTouch($block, $event->getPlayer(), $event);
+        }
+    }
+
+    /**
+     * @param BlockPlaceEvent $event
+     */
+    public function onBlockPlace(BlockPlaceEvent $event){
+        if(($tile = $event->getBlock()->getLevel()->getTile($event->getBlock())) instanceof Sign){
+            $this->manager->onBlockPlace($tile);
+        }
+    }
+
+    public function onSignChange(SignChangeEvent $event){
+        if(strtolower(trim($event->getLine(0))) == "touchit"){
+            $this->manager->onNewSign($event->getPlayer(), $event->getLines(), $event->getBlock());
         }
     }
 

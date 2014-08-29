@@ -2,18 +2,21 @@
 namespace TouchIt;
 
 use pocketmine\plugin\PluginBase;
+use pocketmine\event\Listener;
 use TouchIt\DataProvider\Provider;
 use TouchIt\DataProvider\SQLDataProvider;
 use TouchIt\Listener\MainListener;
 use TouchIt\Listener\UpdateListener;
 
 class TouchIt extends PluginBase{
-    private $objects;
-    
+    /** @var array */
     public $lang = [];//TouchIt language profile
 
     /** @var null|SignManager */
     private $manager = null;
+
+    /** @var null|ConfigAccessor */
+    private $touchit_config = null;
 
     /** @var null|Listener[] */
     private $listener = null;
@@ -72,8 +75,8 @@ class TouchIt extends PluginBase{
      * Re-analyze config
      */
     public function reloadConfig(){
-        $this->config = new ConfigAccessor($this->getDataFolder()."config.cnf", $this);
-        $this->config->analyzeFile();
+        $this->touchit_config = new ConfigAccessor($this->getDataFolder()."config.cnf", $this);
+        $this->touchit_config->analyzeFile();
     }
 
     /**
@@ -87,8 +90,8 @@ class TouchIt extends PluginBase{
      * @return ConfigAccessor
      */
     public function getConfig(){
-        if($this->config instanceof ConfigAccessor){
-            return $this->config;
+        if($this->touchit_config instanceof ConfigAccessor){
+            return $this->touchit_config;
         }else{
             $this->reloadConfig();
             return $this->getConfig();

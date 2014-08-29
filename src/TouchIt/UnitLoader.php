@@ -9,13 +9,13 @@ class UnitLoader{
     /** @var TouchIt */
     private $plugin;
 
-    /** @var callable[] */
+    /** @var array */
     private $units;
 
     public $args = array(
         0 => '$text, $tile, $thread_manager',
         1 => '$sign, $tile, $thread_manager',
-        2 => '$tile, $manager'
+        2 => '$info, $player, $manager'
     );
 
     public function __construct(TouchIt $plugin){

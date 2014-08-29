@@ -1,7 +1,6 @@
 <?php
 namespace TouchIt\Thread;
 
-use TouchIt\Thread\ThreadManager;
 use pocketmine\tile\Sign;
 
 class CheckThread extends \Thread{
@@ -12,7 +11,6 @@ class CheckThread extends \Thread{
     private $tiles;
     
     public function run(){
-        $next_check = [];
         while($this->check(null, 3) > 0){
             $info = $this->check(null, 2);
             if($info === null or (time() - $info[1]) > $this->thread_manager->config->get("CreateTimeout", 60))break;
@@ -58,17 +56,8 @@ class CheckThread extends \Thread{
         $this->check_unit = $unit;
     }
     
-    protected function check($tile, $action = 0){
-        switch($action){
-            case 0:
-                if(!($tile instanceof Sign))break;
-                $this->tiles[] = [(new \WeakRef($tile)), time()];
-                break;
-            case 1:
-                return @array_shift($this->tiles);
-            case 2:
-                return count($this->tiles);
-        }
+    protected function add($tile){
+        $this->tiles[] = new \WekRef($tile);
     }
 }
 ?>

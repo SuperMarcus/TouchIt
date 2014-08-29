@@ -2,15 +2,14 @@
 namespace TouchIt\Thread;
 
 use pocketmine\plugin\PluginLogger;
+use pocketmine\Thread;
 use pocketmine\tile\Sign;
 use TouchIt\TouchIt;
-use TouchIt\Thread\Thread;
 use TouchIt\DataProvider\Provider;
 use TouchIt\ConfigAccessor;
-use TouchIt\Thread\UpdateThread;
-use TouchIt\Thread\CheckThread;
+use TouchIt\UnitLoader;
 
-class ThreadManager extends \Thread{
+class ThreadManager extends Thread{
     private $isenable;
 
     private $types;
@@ -20,6 +19,9 @@ class ThreadManager extends \Thread{
     
     /** @var CheckThread */
     private $check_thread;
+
+    /** @var UnitLoader */
+    private $unit;
     
     /** @var Provider */
     public $provider;
@@ -33,13 +35,14 @@ class ThreadManager extends \Thread{
     /** @var ConfigAccessor */
     public $config;
     
-    public function __construct(TouchIt $plugin, PluginLogger $logger, Provider $provider, ConfigAccessor $config){
+    public function __construct(TouchIt $plugin, UnitLoader $unit, PluginLogger $logger, Provider $provider, ConfigAccessor $config){
         $this->plugin = $plugin;
         $this->logger = $logger;
         $this->provider = $provider;
         $this->config = $config;
         $this->isenable = false;
         $this->types = $plugin->getTypes();
+        $this->unit = $unit;
     }
 
     /**
@@ -52,9 +55,9 @@ class ThreadManager extends \Thread{
     /**
      * Start process.
      */
-    public function start(){
+    public function onEnable(){
         $this->isenable = true;
-        parent::start(PTHREADS_INHERIT_ALL & ~PTHREADS_INHERIT_CLASSES);
+        $this->start(PTHREADS_INHERIT_ALL & ~PTHREADS_INHERIT_CLASSES);
     }
 
     /**
@@ -70,7 +73,6 @@ class ThreadManager extends \Thread{
     public function onDisable(){
         $this->isenable = false;
         $this->notify();
-        $this->logger->info($this->plugin->findLang("thread.stop"));
     }
 
     /**
@@ -79,14 +81,14 @@ class ThreadManager extends \Thread{
     public function run(){
         /** --- Start thread --- */
         $this->logger->info($this->plugin->findLang("thread.start"));
-        $this->check_thread = new CheckThread($this);
+        $this->check_thread = new CheckThread($this, $this->unit->getUnits("unit_check"));
         $this->update_threads = [];
         if(($thread = $this->config->get("thread", 3)) <= 1){
             $this->logget->warning($this->plugin->findLang("thread.warning.notenough"));
             $thread = 3;
         }
         while($thread > 0){
-            $update_thread = new UpdateThread($this);
+            $update_thread = new UpdateThread($this, $this->unit->getUnits("unit_process"));
             $update_thread->setTypes($this->types);
             $this->update_threads[] = $update_thread;
             $thread--;
@@ -118,6 +120,18 @@ class ThreadManager extends \Thread{
             }
             unset($updates);
             $this->wait(10);
+        }
+    }
+
+    public function kill(){
+        $this->logger->info($this->plugin->findLang("thread.stop"));
+        if($this->isenable){
+            $this->isenable = false;
+            $this->notify();
+            $this->logger->info($this->plugin->findLang("thread.shut"));
+            $this->join();
+        }else{
+
         }
     }
 }

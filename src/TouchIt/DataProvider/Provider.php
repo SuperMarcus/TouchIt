@@ -2,15 +2,18 @@
 namespace TouchIt\DataProvider;
 
 use TouchIt\TouchIt;
-use pocketmine\level\Position;
-use pocketmine\tile\Sign;
+use pocketmine\Thread;
 
-abstract class Provider implements \Thread{
+abstract class Provider extends Thread{
+    private $plugin;
+
     /**
      * Initialize method
      * @param TouchIt $plugin
      */
-    abstract public function __construct(TouchIt $plugin);
+    public final function __construct(TouchIt $plugin){
+        $this->plugin = $plugin;
+    }
 
     /**
      * Add a new sign
@@ -67,5 +70,9 @@ abstract class Provider implements \Thread{
      * Internal method
      */
     abstract public function onDisable();
+
+    public function kill(){
+        $this->onDisable();
+    }
 }
 ?>
