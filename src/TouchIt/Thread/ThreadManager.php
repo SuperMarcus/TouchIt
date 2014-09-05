@@ -49,7 +49,7 @@ class ThreadManager extends Thread{
      * @param Sign $tile
      */
     public function submitNewSign(Sign $tile){
-        $this->check_thread->check($tile);
+        $this->check_thread->add($tile);
     }
 
     /**

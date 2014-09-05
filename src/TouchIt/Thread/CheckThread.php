@@ -11,8 +11,8 @@ class CheckThread extends \Thread{
     private $tiles;
     
     public function run(){
-        while($this->check(null, 3) > 0){
-            $info = $this->check(null, 2);
+        while(count($this->tiles) > 0){
+            $info = @array_shift($this->tiles);
             if($info === null or (time() - $info[1]) > $this->thread_manager->config->get("CreateTimeout", 60))break;
             if(!$info[0]->valid())continue;
             $info[0]->acquire();
