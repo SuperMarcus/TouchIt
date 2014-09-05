@@ -1,11 +1,14 @@
 <?php
 namespace TouchIt\DataProvider;
 
+use Thread;
 use TouchIt\TouchIt;
-use pocketmine\Thread;
 
 abstract class Provider extends Thread{
+    /** @var TouchIt */
     private $plugin;
+
+    private $isenable;
 
     /**
      * Initialize method
@@ -14,6 +17,44 @@ abstract class Provider extends Thread{
     public final function __construct(TouchIt $plugin){
         $this->plugin = $plugin;
     }
+
+    /**
+     * Process
+     */
+    public final function run(){
+        while($this->isEnable()){
+            $this->onLoop();
+        }
+        exit(0);
+    }
+
+    public final function start(){
+        $this->isenable = true;
+        $this->onEnable();
+        parent::start(PTHREADS_INHERIT_ALL & ~PTHREADS_INHERIT_CLASSES);
+    }
+
+    /**
+     * Call when need to stop the thread
+     */
+    public final function stop(){
+        $this->isenable = false;
+        $this->notify();
+        $this->join();
+        $this->onDisable();
+    }
+
+    /**
+     * @return bool
+     */
+    public final function isEnable(){
+        return (bool) $this->isenable;
+    }
+
+    /**
+     * Process thread
+     */
+    abstract public function onLoop();
 
     /**
      * Add a new sign
@@ -47,12 +88,21 @@ abstract class Provider extends Thread{
 
     /**
      * Get all the sign
+     * @see Provider::get()
      * @return array
      */
     abstract public function getAll();
 
     /**
      * Get sign from provider
+     *
+     * Format:
+     * [
+     *   "position" => ["x" => int, "y" => int, "z" => int],
+     *   "type" => int,
+     *   "data" => string
+     * ]
+     *
      * @param $x
      * @param $y
      * @param $z
@@ -70,9 +120,5 @@ abstract class Provider extends Thread{
      * Internal method
      */
     abstract public function onDisable();
-
-    public function kill(){
-        $this->onDisable();
-    }
 }
 ?>

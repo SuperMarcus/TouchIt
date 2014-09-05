@@ -9,8 +9,6 @@ class UpdateThread extends \Thread{
     private $signs;
     private $callbacks;
 
-    private $types = null;
-
     /**
      * Process
      */
@@ -44,20 +42,6 @@ class UpdateThread extends \Thread{
      */
     public function addUnit(callable $unit, $id){
         $this->callbacks[$id] = $unit;
-    }
-
-    /**
-     * Init TouchIt supported sign list
-     * Only call this method once!
-     * @param array $types
-     * @throws \ErrorException
-     */
-    public function setTypes(array $types){
-        if($this->types === null){
-            $this->types === $types;
-        }else{
-            throw new \ErrorException("Duplicate assignment is not allowed.");
-        }
     }
 
     /**

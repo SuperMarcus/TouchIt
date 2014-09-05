@@ -11,12 +11,9 @@ class SQLDataProvider extends Provider{
     private $plugin;
 
     private $enable;
-    private $write;
-    
-    public function __construct(TouchIt $plugin){
-        $this->plugin = $plugin;
-        $this->write = [];
-    }
+    private $write = [];
+
+    public function onLoad(){}
 
     /**
      * Write an new log
@@ -28,7 +25,7 @@ class SQLDataProvider extends Provider{
      * @param $level
      */
     public function create($type, $data, $x, $y, $z, $level){
-        $this->write[] = "INSERT INTO sign VALUES ('".$this->position2string($x, $y, $z, $level)."', ".$type.", '".json_decode($data)."')";
+        $this->write[] = "INSERT INTO sign VALUES ('".$this->position2string($x, $y, $z, $level)."', ".$type.", '".json_decode($data)."');";
         $this->notify();
     }
 
@@ -41,7 +38,7 @@ class SQLDataProvider extends Provider{
      * @return bool
      */
     public function exists($x, $y, $z, $level){
-        $query = $this->database->query("SELECT position FROM sign WHERE position = '".$this->position2string($x, $y, $z, $level)."'");
+        $query = $this->database->query("SELECT position FROM sign WHERE position = '".$this->position2string($x, $y, $z, $level)."';");
         if($query instanceof \SQLite3Result){
             while(($array = $query->fetchArray(SQLITE3_ASSOC))){
                 if($array['position'] === $this->position2string($x, $y, $z, $level)){
@@ -60,17 +57,18 @@ class SQLDataProvider extends Provider{
      * @param $level
      */
     public function remove($x, $y, $z, $level){
-        $this->write[] = "DELETE FROM sign WHERE position = '".$this->position2string($x, $y, $z, $level)."'";
+        $this->write[] = "DELETE FROM sign WHERE position = '".$this->position2string($x, $y, $z, $level)."';";
         $this->notify();
     }
 
     /**
      * return all the logs
+     * @see Provider::getAll()
      * @return array
      */
     public function getAll(){
         $resule = [];
-        $query = $this->database->query("SELECT * FROM sign");
+        $query = $this->database->query("SELECT * FROM sign;");
         if($query instanceof \SQLite3Result){
             while(($array = $query->fetchArray(SQLITE3_ASSOC))){
                 $resule[] = ["position" => $this->string2position($array['position']), "type" => $array['type'], "data" => $array['data']];
@@ -81,6 +79,7 @@ class SQLDataProvider extends Provider{
 
     /**
      * Get log from database
+     * @see Provider::get()
      * @param $x
      * @param $y
      * @param $z
@@ -89,7 +88,7 @@ class SQLDataProvider extends Provider{
      */
     public function get($x, $y, $z, $level){
         $resule = null;
-        $query = $this->database->query("SELECT * FROM sign WHERE position = '".$this->position2string($x, $y, $z, $level)."'");
+        $query = $this->database->query("SELECT * FROM sign WHERE position = '".$this->position2string($x, $y, $z, $level)."';");
         if($query instanceof \SQLite3Result){
             $array = $query->fetchArray(SQLITE3_ASSOC);
             $resule = ["position" => $this->string2position($array['position']), "type" => $array['type'], "data" => $array['data']];
@@ -102,46 +101,39 @@ class SQLDataProvider extends Provider{
      */
     public function onEnable(){
     	$this->loadDataBase();
-        $this->enable = true;
-        $this->start(PTHREADS_INHERIT_ALL & ~PTHREADS_INHERIT_CLASSES);
     }
 
     /**
      * Call when need to close database
      */
     public function onDisable(){
-        $this->enable = false;
-        $this->join();
+        $this->database->close();
     }
 
     /**
      * Database writing thread
      * @throws \ErrorException
      */
-    public function run(){
-        while($this->enable){
-            if(count($this->write) > 0){
-                foreach($this->write as $action){
-                    if(!$this->database->exec((string) $action)){
-                        throw new \ErrorException("Unable to write TouchIt database. Make sure you've got enough permissions.");
-                    }
+    public function onLoop(){
+        if(count($this->write) > 0){
+            foreach($this->write as $action){
+                if(!$this->database->exec((string) $action)){
+                    throw new \ErrorException("Unable to write TouchIt database. Make sure you've got enough permissions.");
                 }
             }
-            $this->wait();
         }
-        $this->database->close();
-        exit(0);
+        $this->wait();
     }
 
     /**
      * Internal use
      */
     private function loadDataBase(){
-    	if(file_exists(TouchIt::getTouchIt()->getDataFolder()."data.db")){
-    		$this->database = new \SQLite3(TouchIt::getTouchIt()->getDataFolder()."data.db", SQLITE3_OPEN_READWRITE|SQLITE3_OPEN_CREATE);
-    		$this->database->exec(stream_get_contents(TouchIt::getTouchIt()->getResource("database/sqlite3.sql")));
+    	if(file_exists($this->plugin->getDataFolder()."data.db")){
+    		$this->database = new \SQLite3($this->plugin->getDataFolder()."data.db", SQLITE3_OPEN_READWRITE|SQLITE3_OPEN_CREATE);
+    		$this->database->exec(stream_get_contents($this->plugin->getResource("database/sqlite3.sql")));
     	}else{
-    		$this->database = new \SQLite3(TouchIt::getTouchIt()->getDataFolder()."data.db", SQLITE3_OPEN_READWRITE);
+    		$this->database = new \SQLite3($this->plugin->getDataFolder()."data.db", SQLITE3_OPEN_READWRITE);
     	}
     }
 

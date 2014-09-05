@@ -84,22 +84,22 @@ class ThreadManager extends Thread{
         $this->check_thread = new CheckThread($this, $this->unit->getUnits("unit_check"));
         $this->update_threads = [];
         if(($thread = $this->config->get("thread", 3)) <= 1){
-            $this->logget->warning($this->plugin->findLang("thread.warning.notenough"));
+            $this->logger->warning($this->plugin->findLang("thread.warning.notenough"));
             $thread = 3;
         }
         while($thread > 0){
             $update_thread = new UpdateThread($this, $this->unit->getUnits("unit_process"));
-            $update_thread->setTypes($this->types);
             $this->update_threads[] = $update_thread;
             $thread--;
         }
-        foreach($this->config->getProcessUnit() as $id => $unit){
+        foreach($this->unit->getUnits("unit_process") as $id => $unit){
             if(is_callable($unit)){
                 foreach($this->update_threads as $thread){
                     $thread->addUnit($unit, $id);
                 }
             }
         }
+        $this->provider->start();//Start provider's thread
         unset($id, $unit, $thread, $update_thread);
         
         /** --- Main process --- */
@@ -121,6 +121,8 @@ class ThreadManager extends Thread{
             unset($updates);
             $this->wait(10);
         }
+        $this->provider->stop();//Stop provider's thread
+        exit(0);
     }
 
     public function kill(){
@@ -130,8 +132,6 @@ class ThreadManager extends Thread{
             $this->notify();
             $this->logger->info($this->plugin->findLang("thread.shut"));
             $this->join();
-        }else{
-
         }
     }
 }
