@@ -1,7 +1,0 @@
-if(trim($text[1]) === "world" or trim($text[1]) === "w"){
-    if($thread_manager->config->get("CheckLevel")){
-    }
-    $thread_manager->provider->create($tile);
-}else{
-    return false;
-}

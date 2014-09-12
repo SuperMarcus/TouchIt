@@ -1,5 +1,0 @@
-CREATE TABLE sign (
-    position TEXT PRIMARY KEY NOT NULL,
-    type INTEGER NOT NULL,
-    data TEXT NOT NULL
-);
