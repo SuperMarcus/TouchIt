@@ -2,100 +2,48 @@
 namespace TouchIt;
 
 use pocketmine\plugin\PluginBase;
-use pocketmine\event\Listener;
-use TouchIt\DataProvider\Provider;
-use TouchIt\DataProvider\SQLDataProvider;
-use TouchIt\Listener\MainListener;
-use TouchIt\Listener\UpdateListener;
 
 class TouchIt extends PluginBase{
-    /** @var array */
-    public $lang = [];//TouchIt language profile
-
-    /** @var null|SignManager */
-    private $manager = null;
-
-    /** @var null|ConfigAccessor */
-    private $touchit_config = null;
-
-    /** @var null|Listener[] */
-    private $listener = null;
-
-    /** @var null|Provider */
-    private $provider = null;
-
-    /** @var null|UnitLoader */
-    private $unit_loader = null;
+    /** @var string */
+    private $lang;
 
     /**
      * Call when enable
      */
     public function onEnable(){
-    	@mkdir($this->getDataFolder());
-
-        $this->unit_loader = new UnitLoader($this);
-        $this->provider = new SQLDataProvider($this);
-        $this->manager = new SignManager($this, $this->provider, $this->unit_loader);
-        $this->listener = [new MainListener($this->manager, $this), new UpdateListener($this->manager)];
-
-        $this->getConfig()->analyzeFile();
-        
-        $this->lang = $this->getConfig()->getLang();
-
-        $this->manager->onEnable();
-
-        foreach($this->listener as $listener){
-            $this->getServer()->getPluginManager()->registerEvents($listener, $this);
-        }
-        //Auto register all the events
-    }
-
-    /**
-     * @param $key
-     * @return string
-     */
-    public function findLang($key){
-    	if(isset($this->lang[$key]))return $this->lang[$key];
-        return "Language profile error";
+        $this->reloadLang();
     }
 
     /**
      * Call when disable
      */
     public function onDisable(){
-        $this->manager->onDisable();
-        $this->provider->onDisable();
-    }
 
-    public function saveDefaultConfig(){
-        $this->reloadConfig();
     }
 
     /**
-     * Re-analyze config
+     * Use to reload language profile
      */
-    public function reloadConfig(){
-        $this->touchit_config = new ConfigAccessor($this->getDataFolder()."config.cnf", $this);
-        $this->touchit_config->analyzeFile();
-    }
-
-    /**
-     * Same as reloadConfig();
-     */
-    public function saveConfig(){
-        $this->reloadConfig();
-    }
-
-    /**
-     * @return ConfigAccessor
-     */
-    public function getConfig(){
-        if($this->touchit_config instanceof ConfigAccessor){
-            return $this->touchit_config;
-        }else{
-            $this->reloadConfig();
-            return $this->getConfig();
+    public function reloadLang(){
+        $this->lang = [];
+        $stream = $this->getResource("language/".strtolower($this->getConfig()->get("language")).".lang");
+        if(!$stream or !is_readable($stream)){
+            $stream = $this->getResource("language/english.lang");
+            if(!$stream or !is_readable($stream)){
+                $this->getLogger()->error("Unable to open stream. Could not load TouchIt languages.");
+                $this->getServer()->forceShutdown();
+                return;
+            }
+            $this->getLogger()->notice("Language \"".$this->getConfig()->get("language")."\" not found.");
+            $this->getLogger()->notice("Make sure your spelling was correct. Change this option at \"plugins/TouchIt/config.yml\"");
         }
+        while(!feof($stream)){
+            $line = ltrim(fgets($stream));
+            if((strlen($line) >= 3) and $line{0} !== "#" and ($pos = strpos($line, "=")) != false){
+                $this->lang[substr($line, 0, ($pos -1))] = substr($line, $pos);
+            }
+        }
+        @fclose($stream);
     }
 }
 ?>

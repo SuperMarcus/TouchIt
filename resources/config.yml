@@ -1,12 +1,12 @@
-# TouchIt config file
+# TouchIt configuration file
 # Pyramid development team 2014
 
-# The title
+# The title for all teleport sign
 name: Teleport
 
 # TouchIt language
 # Only support English now
-Language: English
+language: English
 
 # Server's main world
 # If people in this world is more than 'Maximum number of people in one level' player still can teleport to that level
@@ -18,19 +18,19 @@ DefaultLevel: world
 ShowCountInMainLevel: true
 
 # Maximum number of people in one level
-maxPeople: 20
+MaxPeople: 20
 
 # Switch on this option to show count on sign
-showCount: true
+ShowCount: true
 
 # Switch on this option to show a warning when some level is full
-showFull: true
+ShowFull: true
 
 # Switch on this option to allow none-op player to build touchit sign
-allowPlayerBuild: false
+AllowPlayerBuild: false
 
 # Switch on this option to allow none-op player break touchit sign
-allowPlayerBreak: false
+AllowPlayerBreak: false
 
 # Check level is loaded when building the teleport sign
 CheckLevel: true
@@ -39,4 +39,4 @@ CheckLevel: true
 CreateTimeout: 40
 
 # The time interval between updates the announcement
-announcementUpdateInterval: 15
+AnnouncementUpdateInterval: 15
