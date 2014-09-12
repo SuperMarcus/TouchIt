@@ -31,7 +31,6 @@ class SignManager{
         $this->initialize();
     }
 
-    
     public function onEnable(){
         $this->thread_manager->onEnable();
     }
@@ -72,7 +71,7 @@ class SignManager{
     }
 
     private function initialize(){
-        $this->thread_manager = new ThreadManager($this->plugin, $this->unit, $this->plugin->getLogger(), $this->provider, $this->plugin->getConfig());
+        $this->thread_manager = new ThreadManager($this->plugin, $this->unit, $this->provider, $this->plugin->getConfig());
     }
 }
 ?>

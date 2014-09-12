@@ -6,6 +6,8 @@ use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\SignChangeEvent;
+use pocketmine\block\SignPost;
+use pocketmine\block\WallSign;
 use pocketmine\tile\Sign;
 use TouchIt\SignManager;
 use TouchIt\TouchIt;
@@ -39,6 +41,11 @@ class MainListener implements Listener{
         }
     }
 
+    /**
+     * @param SignChangeEvent $event
+     *
+     * @priority HIGH
+     */
     public function onSignChange(SignChangeEvent $event){
         if(strtolower(trim($event->getLine(0))) == "touchit"){
             $this->manager->onNewSign($event->getPlayer(), $event->getLines(), $event->getBlock());

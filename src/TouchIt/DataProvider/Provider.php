@@ -19,28 +19,14 @@ abstract class Provider extends Thread{
     }
 
     /**
-     * Process
-     */
-    public final function run(){
-        while($this->isEnable()){
-            $this->onLoop();
-        }
-        exit(0);
-    }
-
-    public final function start(){
-        $this->isenable = true;
-        $this->onEnable();
-        parent::start(PTHREADS_INHERIT_ALL & ~PTHREADS_INHERIT_CLASSES);
-    }
-
-    /**
      * Call when need to stop the thread
      */
     public final function stop(){
         $this->isenable = false;
-        $this->notify();
-        $this->join();
+        if($this instanceof ThreadProvider){
+            $this->notify();
+            $this->join();
+        }
         $this->onDisable();
     }
 
@@ -52,9 +38,26 @@ abstract class Provider extends Thread{
     }
 
     /**
-     * Process thread
+     * @param int $opt
+     * @return bool|void
+     * @throws \BadMethodCallException
      */
-    abstract public function onLoop();
+    public final function start($opt){
+        if($this instanceof ThreadProvider){
+            parent::start($opt);
+        }else{
+            throw new \BadMethodCallException("Could not start thread because object is not extends from \"ThreadProvider\"");
+        }
+    }
+
+    /**
+     * @return bool|void
+     */
+    public final function notify(){
+        if($this instanceof ThreadProvider){
+            parent::notify();
+        }
+    }
 
     /**
      * Add a new sign
@@ -121,4 +124,3 @@ abstract class Provider extends Thread{
      */
     abstract public function onDisable();
 }
-?>

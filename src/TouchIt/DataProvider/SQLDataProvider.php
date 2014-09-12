@@ -107,7 +107,9 @@ class SQLDataProvider extends Provider{
      * Call when need to close database
      */
     public function onDisable(){
-        $this->database->close();
+        if($this->database instanceof \SQLite3){
+            $this->database->close();
+        }
     }
 
     /**

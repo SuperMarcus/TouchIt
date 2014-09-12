@@ -11,8 +11,6 @@ use TouchIt\UnitLoader;
 
 class ThreadManager extends Thread{
     private $isenable;
-
-    private $types;
     
     /** @var UpdateThread[] */
     private $update_threads;
@@ -35,13 +33,12 @@ class ThreadManager extends Thread{
     /** @var ConfigAccessor */
     public $config;
     
-    public function __construct(TouchIt $plugin, UnitLoader $unit, PluginLogger $logger, Provider $provider, ConfigAccessor $config){
+    public function __construct(TouchIt $plugin, UnitLoader $unit, Provider $provider, ConfigAccessor $config){
         $this->plugin = $plugin;
-        $this->logger = $logger;
+        $this->logger = $plugin->getLogger();
         $this->provider = $provider;
         $this->config = $config;
         $this->isenable = false;
-        $this->types = $plugin->getTypes();
         $this->unit = $unit;
     }
 
@@ -80,11 +77,9 @@ class ThreadManager extends Thread{
      */
     public function run(){
         /** --- Start thread --- */
-        $this->logger->info($this->plugin->findLang("thread.start"));
         $this->check_thread = new CheckThread($this, $this->unit->getUnits("unit_check"));
         $this->update_threads = [];
         if(($thread = $this->config->get("thread", 3)) <= 1){
-            $this->logger->warning($this->plugin->findLang("thread.warning.notenough"));
             $thread = 3;
         }
         while($thread > 0){
@@ -99,7 +94,7 @@ class ThreadManager extends Thread{
                 }
             }
         }
-        $this->provider->start();//Start provider's thread
+        $this->provider->startThread();//Start provider's thread
         unset($id, $unit, $thread, $update_thread);
         
         /** --- Main process --- */
@@ -125,13 +120,30 @@ class ThreadManager extends Thread{
         exit(0);
     }
 
+    /**
+     * @return bool
+     */
     public function kill(){
         $this->logger->info($this->plugin->findLang("thread.stop"));
         if($this->isenable){
             $this->isenable = false;
             $this->notify();
             $this->logger->info($this->plugin->findLang("thread.shut"));
-            $this->join();
+            return $this->join();
+        }
+        return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function detach(){
+        if($this->isRunning()){
+            $this->kill();
+            return true;
+        }else{
+            parent::kill();
+            return $this->join();
         }
     }
 }
