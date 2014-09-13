@@ -7,18 +7,44 @@ class TouchIt extends PluginBase{
     /** @var string */
     private $lang;
 
+    /** @var SignManager */
+    private $manager;
+
     /**
      * Call when enable
      */
     public function onEnable(){
+        if(!file_exists($this->getDataFolder()."config.yml")){
+            $this->saveDefaultConfig();
+        }
         $this->reloadLang();
+        $this->manager = new SignManager($this);
+        if(class_exists(($class = "TouchIt\\Provider\\".$this->getConfig()->get("Provider")))){
+            $this->manager->setProvider(new $class($this));
+        }else{
+            $this->getLogger()->alert($this->getLang("provider.notfound"));
+        }
+    }
+
+    /**
+     * @param $key
+     * @return string
+     */
+    public function getLang($key){
+        if(isset($this->lang[$key])){
+            return $this->lang[$key];
+        }else if(is_array($this->lang)){
+            return "Key not found.";
+        }
+        $this->reloadLang();
+        return $this->getLang($key);
     }
 
     /**
      * Call when disable
      */
     public function onDisable(){
-
+        $this->manager->close();
     }
 
     /**
@@ -27,9 +53,9 @@ class TouchIt extends PluginBase{
     public function reloadLang(){
         $this->lang = [];
         $stream = $this->getResource("language/".strtolower($this->getConfig()->get("language")).".lang");
-        if(!$stream or !is_readable($stream)){
+        if(!$stream){
             $stream = $this->getResource("language/english.lang");
-            if(!$stream or !is_readable($stream)){
+            if(!$stream){
                 $this->getLogger()->error("Unable to open stream. Could not load TouchIt languages.");
                 $this->getServer()->forceShutdown();
                 return;
@@ -40,10 +66,9 @@ class TouchIt extends PluginBase{
         while(!feof($stream)){
             $line = ltrim(fgets($stream));
             if((strlen($line) >= 3) and $line{0} !== "#" and ($pos = strpos($line, "=")) != false){
-                $this->lang[substr($line, 0, ($pos -1))] = substr($line, $pos);
+                $this->lang[substr($line, 0, $pos)] = substr($line, $pos + 1);
             }
         }
         @fclose($stream);
     }
 }
-?>

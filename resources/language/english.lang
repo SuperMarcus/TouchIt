@@ -1,43 +1,10 @@
 # Language profile for touchit
 # Copyright Marcus 2014
 
-# Message for create the sign
-update.level.notloaded.line2=NOT OPEN
-update.level.notloaded.line3=Join onther
-update.level.notloaded.line4=world
-update.level.limit.line2=This level
-update.level.limit.line3=is full
-update.level.limit.line4=join onther
-update.level.default=Players count
-update.level.main=Main world
-update.level.main.tap=tap to get back
-update.level.people=People
+provider.notfound=The provider you set was not correct. Change this option at "plugins/TouchIt/config.yml"
 
-update.new.wait=Loading...
-update.new.warning.title=WARNING
-update.new.warning.level=The level you set is not loaded
-update.new.warning.permission=You don't have permission to build this sign
-update.new.warning.offline=Player offline
-update.new.create=This sign has been create
-update.new.commandsign.title=CommandSign
-update.new.commandsign.default.line2=Tap this sign
-update.new.commandsign.default.line3=to run command
-
-update.boardcase.title=Announcement
-
-# Message for all the sign action
-sign.boardcase.title=Announcement
-sign.boardcase.unavailable=No announcement available.
-
-sign.teleport.notopen=This world is not open yet.
-sign.teleport.running=Teleporting to
-
-sign.destroy.done=This sign has been destroy.
-sign.destroy.permission=You don't have permission to break this sign.
-
-# Message for thread information
-thread.start=Starting thread...
-thread.stop=Stopping thread...
-thread.shut=Shutting TouchIt threads...
-
-thread.warning.notenough=The number of threads you set is not enough. Make it bigger.
+event.teleporting=Teleporting to world {target}...
+event.notopen=Level {target} is not open yet. Choose other world instead.
+event.limit=Level {target} is full of people. Choose other world instead.
+event.permission=You do not have permission to use this sign.
+event.unknowtype=Unknow sign type {type}, Please connect server operator for more information

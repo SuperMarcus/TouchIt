@@ -27,7 +27,7 @@ permissions:
                 description: "TouchIt manual updates commands."
                 default: op
       sign:
-        description: "TouchIt sign action permission."
+        description: "TouchIt sign actions permission."
         default: notop
         children:
           build:
@@ -37,5 +37,9 @@ permissions:
             description: "Destroy sign permission."
             default: op
           touch:
-            description: "Use touchit permission."
+            description: "Use sign permission."
             default: notop
+            children:
+              teleport:
+                description: "Use teleport sign permission."
+                default: notop

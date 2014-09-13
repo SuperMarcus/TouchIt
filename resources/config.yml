@@ -2,41 +2,24 @@
 # Pyramid development team 2014
 
 # The title for all teleport sign
-name: Teleport
+title:
+ teleport: Teleport
 
-# TouchIt language
-# Only support English now
+# Player limit in one level
+MaxPlayers: 20
+
+# Fill with server lobby
+# 'MaxPlayers' will not work in this level
+# Change it into an none-exists level to switch off this function
+MainLevel: world
+
+# Multi-languages support
+# Support list: English
 language: English
 
-# Server's main world
-# If people in this world is more than 'Maximum number of people in one level' player still can teleport to that level
-# If you don't need this change it-to an none-exists level
-DefaultLevel: world
+# You may change other way to save data
+# Default is SQLite3
+Provider: SQLite3
 
-# If you are using 'MainLevel' unit maybe you need to change this option
-# Switch on this option to show people's count if target level is the main level of your server
-ShowCountInMainLevel: true
-
-# Maximum number of people in one level
-MaxPeople: 20
-
-# Switch on this option to show count on sign
-ShowCount: true
-
-# Switch on this option to show a warning when some level is full
-ShowFull: true
-
-# Switch on this option to allow none-op player to build touchit sign
-AllowPlayerBuild: false
-
-# Switch on this option to allow none-op player break touchit sign
-AllowPlayerBreak: false
-
-# Check level is loaded when building the teleport sign
-CheckLevel: true
-
-# For the time between place and write the sign
-CreateTimeout: 40
-
-# The time interval between updates the announcement
-AnnouncementUpdateInterval: 15
+# If not necessary, please switch on this option
+SafeSpawn: true
