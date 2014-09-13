@@ -8,3 +8,18 @@ event.notopen=Level {target} is not open yet. Choose other world instead.
 event.limit=Level {target} is full of people. Choose other world instead.
 event.permission=You do not have permission to use this sign.
 event.unknowtype=Unknow sign type {type}, Please connect server operator for more information
+event.create.invargs=Please input some lines to create TouchIt sign.
+event.create.invlevel=The level you set is not loaded.
+event.create.load=The sign has been created.
+
+update.notload.warning=[WARNING]
+update.notload.message=Not open
+update.mainlevel=Back to Lobby
+update.count.message=Peoples
+update.count.show=[{count}/{max}]
+
+create.warning=[WARNING]
+create.level.message=Invalid level
+create.args.message=Invalid args
+create.waitting=Loading...
+create.message=Waiting update

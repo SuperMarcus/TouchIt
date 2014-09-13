@@ -2,6 +2,8 @@
 namespace TouchIt;
 
 use pocketmine\plugin\PluginBase;
+use TouchIt\Listener\PlayerTouchListener;
+use TouchIt\Listener\SignCreateListener;
 
 class TouchIt extends PluginBase{
     /** @var string */
@@ -24,6 +26,8 @@ class TouchIt extends PluginBase{
         }else{
             $this->getLogger()->alert($this->getLang("provider.notfound"));
         }
+        $this->getServer()->getPluginManager()->registerEvents(new PlayerTouchListener($this->manager), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new SignCreateListener($this->manager), $this);
     }
 
     /**

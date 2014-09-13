@@ -107,9 +107,9 @@ class SQLite3 implements Provider{
             $query = $this->database->query("SELECT data FROM sign;");
             if($query instanceof SQLResult){
                 while($data = $query->fetchArray(SQLITE3_ASSOC)){
-                    $data = @json_decode($this->decode($data['data']), true);
+                    $info = @json_decode($this->decode($data['data']), true);
                     if(is_array($data)){
-                        $resule[] = $data;
+                        $resule[] = ["data" => $info, "position" => $this->string2pos($data['position'])];
                     }
                 }
             }
@@ -141,6 +141,11 @@ class SQLite3 implements Provider{
         return $x."-".$y."-".$z."-".$level;
     }
 
+    private function string2pos($data){
+        $array = explode("-", $data);
+        return ["x" => intval($array[0]), "y" => intval($array[1]), "z" => intval($array[2]), "level" => $data[3]];
+    }
+
     /**
      * @param $data
      * @return string
@@ -152,17 +157,23 @@ class SQLite3 implements Provider{
             ")",
             ";",
             "\"",
-            ":"
+            ":",
+            "\\"
         ], [
             "%1%",
             "%2%",
             "%3%",
             "%4%",
             "%5%",
-            "%6%"
+            "%6%",
+            "%7%"
         ], $data);
     }
 
+    /**
+     * @param $data
+     * @return string
+     */
     private function decode($data){
         return str_replace([
             "%1%",
@@ -170,14 +181,16 @@ class SQLite3 implements Provider{
             "%3%",
             "%4%",
             "%5%",
-            "%6%"
+            "%6%",
+            "%7%"
         ], [
             "'",
             "(",
             ")",
             ";",
             "\"",
-            ":"
+            ":",
+            "\\"
         ], $data);
     }
 }

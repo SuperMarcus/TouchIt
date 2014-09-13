@@ -23,3 +23,9 @@ Provider: SQLite3
 
 # If not necessary, please switch on this option
 SafeSpawn: true
+
+# To show players count on the sign
+EnableCount: true
+
+# Check settings when create new sign
+CreateCheck: true
