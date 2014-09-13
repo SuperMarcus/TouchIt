@@ -2,6 +2,7 @@
 namespace TouchIt;
 
 use pocketmine\plugin\PluginBase;
+use pocketmine\scheduler\CallbackTask;
 use TouchIt\Listener\PlayerTouchListener;
 use TouchIt\Listener\SignCreateListener;
 
@@ -28,6 +29,7 @@ class TouchIt extends PluginBase{
         }
         $this->getServer()->getPluginManager()->registerEvents(new PlayerTouchListener($this->manager), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SignCreateListener($this->manager), $this);
+        $this->getServer()->getScheduler()->scheduleRepeatingTask(new CallbackTask([$this->manager, "update"]), 20 * $this->getConfig()->get("ScheduleRepeatingPeriod"));
     }
 
     /**

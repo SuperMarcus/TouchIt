@@ -29,3 +29,6 @@ EnableCount: true
 
 # Check settings when create new sign
 CreateCheck: true
+
+# If not necessary, do not change this
+ScheduleRepeatingPeriod: 5

@@ -104,7 +104,7 @@ class SQLite3 implements Provider{
     public function getAll(){
         $resule = [];
         if($this->database instanceof SQL){
-            $query = $this->database->query("SELECT data FROM sign;");
+            $query = $this->database->query("SELECT * FROM sign;");
             if($query instanceof SQLResult){
                 while($data = $query->fetchArray(SQLITE3_ASSOC)){
                     $info = @json_decode($this->decode($data['data']), true);
