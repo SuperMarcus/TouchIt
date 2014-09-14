@@ -13,6 +13,11 @@ class SignCreateListener implements Listener{
         $this->manager = $manager;
     }
 
+    /**
+     * @param SignChangeEvent $event
+     * @priority HIGHEST
+     * @ignoreCancelled true
+     */
     public function onSignChange(SignChangeEvent $event){
         if(trim(strtolower($event->getLine(0))) === "touchit"){
             if((trim($event->getLine(0)) !== "") and (trim($event->getLine(1)) !== "")){

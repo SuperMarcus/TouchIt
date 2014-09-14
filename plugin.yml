@@ -12,34 +12,26 @@ website: https://github.com/SuperMarcus/TouchIt
 
 permissions:
   touchit:
-    description: "TouchIt permission."
-    default: notop
+    default: operator
+    description: "TouchIt permissions"
     children:
-      command:
-        description: "TouchIt commands."
+      touchit.sign:
         default: notop
+        description: "TouchIt sign permissions"
         children:
-          touchit:
-            description: "TouchIt main commands."
+          touchit.sign.create:
+            default: operator
+            description: "TouchIt create sign permission"
+          touchit.sign.destroy:
+            default: operator
+            description: "TouchIt delete sign permission"
+          touchit.sign.use:
             default: notop
+            description: "TouchIt use sign permission"
             children:
-              update:
-                description: "TouchIt manual updates commands."
-                default: op
-      sign:
-        description: "TouchIt sign actions permission."
-        default: notop
-        children:
-          build:
-            description: "Build sign permission."
-            default: op
-          break:
-            description: "Destroy sign permission."
-            default: op
-          touch:
-            description: "Use sign permission."
-            default: notop
-            children:
-              teleport:
-                description: "Use teleport sign permission."
+              touchit.sign.use.teleport:
+                description: "TouchIt use teleport sign permission"
                 default: notop
+      touchit.command:
+        default: operator
+        description: "TouchIt command permissions"

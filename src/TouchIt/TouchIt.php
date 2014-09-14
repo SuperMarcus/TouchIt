@@ -20,6 +20,7 @@ class TouchIt extends PluginBase{
         if(!file_exists($this->getDataFolder()."config.yml")){
             $this->saveDefaultConfig();
         }
+        $this->reloadConfig();
         $this->reloadLang();
         $this->manager = new SignManager($this);
         if(class_exists(($class = "TouchIt\\Provider\\".$this->getConfig()->get("Provider")))){

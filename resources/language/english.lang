@@ -1,4 +1,4 @@
-# Language profile for touchit
+# Language profile for TouchIt
 # Copyright Marcus 2014
 
 provider.notfound=The provider you set was not correct. Change this option at "plugins/TouchIt/config.yml"
@@ -11,6 +11,8 @@ event.unknowtype=Unknow sign type {type}, Please connect server operator for mor
 event.create.invargs=Please input some lines to create TouchIt sign.
 event.create.invlevel=The level you set is not loaded.
 event.create.load=The sign has been created.
+event.destroy.load=This sign has been delete.
+event.destroy.permission=You do not have permission to break this sign
 
 update.notload.warning=[WARNING]
 update.notload.message=Not open

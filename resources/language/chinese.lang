@@ -1,0 +1,27 @@
+# Language profile for TouchIt
+# Copyright Marcus 2014
+
+provider.notfound=您的访问器设置不正确, 请在 "plugins/TouchIt/config.yml" 内更改此设置
+
+event.teleporting=正在传送至世界 {target}...
+event.notopen=世界 {target} 当前未开放, 请选择其他牌子
+event.limit=世界 {target} 人数已满, 请选择其他牌子
+event.permission=您没有权限使用这个牌子
+event.unknowtype=未知牌子种类 {type}, 请联系服务器管理员获得更多信息
+event.create.invargs=请输入牌子信息
+event.create.invlevel=您设置的世界没有被加载
+event.create.load=成功创建牌子, 正在等待更新
+event.destroy.load=成功移除这个牌子
+event.destroy.permission=您没有权限破坏这个牌子
+
+update.notload.warning=[ 警告 ]
+update.notload.message=未开放
+update.mainlevel=回到主城区
+update.count.message=玩家总数
+update.count.show=[{count}/{max}]
+
+create.warning=[ 警告 ]
+create.level.message=错误的世界名
+create.args.message=错误的参数
+create.waitting=加载中...
+create.message=正在等待更新

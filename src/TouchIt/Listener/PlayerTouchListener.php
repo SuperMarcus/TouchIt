@@ -15,18 +15,19 @@ class PlayerTouchListener implements Listener{
 
     /**
      * @param PlayerInteractEvent $event
+     * @ignoreCancelled true
      */
     public function onPlayerTouch(PlayerInteractEvent $event){
         if($this->manager->getProvider()->exists($event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ(), $event->getBlock()->getLevel()->getName())){
             $event->setCancelled();
-            if(!$event->getPlayer()->hasPermission("touchit.sign.touch")){
+            if(!$event->getPlayer()->hasPermission("touchit.sign.use")){
                 $event->getPlayer()->sendMessage($this->manager->getLang("event.permission"));
                 return;
             }
             $data = $this->manager->getProvider()->get($event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ(), $event->getBlock()->getLevel()->getName());
             switch($data['type']){
                 case SignManager::SIGN_TELEPORT:
-                    if(!$event->getPlayer()->hasPermission("touchit.sign.touch.teleport")){
+                    if(!$event->getPlayer()->hasPermission("touchit.sign.use.teleport")){
                         $event->getPlayer()->sendMessage($this->manager->getLang("event.permission"));
                         break;
                     }

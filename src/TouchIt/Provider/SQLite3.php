@@ -143,7 +143,7 @@ class SQLite3 implements Provider{
 
     private function string2pos($data){
         $array = explode("-", $data);
-        return ["x" => intval($array[0]), "y" => intval($array[1]), "z" => intval($array[2]), "level" => $data[3]];
+        return ["x" => intval($array[0]), "y" => intval($array[1]), "z" => intval($array[2]), "level" => $array[3]];
     }
 
     /**
