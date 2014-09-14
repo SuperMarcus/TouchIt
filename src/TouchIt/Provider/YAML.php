@@ -14,23 +14,23 @@ class YAML implements Provider{
     }
 
     public function exists($x, $y, $z, $level){
-        return (bool) @file_exists($this->plugin->getDataFolder()."data/".$level."/".$x."-".$y."-".$z.".yml");
+        return (bool) @file_exists($this->plugin->getDataFolder()."data/".$level."-".$x."-".$y."-".$z.".yml");
     }
 
     public function get($x, $y, $z, $level){
         if($this->exists($x, $y, $z, $level)){
-            return @yaml_parse(Config::fixYAMLIndexes(@file_get_contents($this->plugin->getDataFolder()."data/".$level."/".$x."-".$y."-".$z.".yml")))['data'];
+            return @yaml_parse(Config::fixYAMLIndexes(@file_get_contents($this->plugin->getDataFolder()."data/".$level."-".$x."-".$y."-".$z.".yml")))['data'];
         }
         return [];
     }
 
     public function remove($x, $y, $z, $level){
-        @unlink($this->plugin->getDataFolder()."data/".$level."/".$x."-".$y."-".$z.".yml");
+        @unlink($this->plugin->getDataFolder()."data/".$level."-".$x."-".$y."-".$z.".yml");
     }
 
     public function create(array $data, $x, $y, $z, $level){
         @mkdir($this->plugin->getDataFolder()."data/".$level."/");
-        @file_put_contents($this->plugin->getDataFolder()."data/".$level."/".$x."-".$y."-".$z.".yml", @yaml_emit([
+        @file_put_contents($this->plugin->getDataFolder()."data/".$level."-".$x."-".$y."-".$z.".yml", @yaml_emit([
             "position" => [
                 "x" => $x,
                 "y" => $y,
@@ -42,16 +42,12 @@ class YAML implements Provider{
     }
 
     public function getAll(){
-        $iterator = new \DirectoryIterator($this->plugin->getDataFolder()."data/");
         $resule = [];
-        foreach($iterator as $dir){
-            /** @var \DirectoryIterator $dir */
-            if($dir->isDir()){
-                foreach($dir as $file){
-                    /** @var \DirectoryIterator $file */
-                    if($file->isFile() and $file->getExtension() === "yml"){
-                        $resule[] = @yaml_parse(Config::fixYAMLIndexes(@file_get_contents($file->getPathname())));
-                    }
+        foreach(scandir($this->plugin->getDataFolder()."data/") as $file){
+            if(substr($file, -3) === "yml"){
+                $data = @yaml_parse(Config::fixYAMLIndexes(@file_get_contents($this->plugin->getDataFolder()."data/".$file)));
+                if(is_array($data) and isset($data['position']) and isset($data['data'])){
+                    $resule[] = $data;
                 }
             }
         }

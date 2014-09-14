@@ -11,6 +11,7 @@ event.unknowtype=未知牌子种类 {type}, 请联系服务器管理员获得更
 event.create.invargs=请输入牌子信息
 event.create.invlevel=您设置的世界没有被加载
 event.create.load=成功创建牌子, 正在等待更新
+event.create.permission=您没有权限创建这类牌子
 event.destroy.load=成功移除这个牌子
 event.destroy.permission=您没有权限破坏这个牌子
 
@@ -21,6 +22,7 @@ update.count.message=玩家总数
 update.count.show=[{count}/{max}]
 
 create.warning=[ 警告 ]
+create.permission=无权限
 create.level.message=错误的世界名
 create.args.message=错误的参数
 create.waitting=加载中...

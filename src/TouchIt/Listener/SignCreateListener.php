@@ -20,6 +20,14 @@ class SignCreateListener implements Listener{
      */
     public function onSignChange(SignChangeEvent $event){
         if(trim(strtolower($event->getLine(0))) === "touchit"){
+            if(!$event->getPlayer()->hasPermission("touchit.sign.create")){
+                $event->getPlayer()->sendMessage($this->manager->getLang("event.create.permission"));
+                $event->setLine(0, $this->manager->getLang("create.warning"));
+                $event->setLine(2, $this->manager->getLang("create.permission"));
+                $event->setLine(1, "----------");
+                $event->setLine(3, "");
+                return;
+            }
             if((trim($event->getLine(0)) !== "") and (trim($event->getLine(1)) !== "")){
                 $type = -1;
                 if(trim($event->getLine(3)) === "" or

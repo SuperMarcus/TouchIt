@@ -5,6 +5,7 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\scheduler\CallbackTask;
 use TouchIt\Listener\PlayerTouchListener;
 use TouchIt\Listener\SignCreateListener;
+use TouchIt\Listener\SignDestroyListener;
 
 class TouchIt extends PluginBase{
     /** @var string */
@@ -30,6 +31,7 @@ class TouchIt extends PluginBase{
         }
         $this->getServer()->getPluginManager()->registerEvents(new PlayerTouchListener($this->manager), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SignCreateListener($this->manager), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new SignDestroyListener($this->manager), $this);
         $this->getServer()->getScheduler()->scheduleRepeatingTask(new CallbackTask([$this->manager, "update"]), 20 * $this->getConfig()->get("ScheduleRepeatingPeriod"));
     }
 

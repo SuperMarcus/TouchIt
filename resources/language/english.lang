@@ -11,6 +11,7 @@ event.unknowtype=Unknow sign type {type}, Please connect server operator for mor
 event.create.invargs=Please input some lines to create TouchIt sign.
 event.create.invlevel=The level you set is not loaded.
 event.create.load=The sign has been created.
+event.create.permission=You do not have permission to create TouchIt signs.
 event.destroy.load=This sign has been delete.
 event.destroy.permission=You do not have permission to break this sign
 
@@ -21,6 +22,7 @@ update.count.message=Peoples
 update.count.show=[{count}/{max}]
 
 create.warning=[WARNING]
+create.permission=No permission
 create.level.message=Invalid level
 create.args.message=Invalid args
 create.waitting=Loading...
