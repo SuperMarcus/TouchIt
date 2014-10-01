@@ -1,29 +1,59 @@
 # Language profile for TouchIt
 # Copyright Marcus 2014
+# Version TouchIt 1.1 Beta
 
 provider.notfound=The provider you set was not correct. Change this option at "plugins/TouchIt/config.yml"
 
-event.teleporting=Teleporting to world {target}...
 event.notopen=Level {target} is not open yet. Choose other world instead.
 event.limit=Level {target} is full of people. Choose other world instead.
 event.permission=You do not have permission to use this sign.
 event.unknowtype=Unknow sign type {type}, Please connect server operator for more information
-event.create.invargs=Please input some lines to create TouchIt sign.
-event.create.invlevel=The level you set is not loaded.
-event.create.load=The sign has been created.
-event.create.permission=You do not have permission to create TouchIt signs.
 event.destroy.load=This sign has been delete.
-event.destroy.permission=You do not have permission to break this sign
+event.destroy.permission=No Permission
+event.destroy.permission.message=You do not have permission to break this sign.
+event.arrival=This is the arrival station of {name}
+event.portal.process=Teleporting to {name}...
+event.teleport.process=Teleporting to world {target}...
+event.command.process.run=Running command {cmd}...
+event.command.process.done=Done for running {cmd}
+event.command.process.error=An exception happened when running the command
 
-update.notload.warning=[WARNING]
-update.notload.message=Not open
-update.mainlevel=Back to Lobby
-update.count.message=Peoples
-update.count.show=[{count}/{max}]
+update.sign.closed=Not open
+update.sign.full=FULL
+update.sign.lobby=Lobby
+update.sign.count=Peoples
+update.sign.count.format=[{count}/{max}]
 
 create.warning=[WARNING]
-create.permission=No permission
-create.level.message=Invalid level
-create.args.message=Invalid args
-create.waitting=Loading...
-create.message=Waiting update
+create.warning.permission=No permission
+create.warning.permission.message=You do not have permission to create TouchIt sign
+create.warning.permission.suggest=Contact the server operators to get more info
+create.warning.level.empty=Empty level
+create.warning.level.empty.message=The level option can not be empty
+create.warning.level.empty.suggest=Re-write a sign with level on line 2
+create.warning.level.invalid=Invalid level
+create.warning.level.invalid.message=The level you entered is not exists
+create.warning.level.invalid.suggest=Re-write a sign with an exists level
+create.warning.name.empty=Empty name
+create.warning.name.empty.message=The name you entered is empty
+create.warning.name.empty.suggest=Re-write a sign with portal name on line 2
+create.warning.command.empty=Empty CMD
+create.warning.command.empty.message=The command you entered is empty
+create.warning.command.empty.suggest=Re-write a sign with valid command on line 2, 3
+create.warning.command.unexists=Unknown CMD
+create.warning.command.unexists.message=Unknown command
+create.warning.command.unexists.suggest=Check your spelling of line 2, 3 or use /help
+create.warning.type.unknown=Unknown Type
+create.warning.type.unknown.message=The type you entered is not correct
+create.warning.type.unknown.suggest=Make sure your spelling was correct
+create.notice.portal=Waiting Arrival
+create.notice.portal.message=Building the portal...
+create.notice.portal.suggest=Please build the arrival sign
+create.process=Loading...
+create.process.message=The new {type} sign has been create
+
+type.world_teleport=WorldTeleport
+type.portal=Portal
+type.portal.arrival=-Arrival-
+type.portal.departure=-Departure-
+type.command=Command

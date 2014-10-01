@@ -3,6 +3,7 @@ namespace TouchIt\Listener;
 
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\Listener;
+use pocketmine\tile\Sign;
 use TouchIt\SignManager;
 
 class SignDestroyListener implements Listener{
@@ -15,8 +16,6 @@ class SignDestroyListener implements Listener{
 
     /**
      * @param BlockBreakEvent $event
-     * @priority HIGHEST
-     * @ignoreCancelled true
      */
     public function onBlockDestroy(BlockBreakEvent $event){
         if($this->manager->getProvider()->exists($event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ(), $event->getBlock()->getLevel()->getName())){
@@ -25,8 +24,17 @@ class SignDestroyListener implements Listener{
                 $this->manager->getProvider()->remove($event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ(), $event->getBlock()->getLevel()->getName());
                 return;
             }
+            $tile = $event->getBlock()->getLevel()->getTile($event->getBlock());
+            if($tile instanceof Sign){
+                SignManager::spawnTemporary($event->getPlayer(), $tile, [
+                    "[TouchIt]",
+                    "----------",
+                    $this->manager->getLang("event.destroy.permission"),
+                    ""
+                ]);
+            }
             $event->setCancelled();
-            $event->getPlayer()->sendMessage($this->manager->getLang("event.destroy.permission"));
+            $event->getPlayer()->sendMessage($this->manager->getLang("event.destroy.permission.message"));
         }
     }
 }

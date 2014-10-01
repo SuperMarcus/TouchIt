@@ -7,10 +7,10 @@
     <orderEntry type="module-library">
       <library name="PHP">
         <CLASSES>
-          <root url="file://$MODULE_DIR$/../PocketMine-MP_NewAPI/src" />
+          <root url="file://$MODULE_DIR$/../PocketMine-MP/src" />
         </CLASSES>
         <SOURCES>
-          <root url="file://$MODULE_DIR$/../PocketMine-MP_NewAPI/src" />
+          <root url="file://$MODULE_DIR$/../PocketMine-MP/src" />
         </SOURCES>
       </library>
     </orderEntry>

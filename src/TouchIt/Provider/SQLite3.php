@@ -158,7 +158,9 @@ class SQLite3 implements Provider{
             ";",
             "\"",
             ":",
-            "\\"
+            "\\",
+            "{",
+            "}"
         ], [
             "%1%",
             "%2%",
@@ -166,7 +168,9 @@ class SQLite3 implements Provider{
             "%4%",
             "%5%",
             "%6%",
-            "%7%"
+            "%7%",
+            "%8%",
+            "%9%"
         ], $data);
     }
 
@@ -182,7 +186,9 @@ class SQLite3 implements Provider{
             "%4%",
             "%5%",
             "%6%",
-            "%7%"
+            "%7%",
+            "%8%",
+            "%9%"
         ], [
             "'",
             "(",
@@ -190,7 +196,9 @@ class SQLite3 implements Provider{
             ";",
             "\"",
             ":",
-            "\\"
+            "\\",
+            "{",
+            "}"
         ], $data);
     }
 }

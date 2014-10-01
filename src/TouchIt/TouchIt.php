@@ -6,6 +6,7 @@ use pocketmine\scheduler\CallbackTask;
 use TouchIt\Listener\PlayerTouchListener;
 use TouchIt\Listener\SignCreateListener;
 use TouchIt\Listener\SignDestroyListener;
+use TouchIt\Provider\SQLite3;
 
 class TouchIt extends PluginBase{
     /** @var string */
@@ -28,6 +29,7 @@ class TouchIt extends PluginBase{
             $this->manager->setProvider(new $class($this));
         }else{
             $this->getLogger()->alert($this->getLang("provider.notfound"));
+            $this->manager->setProvider(new SQLite3($this));
         }
         $this->getServer()->getPluginManager()->registerEvents(new PlayerTouchListener($this->manager), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SignCreateListener($this->manager), $this);
@@ -73,7 +75,7 @@ class TouchIt extends PluginBase{
             $this->getLogger()->notice("Make sure your spelling was correct. Change this option at \"plugins/TouchIt/config.yml\"");
         }
         while(!feof($stream)){
-            $line = ltrim(fgets($stream));
+            $line = trim(fgets($stream));
             if((strlen($line) >= 3) and $line{0} !== "#" and ($pos = strpos($line, "=")) != false){
                 $this->lang[substr($line, 0, $pos)] = substr($line, $pos + 1);
             }

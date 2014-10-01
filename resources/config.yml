@@ -1,34 +1,62 @@
 # TouchIt configuration file
 # Pyramid development team 2014
+# Version TouchIt 1.1 Beta
 
-# The title for all teleport sign
-title:
- teleport: Teleport
+# All settings for world teleport sign
+teleport:
+ # Title of world teleport sign
+ title: Teleport
+ # Player limits in one level (you should switch on 'EnableCount' to use this function)
+ MaxPlayers: 20
+ # If not necessary, please switch on this option
+ SafeSpawn: true
+ # Fill with server lobbys
+ # 'MaxPlayers' will not work in those level
+ # Leave it empty to switch off this function
+ MainLevel: [world]
+ # Show message on sign when the number of people in target level is more than 'MaxPlayers'
+ ShowFull: true
+ # To show player count on the sign
+ EnableCount: true
 
-# Player limit in one level
-MaxPlayers: 20
+# All settings for portal sign
+portal:
+ # Title of world teleport sign
+ title: Portal
+ # Use player limites
+ # The same as world teleport settings
+ UseLimits: true
+ # If not necessary, please switch on this option
+ SafeSpawn: true
+ # To show players count on the sign
+ # The same as world teleport sign
+ EnableCount: true
 
-# Fill with server lobby
-# 'MaxPlayers' will not work in this level
-# Change it into an none-exists level to switch off this function
-MainLevel: world
+# All settings for command sign
+command:
+ # Title of world teleport sign
+ title: Command
+ # Show status when running the command
+ ShowStatus: false
 
 # Multi-languages support
-# Support list: English
+# Support: English, Chinese
 language: English
 
 # You may change other way to save data
 # Default is SQLite3
+# Support: SQLite3, YAML
 Provider: SQLite3
-
-# If not necessary, please switch on this option
-SafeSpawn: true
-
-# To show players count on the sign
-EnableCount: true
 
 # Check settings when create new sign
 CreateCheck: true
 
+# Show suggest when an exception happened
+ShowSuggest: true
+
 # If not necessary, do not change this
 ScheduleRepeatingPeriod: 5
+
+# Auto collect option
+# If not necessary, do not change this
+GarbageCollection: true
