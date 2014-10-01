@@ -47,4 +47,4 @@ Create a sign with format:
 >Line4: [Description]
 
 ###WARNING###
-*This plugin is for made PocketMine-MP 1.4, it can not be used on lower version.*
+*This plugin is made for PocketMine-MP 1.4, it can not be used on lower version.*
