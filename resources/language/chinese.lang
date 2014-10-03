@@ -1,59 +1,78 @@
 # Language profile for TouchIt
 # Copyright Marcus 2014
-# Version TouchIt 1.1 Beta
+# TouchIt development version
 
-provider.notfound=您设置的数据储存器不正确 请在位于 "plugins/TouchIt/config.yml" 的配置文件中更改
+provider.notfound=您设置的数据储存器不正确 请在 "plugins/TouchIt/config.yml" 文件内更改储存器
 
-event.notopen=世界 {target} 现在没有开放 请选择其他的世界
-event.limit=世界 {target} 人数已满 请选择其他的世界
+event.notopen=世界 {target} 没有开放
+event.limit=世界 {target} 人数已满
 event.permission=您没有权限使用这个牌子
-event.unknowtype=该牌子属于未知类型 {type} 请联系管理员获得更多帮助
-event.destroy.load=成功移除这个牌子
+event.unknowtype=未知的牌子类型 {type} 请联系管理员获取更多信息
+event.destroy.load=成功删除这个牌子
 event.destroy.permission=无权限
 event.destroy.permission.message=您没有权限破坏这个牌子
-event.arrival=这是 {name} 的到达站 选择始发站以传送
+event.arrival=这个牌子是 {name} 的到达站
+event.no-arrive=无到达站
 event.portal.process=正在传送至 {name}...
-event.teleport.process=正在传送至世界 {target}...
-event.command.process.run=正在运行命令 {cmd}...
-event.command.process.done=成功运行命令 {cmd}
-event.command.process.error=在运行命令时发生了异常
+event.teleport.process=正在前往世界 {target}...
+event.command.process.run=正在运行命令 /{cmd}...
+event.command.process.done=成功运行 /{cmd}
+event.command.process.error=在运行命令时发生了一个错误
 
 update.sign.closed=未开放
 update.sign.full=人数已满
 update.sign.lobby=主城
 update.sign.count=玩家计数
 update.sign.count.format=[{count}/{max}]
+update.sign.portal.suggest=轻触进行传送
+update.sign.command.suggest=轻触运行命令
+update.sign.no-arrive=无到达站
 
 create.warning=[ 警告 ]
 create.warning.permission=无权限
-create.warning.permission.message=您没有权限创建特殊种类的牌子
+create.warning.permission.message=您没有权限创建这个牌子
 create.warning.permission.suggest=联系服务器管理员获得更多信息
-create.warning.level.empty=世界名称未填写
+create.warning.level.empty=世界未填写
 create.warning.level.empty.message=世界名称不能为空
-create.warning.level.empty.suggest=请检查第 2 行所填写的数据
-create.warning.level.invalid=无效的世界名称
-create.warning.level.invalid.message=您所填写的世界名称未被找到
-create.warning.level.invalid.suggest=重新填写一个牌子并在第 2 行填写正确的世界名称
+create.warning.level.empty.suggest=请重新创建一个牌子并在第二行填写正确的世界名称
+create.warning.level.invalid=无效的世界名
+create.warning.level.invalid.message=您所输入的世界不正确
+create.warning.level.invalid.suggest=请重新创建一个牌子并在第二行填写正确的世界名称
 create.warning.name.empty=名称未填写
 create.warning.name.empty.message=传送门名称不能为空
-create.warning.name.empty.suggest=重新填写一个牌子并在第 2 行填写传送门名称
-create.warning.command.empty=命令为空
-create.warning.command.empty.message=需要执行的命令不能为空
-create.warning.command.empty.suggest=重新填写一个牌子并在第 2,3 行填写正确的命令
-create.warning.command.unexists=未知命令
-create.warning.command.unexists.message=您所填写的命令未被找到或不存在
-create.warning.command.unexists.suggest=使用 /help 命令帮助检查第 2,3 行
-create.warning.type.unknown=未知种类
+create.warning.name.empty.suggest=请重新创建一个牌子并在第二行填写有效的世界名称
+create.warning.name.used=重复的名称
+create.warning.name.used.message=您所输入的传送门名称已经在使用
+create.warning.name.used.suggest=请重新创建一个牌子并在第二行填写有效的传送门名称
+create.warning.name.unset=到达站未建立
+create.warning.name.unset.message=您所设置的传送门未设置到达站
+create.warning.name.unset.suggest=请先设置到达站
+create.warning.portal-type.empty=未设置类型
+create.warning.portal-type.empty.message=传送门的类型不能为空
+create.warning.portal-type.empty.suggest=请重新创建一个牌子并在第一行填写有效的传送门类型
+create.warning.portal-type.unknown=类型无效
+create.warning.portal-type.unknown.message=传送门类型只能为 "a"(到达站) 或 "d"(始发站)
+create.warning.portal-type.unknown.suggest=请重新创建一个牌子并填写上有效的传送门类型
+create.warning.command.empty=命令未填写
+create.warning.command.empty.message=您所输入的命令为空
+create.warning.command.empty.suggest=请在第二, 三行填写有效的命令
+create.warning.command.unexists=未知的命令
+create.warning.command.unexists.message=您所输入的命令未找到或未注册
+create.warning.command.unexists.suggest=检查您输入的值或在配置文件中关闭创建检查
+create.warning.type.unknown=未知牌子类型
 create.warning.type.unknown.message=您所输入的牌子类型不正确
-create.warning.type.unknown.suggest=请确认您输入的类型是正确的
-create.notice.portal=等待建立到达站
-create.notice.portal.message=正在创建传送门...
-create.notice.portal.suggest=请使用同样名称创建到达站牌子
+create.warning.type.unknown.suggest=请确认您输入的类型未出现拼写错误
 create.process=加载中...
-create.process.message=成功创建新的 {type} 牌子
+create.process.message=成功创建新的{type}牌子
+
+command.update.start=更新牌子中...
+command.update.stop=更新成功 ({time} 秒)!
+command.portal.search.no=未找到传送门 {name}
+command.portal.all=-所有传送门-
+command.portal.none=没有传送门可以显示
 
 type.world_teleport=世界传送
-type.portal=传送
+type.portal=传送门
 type.portal.arrival=-到达站-
 type.portal.departure=-始发站-
 type.command=命令

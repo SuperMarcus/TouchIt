@@ -26,6 +26,8 @@ class SignManager{
     /** @var Provider */
     private $provider;
 
+    private $suggest_showed = false;
+
     /**
      * @param $value
      * @return int
@@ -90,17 +92,29 @@ class SignManager{
     
     public function __construct(TouchIt $plugin){
         $this->plugin = $plugin;
+        $this->suggest_showed = 0;
     }
 
     /**
      * Update sign
      */
     public function update(){
+        $show_suggest = false;
+        if($this->suggest_showed > 3){
+            $show_suggest = true;
+            $this->suggest_showed = 0;
+        }else ++$this->suggest_showed;
+
         foreach($this->provider->getAll() as $info){
             $level = $this->getServer()->getLevelByName($info['position']['level']);
             if($level instanceof Level){
                 $tile = $level->getTile(new Vector3($info['position']['x'], $info['position']['y'], $info['position']['z']));
-                if(!($tile instanceof Sign))continue;
+                if(!($tile instanceof Sign)){
+                    if($this->getConfig()->get("GarbageCollection")){
+                        $this->getProvider()->remove($info['position']['x'], $info['position']['y'], $info['position']['z'], $info['position']['level']);
+                    }
+                    continue;
+                }
             }else continue;
 
             switch((int) $info['data']['type']){
@@ -113,8 +127,12 @@ class SignManager{
                         $tile->setText("[".$this->getConfig()->get("teleport")['title']."]", "----------", $this->getLang("update.sign.full"));
                         break;
                     }
-                    if(@array_search($info['data']['data']['target'], (array) $this->getConfig()->get("teleport")['MainLevel'])){
+                    if(@array_search($info['data']['data']['target'], (array) $this->getConfig()->get("teleport")['MainLevel']) !== false){
                         $tile->setText("[".$this->getConfig()->get("teleport")['title']."]", "----------", $this->getLang("update.sign.lobby"));
+                        break;
+                    }
+                    if($show_suggest){
+                        $tile->setText("[TouchIt]", "----------", $this->getLang("update.sign.portal.suggest"));
                         break;
                     }
                     $tile->setText(
@@ -135,11 +153,19 @@ class SignManager{
                     if(count($description) > 1)$description[0] .= "-";
                     else $description[1] = "";
                     switch($info['data']['data']['id']){
-                        case 0:
+                        case 0://arrival
                             $tile->setText("[".$this->getConfig()->get("portal")['title']."]", $this->getLang("type.portal.arrival"), $description[0], $description[1]);
                             break;
-                        case 1:
-                            if($info['position']['level'] === $info['data']['data']['target'][3]){
+                        case 1://departure
+                            if(!$this->getProvider()->exists($info['data']['data']['target']['x'], $info['data']['data']['target']['y'], $info['data']['data']['target']['z'], $info['data']['data']['target']['level'])){
+                                $tile->setText("[TouchIt]", "----------", $this->getLang("update.sign.no-arrive"));
+                                break;
+                            }
+                            if($info['position']['level'] === $info['data']['data']['target']['level']){
+                                if($show_suggest){
+                                    $tile->setText("[TouchIt]", "----------", $this->getLang("update.sign.portal.suggest"));
+                                    break;
+                                }
                                 $tile->setText(
                                     "[".$this->getConfig()->get("portal")['title']."]",
                                     $description[0],
@@ -148,12 +174,16 @@ class SignManager{
                                 );
                                 break;
                             }
-                            if(!$this->getServer()->isLevelLoaded($info['data']['data']['target'][3]) or !(($target = $this->getServer()->getLevelByName($info['data']['data']['target'][3])) instanceof Level)){
+                            if(!$this->getServer()->isLevelLoaded($info['data']['data']['target']['level']) or !(($target = $this->getServer()->getLevelByName($info['data']['data']['target']['level'])) instanceof Level)){
                                 $tile->setText("[".$this->getConfig()->get("portal")['title']."]", "----------", $this->getLang("update.sign.closed"));
                                 break;
                             }
                             if($this->getConfig()->get("portal")['EnableCount'] and $this->getConfig()->get("teleport")['ShowFull'] and (count($target->getPlayers()) >= $this->getConfig()->get("teleport")['MaxPlayers'])){
                                 $tile->setText("[".$this->getConfig()->get("portal")['title']."]", "----------", $this->getLang("update.sign.full"));
+                                break;
+                            }
+                            if($show_suggest){
+                                $tile->setText("[TouchIt]", "----------", $this->getLang("update.sign.portal.suggest"));
                                 break;
                             }
                             $tile->setText(
@@ -176,6 +206,10 @@ class SignManager{
                     }
                     break;
                 case SignManager::SIGN_COMMAND:
+                    if($show_suggest){
+                        $tile->setText("[TouchIt]", "----------", $this->getLang("update.sign.command.suggest"));
+                        break;
+                    }
                     $tile->setText(
                         "[".$this->getConfig()->get("command")['title']."]",
                         "----------",

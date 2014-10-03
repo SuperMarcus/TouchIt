@@ -51,14 +51,18 @@ class PlayerTouchListener implements Listener{
                     if($data['data']['id'] === 0){
                         $event->getPlayer()->sendMessage(str_replace("{name}", $data['data']['name'], $this->manager->getLang("event.arrival")));
                     }else{
-                        if($this->manager->getServer()->isLevelLoaded($data['data']['target'][3])){
-                            $level = $this->manager->getServer()->getLevelByName($data['data']['target'][3]);
+                        if(!$this->manager->getProvider()->exists($data['data']['target']['x'], $data['data']['target']['y'], $data['data']['target']['z'], $data['data']['target']['level'])){
+                            $event->getPlayer()->sendMessage($this->manager->getLang("event.no-arrive"));
+                            break;
+                        }
+                        if($this->manager->getServer()->isLevelLoaded($data['data']['target']['level'])){
+                            $level = $this->manager->getServer()->getLevelByName($data['data']['target']['level']);
                             if($this->manager->getConfig()->get("portal")['UseLimits'] and @array_search($data['data']['target'], (array) $this->manager->getConfig()->get("teleport")['MainLevel']) === false and (count($level->getPlayers()) >= $this->manager->getConfig()->get("teleport")['MaxPlayers'])){
                                 $event->getPlayer()->sendMessage(str_replace(["{target}", "{origin}", "{player}"], [$data['data']['target'], $event->getPlayer()->getLevel()->getName(), $event->getPlayer()->getName()], $this->manager->getLang("event.limit")));
                                 break;
                             }
                             $event->getPlayer()->sendMessage(str_replace("{name}", $data['data']['name'], $this->manager->getLang("event.portal.process")));
-                            $pos = new Position($data['data']['target'][0], $data['data']['target'][1], $data['data']['target'][2], $level);
+                            $pos = new Position($data['data']['target']['x'], $data['data']['target']['y'], $data['data']['target']['z'], $level);
                             if($this->manager->getConfig()->get("portal")['SafeSpawn']){//Implements safe spawn option
                                 $pos = $level->getSafeSpawn($pos);
                             }

@@ -1,6 +1,6 @@
 # Language profile for TouchIt
 # Copyright Marcus 2014
-# Version TouchIt 1.1 Beta
+# TouchIt development version
 
 provider.notfound=The provider you set was not correct. Change this option at "plugins/TouchIt/config.yml"
 
@@ -11,11 +11,12 @@ event.unknowtype=Unknow sign type {type}, Please connect server operator for mor
 event.destroy.load=This sign has been delete.
 event.destroy.permission=No Permission
 event.destroy.permission.message=You do not have permission to break this sign.
-event.arrival=This is the arrival station of {name}
+event.arrival=This is the arrival of {name}
+event.no-arrive=Could not find the arrival
 event.portal.process=Teleporting to {name}...
 event.teleport.process=Teleporting to world {target}...
-event.command.process.run=Running command {cmd}...
-event.command.process.done=Done for running {cmd}
+event.command.process.run=Running command /{cmd}...
+event.command.process.done=Done for running /{cmd}
 event.command.process.error=An exception happened when running the command
 
 update.sign.closed=Not open
@@ -23,6 +24,9 @@ update.sign.full=FULL
 update.sign.lobby=Lobby
 update.sign.count=Peoples
 update.sign.count.format=[{count}/{max}]
+update.sign.portal.suggest=Tap to portal
+update.sign.command.suggest=Tap to run
+update.sign.no-arrive=No arrival
 
 create.warning=[WARNING]
 create.warning.permission=No permission
@@ -37,6 +41,18 @@ create.warning.level.invalid.suggest=Re-write a sign with an exists level
 create.warning.name.empty=Empty name
 create.warning.name.empty.message=The name you entered is empty
 create.warning.name.empty.suggest=Re-write a sign with portal name on line 2
+create.warning.name.used=Name repeated
+create.warning.name.used.message=This name has been used
+create.warning.name.used.suggest=Re-write a sign with unrepeated name on line 2
+create.warning.name.unset=Departure unset
+create.warning.name.unset.message=There's no arrival for name "{name}"
+create.warning.name.unset.suggest=Please create the arrival sign first
+create.warning.portal-type.empty=Empty Type
+create.warning.portal-type.empty.message=The type of this portal can not be blank
+create.warning.portal-type.empty.suggest=Re-write a sign with correct type
+create.warning.portal-type.unknown=Invalid type
+create.warning.portal-type.unknown.message=Portal type must be "a"(arrival) or "d"(departure)
+create.warning.portal-type.unknown.suggest=Re-write a sign with valid portal type
 create.warning.command.empty=Empty CMD
 create.warning.command.empty.message=The command you entered is empty
 create.warning.command.empty.suggest=Re-write a sign with valid command on line 2, 3
@@ -51,6 +67,12 @@ create.notice.portal.message=Building the portal...
 create.notice.portal.suggest=Please build the arrival sign
 create.process=Loading...
 create.process.message=The new {type} sign has been create
+
+command.update.start=Updating signs...
+command.update.stop=Done ({time}s)!
+command.portal.search.no=Did not find portal {name}
+command.portal.all=-All portals-
+command.portal.none=There's no portal to be show
 
 type.world_teleport=WorldTeleport
 type.portal=Portal

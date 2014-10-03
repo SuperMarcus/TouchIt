@@ -1,6 +1,6 @@
 # TouchIt configuration file
 # Pyramid development team 2014
-# Version TouchIt 1.1 Beta
+# TouchIt development version
 
 # All settings for world teleport sign
 teleport:
@@ -53,6 +53,9 @@ CreateCheck: true
 
 # Show suggest when an exception happened
 ShowSuggest: true
+
+# If not necessary, do not change this
+AutoUpdate: true
 
 # If not necessary, do not change this
 ScheduleRepeatingPeriod: 5

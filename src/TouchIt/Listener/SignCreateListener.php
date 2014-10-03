@@ -10,8 +10,6 @@ class SignCreateListener implements Listener{
     /** @var SignManager */
     private $manager;
 
-    private $portal_cash;
-
     public function __construct(SignManager $manager){
         $this->manager = $manager;
     }
@@ -78,6 +76,16 @@ class SignCreateListener implements Listener{
                         $event->getPlayer()->sendMessage(str_replace("{type}", $this->manager->getLang("type.world_teleport"), $this->manager->getLang("create.process.message")));
                         break;
                     case SignManager::SIGN_PORTAL:
+                        if(count(explode("&", trim($event->getLine(0)))) < 3){
+                            $event->setLine(0, $this->manager->getLang("create.warning"));
+                            $event->setLine(1, "----------");
+                            $event->setLine(2, $this->manager->getLang("create.warning.portal-type.empty"));
+                            $event->setLine(3, "");
+                            $event->getPlayer()->sendMessage($this->manager->getLang("create.warning.portal-type.empty.message"));
+                            if($this->manager->getConfig()->get("ShowSuggest")){
+                                $event->getPlayer()->sendMessage($this->manager->getLang("create.warning.portal-type.empty.suggest"));
+                            }
+                        }
                         if(trim($event->getLine(1)) == ""){
                             $event->setLine(0, $this->manager->getLang("create.warning"));
                             $event->setLine(1, "----------");
@@ -91,54 +99,81 @@ class SignCreateListener implements Listener{
                         }
                         $name = trim($event->getLine(1));
                         $description = (trim($event->getLine(2)) != "" or trim($event->getLine(3)) != "") ? ltrim($event->getLine(2)).rtrim($event->getLine(3)) : "Portal: ".trim($event->getLine(1));
-                        if(isset($this->portal_cash[$name])){
-                            $departure = $this->portal_cash[$name];
-                            unset($this->portal_cash[$name]);
-                            if($departure[0] instanceof \WeakRef and $departure[0]->valid() and $departure[0]->get() instanceof Sign){
-                                /** @var Sign $tile */
-                                $tile = $departure[0]->get();
-                                $event->setLine(0, "[TouchIt]");
-                                $event->setLine(1, "----------");
-                                $event->setLine(2, $this->manager->getLang("create.process"));
-                                $event->setLine(3, "");
-                                $tile->setText("[TouchIt]", "----------", $this->manager->getLang("create.process"), "");
+                        switch(trim(explode("&", trim($event->getLine(0)))[2])){
+                            case "a":
+                                $used = 0;
+                                foreach($this->manager->getProvider()->getAll() as $sign){
+                                    if($sign['data']['type'] === SignManager::SIGN_PORTAL and $sign['data']['data']['id'] === 0 and $sign['data']['data']['name'] === $name){
+                                        ++$used;
+                                    }
+                                }
+                                if($used > 0){
+                                    $event->setLine(0, $this->manager->getLang("create.warning"));
+                                    $event->setLine(1, "----------");
+                                    $event->setLine(2, $this->manager->getLang("create.warning.name.used"));
+                                    $event->setLine(3, "");
+                                    $event->getPlayer()->sendMessage($this->manager->getLang("create.warning.name.used.message"));
+                                    if($this->manager->getConfig()->get("ShowSuggest")){
+                                        $event->getPlayer()->sendMessage($this->manager->getLang("create.warning.name.used.suggest"));
+                                    }
+                                    break;
+                                }
                                 $this->manager->getProvider()->create([
                                     "type" => SignManager::SIGN_PORTAL,
                                     "data" => [
-                                        "id" => 0,//arrival
+                                        "id" => 0,
                                         "name" => $name,
                                         "description" => $description
                                     ]
                                 ], $event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ(), $event->getBlock()->getLevel()->getName());
+                                $event->setLine(0, "[TouchIt]");
+                                $event->setLine(1, "----------");
+                                $event->setLine(2, $this->manager->getLang("create.process"));
+                                $event->setLine(3, "");
+                                $event->getPlayer()->sendMessage(str_replace("{type}", $this->manager->getLang("type.portal"), $this->manager->getLang("create.process.message")));
+                                break;
+                            case "d":
+                                $arrival = null;
+                                foreach($this->manager->getProvider()->getAll() as $sign){
+                                    if($sign['data']['type'] === SignManager::SIGN_PORTAL and $sign['data']['data']['id'] === 0 and $sign['data']['data']['name'] === $name){
+                                        $arrival = $sign['position'];
+                                    }
+                                }
+                                if($arrival === null){
+                                    $event->setLine(0, $this->manager->getLang("create.warning"));
+                                    $event->setLine(1, "----------");
+                                    $event->setLine(2, $this->manager->getLang("create.warning.name.unset"));
+                                    $event->setLine(3, "");
+                                    $event->getPlayer()->sendMessage(str_replace("{name}", $name, $this->manager->getLang("create.warning.name.unset.message")));
+                                    if($this->manager->getConfig()->get("ShowSuggest")){
+                                        $event->getPlayer()->sendMessage($this->manager->getLang("create.warning.name.unset.suggest"));
+                                    }
+                                    break;
+                                }
                                 $this->manager->getProvider()->create([
                                     "type" => SignManager::SIGN_PORTAL,
                                     "data" => [
-                                        "id" => 1,//departure
+                                        "id" => 1,
                                         "name" => $name,
-                                        "target" => [
-                                            $event->getBlock()->getFloorX(),
-                                            $event->getBlock()->getFloorY(),
-                                            $event->getBlock()->getFloorZ(),
-                                            $event->getBlock()->getLevel()->getName()
-                                        ],
-                                        "description" => $departure[1]
+                                        "target" => $arrival,
+                                        "description" => $description
                                     ]
-                                ], $tile->getFloorX(), $tile->getFloorY(), $tile->getFloorZ(), $tile->getLevel()->getName());
+                                ], $event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ(), $event->getBlock()->getLevel()->getName());
+                                $event->setLine(0, "[TouchIt]");
+                                $event->setLine(1, "----------");
+                                $event->setLine(2, $this->manager->getLang("create.process"));
+                                $event->setLine(3, "");
                                 $event->getPlayer()->sendMessage(str_replace("{type}", $this->manager->getLang("type.portal"), $this->manager->getLang("create.process.message")));
                                 break;
-                            }
-                        }
-                        $this->portal_cash[trim($event->getLine(1))] = [
-                            new \WeakRef($event->getBlock()->getLevel()->getTile($event->getBlock())),
-                            $description
-                        ];
-                        $event->setLine(0, "[TouchIt]");
-                        $event->setLine(1, "----------");
-                        $event->setLine(2, $this->manager->getLang("create.notice.portal"));
-                        $event->setLine(3, "");
-                        $event->getPlayer()->sendMessage($this->manager->getLang("create.notice.portal.message"));
-                        if($this->manager->getConfig()->get("ShowSuggest")){
-                            $event->getPlayer()->sendMessage($this->manager->getLang("create.notice.portal.suggest"));
+                            default:
+                                $event->setLine(0, $this->manager->getLang("create.warning"));
+                                $event->setLine(1, "----------");
+                                $event->setLine(2, $this->manager->getLang("create.warning.portal-type.unknown"));
+                                $event->setLine(3, "");
+                                $event->getPlayer()->sendMessage($this->manager->getLang("create.warning.portal-type.unknown.message"));
+                                if($this->manager->getConfig()->get("ShowSuggest")){
+                                    $event->getPlayer()->sendMessage($this->manager->getLang("create.warning.portal-type.unknown.suggest"));
+                                }
                         }
                         break;
                     case SignManager::SIGN_COMMAND:
