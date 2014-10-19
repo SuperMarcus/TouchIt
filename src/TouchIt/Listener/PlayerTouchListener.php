@@ -80,7 +80,7 @@ class PlayerTouchListener implements Listener{
                     if($this->manager->getConfig()->get("command")['ShowStatus']){
                         $event->getPlayer()->sendMessage(str_replace("{cmd}", $data['data']['cmd'], $this->manager->getLang("event.command.process.run")));
                     }
-                    if($this->manager->getServer()->dispatchCommand($event->getPlayer(), $data['data']['cmd'])){//Run, will use target player to be the CommandSender
+                    if($this->manager->getServer()->dispatchCommand($event->getPlayer(), str_replace(["@p", "@player"], [$event->getPlayer()->getName(), $event->getPlayer()->getName()], $data['data']['cmd']))){//Run, will use target player to be the CommandSender
                         if($this->manager->getConfig()->get("command")['ShowStatus']){
                             $event->getPlayer()->sendMessage(str_replace("{cmd}", $data['data']['cmd'], $this->manager->getLang("event.command.process.done")));
                         }
