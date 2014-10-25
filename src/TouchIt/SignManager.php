@@ -224,6 +224,16 @@ class SignManager{
     }
 
     /**
+     * Save the default preloaded commands configuration
+     * @param $name
+     */
+    public function saveDefaultPreloadedFile($name){
+        if(!file_exists($this->getPreloadedDataFolder().$name.".txt")){
+            file_put_contents($this->getPreloadedDataFolder().$name.".txt", @stream_get_contents($this->plugin->getResource("preloaded.txt")));
+        }
+    }
+
+    /**
      * Call when disable
      */
     public function close(){
@@ -266,5 +276,12 @@ class SignManager{
      */
     public function getProvider(){
         return $this->provider;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPreloadedDataFolder(){
+        return $this->plugin->getPreloadedDataFolder();
     }
 }

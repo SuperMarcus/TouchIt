@@ -2,8 +2,10 @@
 namespace TouchIt\Listener;
 
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\level\Position;
+use TouchIt\Command\OperatorCommandSender;
 use TouchIt\SignManager;
 
 class PlayerTouchListener implements Listener{
@@ -77,16 +79,34 @@ class PlayerTouchListener implements Listener{
                         $event->getPlayer()->sendMessage($this->manager->getLang("event.permission"));
                         break;
                     }
-                    if($this->manager->getConfig()->get("command")['ShowStatus']){
-                        $event->getPlayer()->sendMessage(str_replace("{cmd}", $data['data']['cmd'], $this->manager->getLang("event.command.process.run")));
+                    $opts = ["operator" => false, "preloaded" => false];
+                    if(isset($data['data']['option'])){
+                        $opts = $data['data']['option'];
                     }
-                    if($this->manager->getServer()->dispatchCommand($event->getPlayer(), str_replace(["@p", "@player"], [$event->getPlayer()->getName(), $event->getPlayer()->getName()], $data['data']['cmd']))){//Run, will use target player to be the CommandSender
-                        if($this->manager->getConfig()->get("command")['ShowStatus']){
-                            $event->getPlayer()->sendMessage(str_replace("{cmd}", $data['data']['cmd'], $this->manager->getLang("event.command.process.done")));
+                    if($opts['preloaded']){
+                        if(file_exists($this->manager->getPreloadedDataFolder().$data['data']['cmd'].".txt")){
+                            $fp = @fopen($this->manager->getPreloadedDataFolder().$data['data']['cmd'].".txt", "r");
+                            if($fp){
+                                while(!feof($fp)){
+                                    $line = str_replace(["@time", "@player", "@level"], [time(), $event->getPlayer()->getName(), $event->getPlayer()->getLevel()->getName()], ltrim(fgets($fp)));
+                                    if(substr(trim($line)."#", 0, 1) !== "#"){
+                                        $this->manager->getServer()->getPluginManager()->callEvent($e = new PlayerCommandPreprocessEvent($event->getPlayer(), "/".$line));
+                                        if(!$e->isCancelled()){
+                                            $this->manager->getServer()->dispatchCommand(($opts['operator'] ? new OperatorCommandSender($event->getPlayer(), $this->manager->getServer()) : $event->getPlayer()), $line);
+                                        }
+                                    }
+                                }
+                            }else{
+                                $event->getPlayer()->sendMessage($this->manager->getLang("event.command.preloaded.unreadable"));
+                            }
+                        }else{
+                            $event->getPlayer()->sendMessage($this->manager->getLang("event.command.preloaded.unexists"));
                         }
                     }else{
-                        if($this->manager->getConfig()->get("command")['ShowStatus']){
-                            $event->getPlayer()->sendMessage(str_replace("{cmd}", $data['data']['cmd'], $this->manager->getLang("event.command.process.error")));
+                        $cmd = str_replace(["@time", "@player", "@level"], [time(), $event->getPlayer()->getName(), $event->getPlayer()->getLevel()->getName()], $data['data']['cmd']);
+                        $this->manager->getServer()->getPluginManager()->callEvent($e = new PlayerCommandPreprocessEvent($event->getPlayer(), "/".$cmd));
+                        if(!$e->isCancelled()){
+                            $this->manager->getServer()->dispatchCommand(($opts['operator'] ? new OperatorCommandSender($event->getPlayer(), $this->manager->getServer()) : $event->getPlayer()), $cmd);
                         }
                     }
                     break;

@@ -15,9 +15,8 @@ event.arrival=This is the arrival of {name}
 event.no-arrive=Could not find the arrival
 event.portal.process=Teleporting to {name}...
 event.teleport.process=Teleporting to world {target}...
-event.command.process.run=Running command /{cmd}...
-event.command.process.done=Done for running /{cmd}
-event.command.process.error=An exception happened when running the command
+event.command.preloaded.unexists=Could not find the commands list
+event.command.preloaded.unreadable=Could not open the stream
 
 update.sign.closed=Not open
 update.sign.full=FULL
@@ -65,6 +64,8 @@ create.warning.type.unknown.suggest=Make sure your spelling was correct
 create.notice.portal=Waiting Arrival
 create.notice.portal.message=Building the portal...
 create.notice.portal.suggest=Please build the arrival sign
+create.notice.command.operator=This sign will be run as operator
+create.notice.command.preloaded=Set to a preloaded command
 create.process=Loading...
 create.process.message=The new {type} sign has been create
 

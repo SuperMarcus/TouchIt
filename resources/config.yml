@@ -1,4 +1,4 @@
-# TouchIt configuration file
+# TouchIt main configuration
 # Pyramid development team 2014
 # TouchIt development version
 
@@ -36,8 +36,6 @@ portal:
 command:
  # Title of world teleport sign
  title: Command
- # Show status when running the command
- ShowStatus: false
 
 # Multi-languages support
 # Support: English, Chinese

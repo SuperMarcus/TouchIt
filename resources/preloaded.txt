@@ -1,0 +1,5 @@
+# TouchIt preloaded commands configuration
+# Supported variables: (will be replaced)
+# @time Current timestamps
+# @player The player who touched the sign
+# @level Current world name

@@ -147,4 +147,14 @@ class TouchIt extends PluginBase implements CommandExecutor{
         }
         @fclose($stream);
     }
+
+    /**
+     * Get the preloaded commands config folder
+     * @return string
+     */
+    public function getPreloadedDataFolder(){
+        $dir = $this->getDataFolder()."commands".DIRECTORY_SEPARATOR;
+        @mkdir($dir);
+        return $dir;
+    }
 }
