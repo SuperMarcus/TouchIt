@@ -9,14 +9,6 @@ authors: [Marcus]
 description: "This is a powerful sign plugin."
 website: https://github.com/SuperMarcus/TouchIt
 
-commands:
-  touchit:
-    description: "TouchIt commands"
-    usage: "/touchit <update|portal>"
-    aliases: [touch, touch-it]
-    permission: touchit.command
-    permission-message: "You don't have permissions to use touchit commands"
-
 permissions:
   touchit:
     default: operator

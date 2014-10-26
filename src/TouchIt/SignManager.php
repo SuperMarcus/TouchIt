@@ -95,6 +95,10 @@ class SignManager{
         $this->suggest_showed = 0;
     }
 
+    public function manuallyUpdate(){
+        $this->update();
+    }
+
     /**
      * Update sign
      */
