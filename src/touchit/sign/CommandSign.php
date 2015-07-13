@@ -147,7 +147,9 @@ class CommandSign extends TouchItSign{
      * @param $value
      */
     public function setOption($value){
-        $this->setFunctionProperty(CommandSign::COMMAND_SIGN_OPTION, $value, TouchItSign::PROPERTY_BYTE);
+        if($value !== $this->getOption()){
+            $this->setFunctionProperty(CommandSign::COMMAND_SIGN_OPTION, $value, TouchItSign::PROPERTY_BYTE);
+        }
     }
 
     /**

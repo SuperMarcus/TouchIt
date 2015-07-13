@@ -7,6 +7,7 @@ use pocketmine\nbt\tag\Int;
 use pocketmine\nbt\tag\String;
 use pocketmine\Server;
 use touchit\provider\Provider;
+use touchit\sign\CommandSign;
 use touchit\sign\WorldTeleportSign;
 use touchit\SignManager;
 
@@ -47,6 +48,29 @@ class OldProviderUpdater{
                     case OldProviderUpdater::SIGN_UNKNOWN:
                         $this->getProvider()->remove($sign['position']['x'], $sign['position']['y'], $sign['position']['z'], $sign['position']['level']);
                         break;
+                    case OldProviderUpdater::SIGN_COMMAND:
+                        if(($level = $server->getLevelByName($sign['position']['level'])) instanceof Level){
+                            $this->getProvider()->remove($sign['position']['x'], $sign['position']['y'], $sign['position']['z'], $sign['position']['level']);
+                            $manager->createTile([
+                                    ["setDescription", [$data['data']['description']]],
+                                    [$data['data']['option']['preloaded'] ? "setCommandStore" : "setCommand", [$data['data']['cmd']]],
+                                    ["setRunAsOperator", [$data['data']['option']['operator']]],
+                                    ["setPreloaded", [$data['data']['option']['preloaded']]]
+                                ],
+                                CommandSign::ID,
+                                $level->getChunk($sign['position']['x'] >> 4, $sign['position']['z'] >> 4),
+                                new Compound("", [
+                                    "id" => new String("id", CommandSign::ID),
+                                    "x" => new Int("x", $sign['position']['x']),
+                                    "y" => new Int("y", $sign['position']['y']),
+                                    "z" => new Int("z", $sign['position']['z']),
+                                    "Text1" => new String("Text1", ""),
+                                    "Text2" => new String("Text2", ""),
+                                    "Text3" => new String("Text3", ""),
+                                    "Text4" => new String("Text4", "")
+                                ]));
+                        }
+                        break;
                     case OldProviderUpdater::SIGN_WORLD_TELEPORT:
                         if(($level = $server->getLevelByName($sign['position']['level'])) instanceof Level){
                             $this->getProvider()->remove($sign['position']['x'], $sign['position']['y'], $sign['position']['z'], $sign['position']['level']);
@@ -68,8 +92,6 @@ class OldProviderUpdater{
                                 ]));
                         }
                         break;
-                    default:
-                        $this->getProvider()->remove($sign['position']['x'], $sign['position']['y'], $sign['position']['z'], $sign['position']['level']);
                 }
             }
             return false;
