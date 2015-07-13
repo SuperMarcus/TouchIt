@@ -6,7 +6,9 @@ use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\level\Position;
 use touchit\command\OperatorCommandSender;
+use touchit\sign\TouchItSign;
 use touchit\SignManager;
+use touchit\TouchIt;
 
 class PlayerTouchListener implements Listener{
     /** @var SignManager */
@@ -20,7 +22,11 @@ class PlayerTouchListener implements Listener{
      * @param PlayerInteractEvent $event
      */
     public function onPlayerTouch(PlayerInteractEvent $event){
-        if($this->manager->getProvider()->exists($event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ(), $event->getBlock()->getLevel()->getName())){
+        if(($sign = $event->getBlock()->getLevel()->getTile($event->getBlock())) instanceof TouchItSign){
+            /** @var TouchItSign $sign */
+            $sign->onActive($event->getPlayer(), $this->manager);
+        }
+        /*if($this->manager->getProvider()->exists($event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ(), $event->getBlock()->getLevel()->getName())){
             $event->setCancelled();
             if(!$event->getPlayer()->hasPermission("touchit.sign.use")){
                 $event->getPlayer()->sendMessage($this->manager->getLang("event.permission"));
@@ -113,6 +119,6 @@ class PlayerTouchListener implements Listener{
                 default:
                     $event->getPlayer()->sendMessage(str_replace("{type}", $data['type'], $this->manager->getLang("event.unknowtype")));
             }
-        }
+        }*/
     }
 }

@@ -2,4 +2,5 @@
 # Supported variables: (will be replaced)
 # @time Current timestamps
 # @player The player who touched the sign
+# @display_name Player's display name
 # @level Current world name

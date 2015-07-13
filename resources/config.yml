@@ -1,23 +1,39 @@
-# TouchIt main configuration
-# Pyramid development team 2014
-# TouchIt development version
+# TouchIt main configuration file
+# SuperMarcus (https://github.com/SuperMarcus)
+
+# This plugin allows fully preference by edit this file
+# Please read the comment before doing any changes
+# Unsuitable settings would crash the plugin or corrupt chunks so be really careful and known what you're doing
 
 # All settings for world teleport sign
 teleport:
- # Title of world teleport sign
- title: Teleport
- # Player limits in one level (you should switch on 'EnableCount' to use this function)
- MaxPlayers: 20
+ # Player limits in one level
+ # To let a special player join the level which is full, grant the permission 'touchit.sign.use.world-teleport.force'
+ # Operators has that permission by default
+ max-players: 20
  # If not necessary, please switch on this option
- SafeSpawn: true
- # Fill with server lobbys
- # 'MaxPlayers' will not work in those level
- # Leave it empty to switch off this function
- MainLevel: [world]
+ safe-spawn: true
+ # Fill in server lobby(s)
+ # 'MaxPlayers' won't work with those level(s)
+ main-level: [world]
  # Show message on sign when the number of people in target level is more than 'MaxPlayers'
- ShowFull: true
- # To show player count on the sign
- EnableCount: true
+ show-full: true
+ # Text that shown on the sign
+ format:
+   # Message that shows when target level is full
+   # This message will only appear when 'show-full' is set to true
+   full: "FULL"
+   # Message that shows when target level is unavailable or closed
+   unavailable: "CLOSED"
+   # Will be surrounded with '[' and ']'
+   title: Teleport
+   # The other three lines
+   # Variables are list below:
+   # '{cur}' The number of players in target level
+   # '{max}' The maximum players in one level
+   # '{tar}' Name of target level
+   # '{des}' Description of this sign
+   body: ["{des}", "Players", "{cur}/{max}"]
 
 # All settings for portal sign
 portal:
@@ -34,30 +50,19 @@ portal:
 
 # All settings for command sign
 command:
- # Title of world teleport sign
- title: Command
+ # Notice player when active the sign
+ notice: true
+ # Text that shown on the sign
+ format:
+   # Title of world command sign
+   # Will be surrounded with '[' and ']'
+   title: Command
+   # The other three lines
+   # Variables are list below:
+   # '{cmd}' Command you set
+   # '{des}' Description of this sign
+   # '{nam}' Commands store name (Only work with preloaded signs)
+   body: ["----------", "{des}", ""]
 
-# Multi-languages support
-# Support: English, Chinese
-language: English
-
-# You may change other way to save data
-# Default is SQLite3
-# Support: SQLite3, YAML
-Provider: SQLite3
-
-# Check settings when create new sign
-CreateCheck: true
-
-# Show suggest when an exception happened
-ShowSuggest: true
-
-# If not necessary, do not change this
-AutoUpdate: true
-
-# If not necessary, do not change this
-ScheduleRepeatingPeriod: 5
-
-# Auto collect option
-# If not necessary, do not change this
-GarbageCollection: true
+# Check settings while creation
+check-settings: true

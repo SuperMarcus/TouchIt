@@ -1,17 +1,18 @@
 <?php
 namespace touchit;
 
-use pocketmine\level\Level;
-use pocketmine\math\Vector3;
+/*use pocketmine\level\Level;
+use pocketmine\math\Vector3;*/
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Int;
 use pocketmine\nbt\tag\String;
-use pocketmine\network\protocol\EntityDataPacket;
+use pocketmine\network\protocol\TileEntityDataPacket;
 use pocketmine\Player;
 use pocketmine\tile\Sign;
 use pocketmine\tile\Tile;
 use touchit\Provider\Provider;
+use touchit\task\TileCreateTask;
 
 class SignManager{
     /** Supported types */
@@ -22,9 +23,6 @@ class SignManager{
 
     /** @var TouchIt */
     private $plugin;
-
-    /** @var Provider */
-    private $provider;
 
     private $suggest_showed = false;
 
@@ -81,7 +79,7 @@ class SignManager{
             new Int("z", $sign->getFloorZ())
         ]));
 
-        $pk = new EntityDataPacket;
+        $pk = new TileEntityDataPacket;
         $pk->x = $sign->getFloorX();
         $pk->y = $sign->getFloorY();
         $pk->z = $sign->getFloorZ();
@@ -96,13 +94,13 @@ class SignManager{
     }
 
     public function manuallyUpdate(){
-        $this->update();
+        /*$this->update();*/
     }
 
     /**
      * Update sign
      */
-    public function update(){
+    /*public function update(){
         $show_suggest = false;
         if($this->suggest_showed > 3){
             $show_suggest = true;
@@ -122,36 +120,6 @@ class SignManager{
             }else continue;
 
             switch((int) $info['data']['type']){
-                case SignManager::SIGN_WORLD_TELEPORT:
-                    if(!$this->getServer()->isLevelLoaded($info['data']['data']['target']) or !(($target = $this->getServer()->getLevelByName($info['data']['data']['target'])) instanceof Level)){
-                        $tile->setText("[".$this->getConfig()->get("teleport")['title']."]", "----------", $this->getLang("update.sign.closed"));
-                        break;
-                    }
-                    if($this->getConfig()->get("teleport")['EnableCount'] and $this->getConfig()->get("teleport")['ShowFull'] and (count($target->getPlayers()) >= $this->getConfig()->get("teleport")['MaxPlayers'])){
-                        $tile->setText("[".$this->getConfig()->get("teleport")['title']."]", "----------", $this->getLang("update.sign.full"));
-                        break;
-                    }
-                    if(@array_search($info['data']['data']['target'], (array) $this->getConfig()->get("teleport")['MainLevel']) !== false){
-                        $tile->setText("[".$this->getConfig()->get("teleport")['title']."]", "----------", $this->getLang("update.sign.lobby"));
-                        break;
-                    }
-                    if($show_suggest){
-                        $tile->setText("[TouchIt]", "----------", $this->getLang("update.sign.portal.suggest"));
-                        break;
-                    }
-                    $tile->setText(
-                        "[".$this->getConfig()->get("teleport")['title']."]",
-                        ($this->getConfig()->get("teleport")['EnableCount'] ? $info['data']['data']['description'] : "----------"),
-                        ($this->getConfig()->get("teleport")['EnableCount'] ? $this->getLang("update.sign.count") : $info['data']['data']['description']),
-                        ($this->getConfig()->get("teleport")['EnableCount'] ? str_replace([
-                            "{count}",
-                            "{max}"
-                        ], [
-                            min(count($target->getPlayers()), $this->getConfig()->get("teleport")['MaxPlayers']),
-                            $this->getConfig()->get("teleport")['MaxPlayers']
-                        ], $this->getLang("update.sign.count.format")) : "")
-                    );
-                    break;
                 case SignManager::SIGN_PORTAL:
                     $description = str_split($info['data']['data']['description'], 14);
                     if(count($description) > 1)$description[0] .= "-";
@@ -225,7 +193,7 @@ class SignManager{
                     $this->plugin->getLogger()->debug("Sign data: ".print_r($info));
             }
         }
-    }
+    }*/
 
     /**
      * Save the default preloaded commands configuration
@@ -241,17 +209,19 @@ class SignManager{
      * Call when disable
      */
     public function close(){
-        if($this->provider instanceof Provider){
+        /*if($this->provider instanceof Provider){
             $this->provider->save();
-        }
+        }*/
     }
 
     /**
+     * @deprecated
+     *
      * @param string $k
      * @return string
      */
     public function getLang($k){
-        return $this->plugin->getLang($k);
+        return $this->getTranslator()->translateString($k);
     }
 
     /**
@@ -269,23 +239,56 @@ class SignManager{
     }
 
     /**
+     * @return \pocketmine\lang\BaseLang
+     */
+    public function getTranslator(){
+        return $this->plugin->getTranslator();
+    }
+
+    /**
      * @param Provider $provider
      */
-    public function setProvider(Provider $provider){
+    /*public function setProvider(Provider $provider){
         $this->provider = $provider;
-    }
+    }*/
 
     /**
      * @return Provider
      */
-    public function getProvider(){
+    /*public function getProvider(){
         return $this->provider;
-    }
+    }*/
 
     /**
      * @return string
      */
     public function getPreloadedDataFolder(){
         return $this->plugin->getPreloadedDataFolder();
+    }
+
+    /**
+     * @param array $calls
+     * @param ...$args
+     */
+    public function createTile(array $calls, ...$args){
+        $this->getServer()->getScheduler()->scheduleTask(new TileCreateTask($this->plugin, $calls, ...$args));
+    }
+
+    /**
+     * @param $name
+     * @return array
+     */
+    public function getPreloadedCommands($name){
+        $commands = [];
+        if(file_exists($this->getPreloadedDataFolder().$name.".txt")){
+            foreach(((array) explode('\n', @file_get_contents($this->getPreloadedDataFolder().$name.".txt"))) as $cmd){
+                if((strlen(trim($cmd)) > 0) and ($cmd{0} !== '#')){
+                    $commands[] = trim($cmd);
+                }
+            }
+        }else{
+            @file_put_contents($this->getPreloadedDataFolder().$name.".txt", @stream_get_contents($this->plugin->getResource("preloaded.txt")));
+        }
+        return $commands;
     }
 }

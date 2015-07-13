@@ -16,7 +16,7 @@ class TouchItCommand extends Command{
     }
 
     public function execute(CommandSender $sender, $commandLabel, array $args){
-        if(isset($args[0])){
+        /*if(isset($args[0])){
             switch(strtolower(trim($args[0]))){
                 case "update":
                     $time = microtime(true);
@@ -28,11 +28,11 @@ class TouchItCommand extends Command{
                     $this->sendPortals($sender, (isset($args[1]) ? $args[1] : null));
                     break;
             }
-        }
+        }*/
     }
 
     public function sendPortals(CommandSender $sender, $name = null){
-        if($name){
+        /*if($name){
             $info = [
                 [],//Departures
                 null//Arrival
@@ -68,6 +68,6 @@ class TouchItCommand extends Command{
             }else{
                 $sender->sendMessage($this->manager->getLang("command.portal.none"));
             }
-        }
+        }*/
     }
 }

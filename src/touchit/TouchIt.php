@@ -1,16 +1,22 @@
 <?php
 namespace touchit;
 
+use pocketmine\lang\BaseLang;
 use pocketmine\plugin\PluginBase;
-use pocketmine\scheduler\CallbackTask;
+use pocketmine\tile\Tile;
 use touchit\command\TouchItCommand;
 use touchit\listener\PlayerTouchListener;
 use touchit\listener\SignCreateListener;
 use touchit\listener\SignDestroyListener;
-use touchit\provider\SQLite3;
+use touchit\provider\Provider;
+use touchit\provider\update\OldProviderUpdater;
+use touchit\sign\CommandSign;
+use touchit\sign\WorldTeleportSign;
+use touchit\task\ProviderUpdaterTask;
+use touchit\task\SignUpdateTask;
 
 class TouchIt extends PluginBase{
-    /** @var string */
+    /** @var BaseLang */
     private $lang;
 
     /** @var SignManager */
@@ -20,38 +26,35 @@ class TouchIt extends PluginBase{
      * Call when enable
      */
     public function onEnable(){
-        if(!file_exists($this->getDataFolder()."config.yml")){
-            $this->saveDefaultConfig();
-        }
-        $this->reloadConfig();
-        $this->reloadLang();
+        @$this->saveDefaultConfig();
+        @$this->reloadConfig();
+
+        Tile::registerTile(WorldTeleportSign::class);
+        Tile::registerTile(CommandSign::class);
+
+        $this->lang = new BaseLang($this->getServer()->getProperty("settings.language", BaseLang::FALLBACK_LANGUAGE), $this->getFile()."resources/language/");
+
         $this->manager = new SignManager($this);
-        if(class_exists(($class = "touchit\\provider\\".$this->getConfig()->get("Provider")))){
-            $this->manager->setProvider(new $class($this));
-        }else{
-            $this->getLogger()->alert($this->getLang("provider.notfound"));
-            $this->manager->setProvider(new SQLite3($this));
+
+        //Update old sign data
+        if($this->getConfig()->exists("Provider") and (class_exists(($class = "touchit\\provider\\".$this->getConfig()->get("Provider")))) and is_a($class, Provider::class, true) and !((new \ReflectionClass($class))->isAbstract())){
+            $this->getLogger()->info($this->getTranslator()->translateString("provider.update", [(new \ReflectionClass($class))->getShortName()]));
+            $this->getServer()->getScheduler()->scheduleRepeatingTask(new ProviderUpdaterTask($this, new OldProviderUpdater(new $class($this))), 20 * 60);
         }
+
         $this->getServer()->getPluginManager()->registerEvents(new PlayerTouchListener($this->manager), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SignCreateListener($this->manager), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SignDestroyListener($this->manager), $this);
         $this->getServer()->getCommandMap()->register("touchit", new TouchItCommand($this->manager));
-        if($this->getConfig()->get("AutoUpdate"))
-            $this->getServer()->getScheduler()->scheduleRepeatingTask(new CallbackTask([$this->manager, "update"]), 20 * $this->getConfig()->get("ScheduleRepeatingPeriod"));
+
+        $this->getServer()->getScheduler()->scheduleRepeatingTask(new SignUpdateTask($this), 20 * 5);
     }
 
     /**
-     * @param $key
-     * @return string
+     * @return SignManager
      */
-    public function getLang($key){
-        if(isset($this->lang[$key])){
-            return $this->lang[$key];
-        }else if(is_array($this->lang)){
-            return "Key not found.";
-        }
-        $this->reloadLang();
-        return $this->getLang($key);
+    public function getManager(){
+        return $this->manager;
     }
 
     /**
@@ -61,29 +64,8 @@ class TouchIt extends PluginBase{
         $this->manager->close();
     }
 
-    /**
-     * Use to reload language profile
-     */
-    public function reloadLang(){
-        $this->lang = [];
-        $stream = $this->getResource("language/".strtolower($this->getConfig()->get("language")).".lang");
-        if(!$stream){
-            $stream = $this->getResource("language/english.lang");
-            if(!$stream){
-                $this->getLogger()->error("Unable to open stream. Could not load TouchIt languages.");
-                $this->getServer()->forceShutdown();
-                return;
-            }
-            $this->getLogger()->notice("Language \"".$this->getConfig()->get("language")."\" not found.");
-            $this->getLogger()->notice("Make sure your spelling was correct. Change this option at \"plugins/TouchIt/config.yml\"");
-        }
-        while(!feof($stream)){
-            $line = trim(fgets($stream));
-            if((strlen($line) >= 3) and $line{0} !== "#" and ($pos = strpos($line, "=")) != false){
-                $this->lang[substr($line, 0, $pos)] = substr($line, $pos + 1);
-            }
-        }
-        @fclose($stream);
+    public function getTranslator(){
+        return $this->lang;
     }
 
     /**

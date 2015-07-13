@@ -121,12 +121,7 @@ class SQLite3 implements Provider{
      * Internal use
      */
     private function load(){
-        if(file_exists($this->plugin->getDataFolder()."data.db")){
-            $this->database = new SQL($this->plugin->getDataFolder()."data.db", SQLITE3_OPEN_READWRITE);
-        }else{
-            $this->database = new SQL($this->plugin->getDataFolder()."data.db", SQLITE3_OPEN_CREATE|SQLITE3_OPEN_READWRITE);
-            $this->database->exec(stream_get_contents($this->plugin->getResource("provider/sqlite3.sql")));
-        }
+        $this->database = new SQL($this->plugin->getDataFolder()."data.db", SQLITE3_OPEN_READWRITE);
     }
 
     /**
