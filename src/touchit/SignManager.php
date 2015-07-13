@@ -280,10 +280,11 @@ class SignManager{
      */
     public function getPreloadedCommands($name){
         $commands = [];
-        if(file_exists($this->getPreloadedDataFolder().$name.".txt")){
-            foreach(((array) explode('\n', @file_get_contents($this->getPreloadedDataFolder().$name.".txt"))) as $cmd){
-                if((strlen(trim($cmd)) > 0) and ($cmd{0} !== '#')){
-                    $commands[] = trim($cmd);
+        if(file_exists($this->getPreloadedDataFolder().$name.".txt") and strlen($content = file_get_contents($this->getPreloadedDataFolder().$name.".txt")) > 0){
+            foreach(explode("\n", $content) as $cmd){
+                $cmd = trim($cmd);
+                if((strlen($cmd) > 0) and ($cmd{0} != '#')){
+                    $commands[] = $cmd;
                 }
             }
         }else{

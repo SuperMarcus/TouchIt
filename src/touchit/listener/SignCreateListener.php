@@ -269,11 +269,11 @@ class SignCreateListener implements Listener{
                 case SignManager::SIGN_UNKNOWN:
                     $event->setLine(0, "[TouchIt]");
                     $event->setLine(1, "----------");
-                    $event->setLine(2, $this->manager->getLang("create.warning.type.unknown"));
+                    $event->setLine(2, $this->manager->getTranslator()->translateString("create.warning.type.unknown"));
                     $event->setLine(3, "");
-                    $event->getPlayer()->sendMessage($this->manager->getLang("create.warning.type.unknown.message"));
+                    $event->getPlayer()->sendMessage($this->manager->getTranslator()->translateString("create.warning.type.unknown.message"));
                     if($this->manager->getConfig()->get("ShowSuggest")){
-                        $event->getPlayer()->sendMessage($this->manager->getLang("create.warning.type.unknown.suggest"));
+                        $event->getPlayer()->sendMessage($this->manager->getTranslator()->translateString("create.warning.type.unknown.suggest"));
                     }
             }
         }
