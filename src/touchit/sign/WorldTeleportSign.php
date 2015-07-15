@@ -18,7 +18,7 @@ class WorldTeleportSign extends TouchItSign{
     public function onActive(Player $player, SignManager $manager){
         if($player->hasPermission("touchit.sign.use.world-teleport")){
             if(($level = $manager->getServer()->getLevelByName($this->getTargetLevel())) instanceof Level){
-                if(!$player->hasPermission("touchit.sign.use.world-teleport.force") and (count($level->getPlayers()) >= $manager->getConfig()->get("teleport")['max-players'])){
+                if(!array_search($this->getTargetLevel(), $manager->getConfig()->get("teleport")['main-level']) and !$player->hasPermission("touchit.sign.use.world-teleport.force") and (count($level->getPlayers()) >= $manager->getConfig()->get("teleport")['max-players'])){
                     $player->sendTip($manager->getTranslator()->translateString("event.limit", [$this->getTargetLevel()]));
                 }else{
                     $player->sendTip($manager->getTranslator()->translateString("event.teleport.process", [$this->getTargetLevel()]));
@@ -40,15 +40,16 @@ class WorldTeleportSign extends TouchItSign{
             $level = $manager->getServer()->getLevelByName($this->getTargetLevel());
             $format = $manager->getConfig()->get("teleport")["format"];
             if($level instanceof Level){
-                $targetCount = min(count($level->getPlayers()), $manager->getConfig()->get("teleport")["max-players"]);
-                if(($targetCount >= $manager->getConfig()->get("teleport")["max-players"]) and ($manager->getConfig()->get("teleport")["show-full"])){//Full
+                $max = array_search($this->getTargetLevel(), $manager->getConfig()->get("teleport")['main-level']) ? $manager->getServer()->getMaxPlayers() : $manager->getConfig()->get("teleport")["max-players"];
+                $targetCount = min(count($level->getPlayers()), $max);
+                if(($targetCount >= $max) and ($manager->getConfig()->get("teleport")["show-full"])){//Full
                     $this->setText("[".$format["title"]."]",//Level unavailable message
                         "----------",
                         $format["full"]
                     );
                 }else{
                     $replacement = ['{cur}', '{max}', '{tar}', '{des}'];
-                    $replacementData = [$targetCount, $manager->getConfig()->get("teleport")["max-players"], $this->getTargetLevel(), $this->getDescription()];
+                    $replacementData = [$targetCount, $max, $this->getTargetLevel(), $this->getDescription()];
                     $this->setText("[".$format["title"]."]",
                         ...str_replace($replacement, $replacementData, $format["body"])
                     );
