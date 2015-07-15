@@ -1,8 +1,6 @@
 <?php
 namespace touchit;
 
-/*use pocketmine\level\Level;
-use pocketmine\math\Vector3;*/
 use pocketmine\nbt\NBT;
 use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Int;
@@ -11,7 +9,6 @@ use pocketmine\network\protocol\TileEntityDataPacket;
 use pocketmine\Player;
 use pocketmine\tile\Sign;
 use pocketmine\tile\Tile;
-use touchit\Provider\Provider;
 use touchit\task\TileCreateTask;
 
 class SignManager{
@@ -206,15 +203,6 @@ class SignManager{
     }
 
     /**
-     * Call when disable
-     */
-    public function close(){
-        /*if($this->provider instanceof Provider){
-            $this->provider->save();
-        }*/
-    }
-
-    /**
      * @deprecated
      *
      * @param string $k
@@ -244,20 +232,6 @@ class SignManager{
     public function getTranslator(){
         return $this->plugin->getTranslator();
     }
-
-    /**
-     * @param Provider $provider
-     */
-    /*public function setProvider(Provider $provider){
-        $this->provider = $provider;
-    }*/
-
-    /**
-     * @return Provider
-     */
-    /*public function getProvider(){
-        return $this->provider;
-    }*/
 
     /**
      * @return string

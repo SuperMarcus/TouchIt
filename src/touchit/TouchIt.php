@@ -11,6 +11,7 @@ use touchit\listener\SignDestroyListener;
 use touchit\provider\Provider;
 use touchit\provider\update\OldProviderUpdater;
 use touchit\sign\CommandSign;
+use touchit\sign\TouchItSign;
 use touchit\sign\WorldTeleportSign;
 use touchit\task\ProviderUpdaterTask;
 use touchit\task\SignUpdateTask;
@@ -61,7 +62,13 @@ class TouchIt extends PluginBase{
      * Call when disable
      */
     public function onDisable(){
-        $this->manager->close();
+        foreach($this->getServer()->getLevels() as $level){
+            foreach($level->getTiles() as $tile){
+                if($tile instanceof TouchItSign){
+                    $tile->setText("[TouchIt]", "----------", "DISABLE");
+                }
+            }
+        }
     }
 
     public function getTranslator(){
