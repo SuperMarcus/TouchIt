@@ -5,64 +5,76 @@
 # Please read the comment before doing any changes
 # Unsuitable settings would crash the plugin or corrupt chunks so be really careful and known what you're doing
 
-# All settings for world teleport sign
+# Options for teleport sign
+# All the basic settings will be shown here
 teleport:
- # Player limits in one level
- # To let a special player join the level which is full, grant the permission 'touchit.sign.use.world-teleport.force'
- # Operators has that permission by default
- max-players: 20
- # If not necessary, please switch on this option
- safe-spawn: true
- # Fill in server lobby(s)
- # 'MaxPlayers' won't work with those level(s)
- main-level: [world]
- # Show message on sign when the number of people in target level is more than 'MaxPlayers'
- show-full: true
- # Text that shown on the sign
- format:
-   # Message that shows when target level is full
-   # This message will only appear when 'show-full' is set to true
-   full: "FULL"
-   # Message that shows when target level is unavailable or closed
-   unavailable: "CLOSED"
-   # Will be surrounded with '[' and ']'
-   title: Teleport
-   # The other three lines
-   # Variables are list below:
-   # '{cur}' The number of players in target level
-   # '{max}' The maximum players in one level
-   # '{tar}' Name of target level
-   # '{des}' Description of this sign
-   body: ["{des}", "Players", "{cur}/{max}"]
+  # This option provides the abilities to control the number of players in target level by controlling teleportations
+  # To let a special player join the level which is full, grant the permission 'touchit.sign.use.world-teleport.force'
+  # Operators has that permission by default
+  # Set to zero or negative to disable limitation
+  max-players: 20
+  # If not necessary, please switch on this option
+  safe-spawn: true
+  # Fill in server lobby(s)
+  # 'MaxPlayers' won't work with those level(s)
+  main-level: [world]
+  # Show message on sign when the number of people in target level is more than 'MaxPlayers'
+  show-full: true
+  # Text that shown on the sign
+  format:
+    # Message that shows when target level is full
+    # This message will only appear when 'show-full' is set to true
+    full: "FULL"
+    # Message that shows when target level is unavailable or closed
+    unavailable: "CLOSED"
+    # Will be surrounded with '[' and ']'
+    title: Teleport
+    # The other three lines
+    # Variables are list below:
+    # '{cur}' The number of players in target level
+    # '{max}' The maximum players in one level
+    # '{tar}' Name of target level
+    # '{des}' Description of this sign
+    body: ["{des}", "Players", "{cur}/{max}"]
 
-# All settings for portal sign
+# Options for portal sign
+# Portal sign will use settings from teleport sign but it could be overrides here :D
 portal:
- # Title of world teleport sign
- title: Portal
- # Use player limites
- # The same as world teleport settings
- UseLimits: true
- # If not necessary, please switch on this option
- SafeSpawn: true
- # To show players count on the sign
- # The same as world teleport sign
- EnableCount: true
+  # Overrides from teleport sign
+  format:
+    # Message that shows when target level is full
+    # This message will only appear when 'show-full' is set to true
+    full: "FULL"
+    # Message that shows when target level is unavailable or closed
+    unavailable: "CLOSED"
+    # Will be surrounded with '[' and ']'
+    title: Portal
+    # The other three lines
+    # Variables are list below:
+    # '{cur}' The number of players in arrival's level
+    # '{max}' The maximum players in one level
+    # '{lev}' Name of target level
+    # '{pos}' Position of arrival (No level included)
+    # '{des}' Description of this portal
+    # '{nam}' Name of this portal
+    # '{tye}' The types (Arrival or Departure)
+    body: ["{tye}", "{des}", "{cur}/{max}"]
 
-# All settings for command sign
+# Options for command sign
 command:
- # Notice player when active the sign
- notice: true
- # Text that shown on the sign
- format:
-   # Title of world command sign
-   # Will be surrounded with '[' and ']'
-   title: Command
-   # The other three lines
-   # Variables are list below:
-   # '{cmd}' Command you set
-   # '{des}' Description of this sign
-   # '{nam}' Commands store name (Only work with preloaded signs)
-   body: ["----------", "{des}", ""]
+  # Notice player when active the sign
+  notice: true
+  # Text that shown on the sign
+  format:
+    # Title of world command sign
+    # Will be surrounded with '[' and ']'
+    title: Command
+    # The other three lines
+    # Variables are list below:
+    # '{cmd}' Command you set
+    # '{des}' Description of this sign
+    # '{nam}' Commands store name (Only work with preloaded signs)
+    body: ["----------", "{des}", ""]
 
-# Check settings while creation
+# Check settings while creation (level, command, etc.)
 check-settings: true
