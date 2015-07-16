@@ -19,16 +19,16 @@ class WorldTeleportSign extends TouchItSign{
         if($player->hasPermission("touchit.sign.use.world-teleport")){
             if(($level = $manager->getServer()->getLevelByName($this->getTargetLevel())) instanceof Level){
                 if(!array_search($this->getTargetLevel(), $manager->getConfig()->get("teleport")['main-level']) and ($manager->getConfig()->get("teleport")['max-players'] > 0) and !$player->hasPermission("touchit.sign.use.world-teleport.force") and (count($level->getPlayers()) >= $manager->getConfig()->get("teleport")['max-players'])){
-                    $player->sendTip($manager->getTranslator()->translateString("event.limit", [$this->getTargetLevel()]));
+                    $player->sendTip($manager->getTranslator()->translateString("touchit.event.limit", [$this->getTargetLevel()]));
                 }else{
-                    $player->sendTip($manager->getTranslator()->translateString("event.teleport.process", [$this->getTargetLevel()]));
+                    $player->sendTip($manager->getTranslator()->translateString("touchit.event.teleport", [$this->getTargetLevel()]));
                     $manager->getConfig()->get("teleport", ['safe-spawn' => true])['safe-spawn'] ? $player->teleport($level->getSafeSpawn()) : $player->teleport($level->getSpawnLocation());
                 }
             }else{
-                $player->sendTip($manager->getTranslator()->translateString("event.unavailable", [$this->getTargetLevel()]));
+                $player->sendTip($manager->getTranslator()->translateString("touchit.event.unavailable", [$this->getTargetLevel()]));
             }
         }else{
-            $player->sendTip($manager->getTranslator()->translateString("event.permission"));
+            $player->sendTip($manager->getTranslator()->translateString("touchit.event.permission"));
         }
     }
 

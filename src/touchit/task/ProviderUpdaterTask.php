@@ -34,7 +34,7 @@ class ProviderUpdaterTask extends PluginTask{
 
     public function onCancel(){
         if($this->done){
-            $this->getOwner()->getLogger()->info($this->translator->translateString("provider.update.done"));
+            $this->getOwner()->getLogger()->info($this->translator->translateString("touchit.provider.update.done"));
         }
     }
 }

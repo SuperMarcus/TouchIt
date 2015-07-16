@@ -7,6 +7,8 @@ use pocketmine\Server;
 use touchit\SignManager;
 
 class PortalSign extends TouchItSign{
+    const ID = "PortalSign";
+
     const PORTAL_SIGN_OPTION = "Option";
     const PORTAL_SIGN_PORTAL_NAME = "Name";
     const PORTAL_SIGN_DESCRIPTION = "Description";
@@ -32,7 +34,7 @@ class PortalSign extends TouchItSign{
                     $replacementData = [$current, $max, $pair->getLevel()->getName(), $this->getDescription(),
                         $pair->getX()."-".$pair->getY()."-".$pair->getZ(),
                         $this->getPortalName(),
-                        $this->isArrivalOnly() ? $manager->getTranslator()->translateString("type.portal.arrival") : ($this->isDepartureOnly() ? $manager->getTranslator()->translateString("type.portal.departure") : $manager->getTranslator()->translateString("type.portal.two-way"))
+                        $this->isArrivalOnly() ? $manager->getTranslator()->translateString("touchit.type.portal.arrival") : ($this->isDepartureOnly() ? $manager->getTranslator()->translateString("touchit.type.portal.departure") : $manager->getTranslator()->translateString("touchit.type.portal.two-way"))
                     ];
                     $this->setText("[".$format["title"]."]",
                         ...str_replace($replacement, $replacementData, $format['body'])
@@ -42,7 +44,7 @@ class PortalSign extends TouchItSign{
                 $this->setText("[".$format['title']."]", "----------", $format['unavailable']);
             }
         }else{
-            $this->setText("[TouchIt]", "----------", $manager->getTranslator()->translateString("update.portal.unpaired"), $this->getPortalName());
+            $this->setText("[TouchIt]", "----------", $manager->getTranslator()->translateString("touchit.update.portal.unpaired"), $this->getPortalName());
         }
     }
 
@@ -50,22 +52,26 @@ class PortalSign extends TouchItSign{
         if($player->hasPermission("touchit.sign.use.portal")){
             if($this->isPaired()){
                 if(($pair = $this->getPair()) instanceof PortalSign){
+                    if($this->isArrivalOnly() or $pair->isDepartureOnly()){
+                        $player->sendTip($manager->getTranslator()->translateString("touchit.event.portal.arrival"));
+                        return;
+                    }
                     $options = $manager->getConfig()->get("portal", []) + $manager->getConfig()->get("teleport");
                     $max = array_search($pair->getLevel()->getName(), $options['main-level']) ? $manager->getServer()->getMaxPlayers() : ($options['max-players'] > 0 ? $options['max-players'] : $manager->getServer()->getMaxPlayers());
                     if((count($pair->getLevel()->getPlayers()) >= $max) and !$player->hasPermission("touchit.sign.use.world-teleport.force")){
-                        $player->sendTip($manager->getTranslator()->translateString("event.limit", [$pair->getLevel()->getName()]));
+                        $player->sendTip($manager->getTranslator()->translateString("touchit.event.limit", [$pair->getLevel()->getName()]));
                     }else{
-                        $player->sendTip($manager->getTranslator()->translateString("event.portal.process", [$this->getPortalName()]));
+                        $player->sendTip($manager->getTranslator()->translateString("touchit.event.teleport", [$this->getPortalName()]));
                         $player->teleport($pair);
                     }
                 }else{
-                    $player->sendTip($manager->getTranslator()->translateString("event.unavailable"));
+                    $player->sendTip($manager->getTranslator()->translateString("touchit.event.unavailable"));
                 }
             }else{
-                $player->sendTip($manager->getTranslator()->translateString("event.no-arrival"));
+                $player->sendTip($manager->getTranslator()->translateString("touchit.event.no-arrival"));
             }
         }else{
-            $player->sendTip($manager->getTranslator()->translateString("event.permission"));
+            $player->sendTip($manager->getTranslator()->translateString("touchit.event.permission"));
         }
     }
 
@@ -75,7 +81,7 @@ class PortalSign extends TouchItSign{
     public function getPair(){
         foreach(Server::getInstance()->getLevels() as $level){
             foreach($level->getTiles() as $tile){
-                if($tile instanceof PortalSign){
+                if($tile instanceof PortalSign and $tile !== $this){
                     if($tile->getPortalName() === $this->getPortalName()){
                         return $tile;
                     }

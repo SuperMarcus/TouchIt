@@ -36,7 +36,7 @@ class CommandSign extends TouchItSign{
     public function onActive(Player $player, SignManager $manager){
         if($player->hasPermission("touchit.sign.use.command")){
             if($manager->getConfig()->get("command")['notice']){
-                $player->sendTip($manager->getTranslator()->translateString("event.command.run"));
+                $player->sendTip($manager->getTranslator()->translateString("touchit.event.command.run"));
             }
             $sender = $this->isRunAsOperator() ? new OperatorCommandSender($player, $manager->getServer()) : $player;
             if($this->isPreloaded()){
@@ -55,7 +55,7 @@ class CommandSign extends TouchItSign{
                 ], $this->getCommand()));
             }
         }else{
-            $player->sendTip($manager->getTranslator()->translateString("event.permission"));
+            $player->sendTip($manager->getTranslator()->translateString("touchit.event.permission"));
         }
     }
 

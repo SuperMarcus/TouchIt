@@ -11,6 +11,7 @@ use touchit\listener\SignDestroyListener;
 use touchit\provider\Provider;
 use touchit\provider\update\OldProviderUpdater;
 use touchit\sign\CommandSign;
+use touchit\sign\PortalSign;
 use touchit\sign\TouchItSign;
 use touchit\sign\WorldTeleportSign;
 use touchit\task\ProviderUpdaterTask;
@@ -32,6 +33,7 @@ class TouchIt extends PluginBase{
 
         Tile::registerTile(WorldTeleportSign::class);
         Tile::registerTile(CommandSign::class);
+        Tile::registerTile(PortalSign::class);
 
         $this->lang = new BaseLang($this->getServer()->getProperty("settings.language", BaseLang::FALLBACK_LANGUAGE), $this->getFile()."resources/language/");
 
@@ -39,7 +41,7 @@ class TouchIt extends PluginBase{
 
         //Update old sign data
         if($this->getConfig()->exists("Provider") and (class_exists(($class = "touchit\\provider\\".$this->getConfig()->get("Provider")))) and is_a($class, Provider::class, true) and !((new \ReflectionClass($class))->isAbstract())){
-            $this->getLogger()->info($this->getTranslator()->translateString("provider.update", [(new \ReflectionClass($class))->getShortName()]));
+            $this->getLogger()->info($this->getTranslator()->translateString("touchit.provider.update", [(new \ReflectionClass($class))->getShortName()]));
             $this->getServer()->getScheduler()->scheduleRepeatingTask(new ProviderUpdaterTask($this, new OldProviderUpdater(new $class($this))), 20 * 60);
         }
 
