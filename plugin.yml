@@ -1,8 +1,9 @@
-# TouchIt development version
+# TouchIt
+
 name: TouchIt
-main: TouchIt\TouchIt
-version: "Development Preview"
-api: [1.4.1]
+main: touchit\TouchIt
+version: 2.1
+api: [1.10.0]
 load: POSTWORLD
 author: Marcus
 authors: [Marcus]
@@ -31,6 +32,10 @@ permissions:
               touchit.sign.use.world-teleport:
                 description: "TouchIt use world teleport sign permission"
                 default: true
+                children:
+                  touchit.sign.use.world-teleport.force:
+                  description: "Permission to join level which is full"
+                  default: operator
               touchit.sign.use.portal:
                 description: "TouchIt use portal sign permission"
                 default: true
