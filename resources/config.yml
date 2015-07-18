@@ -1,5 +1,5 @@
 # TouchIt main configuration file
-# Version 2.0
+# Version 2.1
 # SuperMarcus (https://github.com/SuperMarcus)
 
 # This plugin allows fully preference by edit this file
@@ -41,6 +41,14 @@ teleport:
 # Options for portal sign
 # Portal sign will use settings from teleport sign but it could be overrides here :D
 portal:
+  # Load the chunks where portal signs were built in and refer to
+  # This functionality spend time to load chunks and refresh more signs at a time
+  automatic-chunk-loading: true
+  # Detect sign in a pair and set them into correct type (Arrival or Departure)
+  # Only works if the pair is not 'two-way'
+  type-detection: true
+  # Repair wrong portal signs
+  repair-dead-sign: true
   # Overrides from teleport sign
   format:
     # Message that shows when target level is full

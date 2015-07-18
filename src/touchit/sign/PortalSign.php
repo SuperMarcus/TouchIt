@@ -1,7 +1,10 @@
 <?php
 namespace touchit\sign;
 
+use pocketmine\level\Level;
 use pocketmine\nbt\tag\Byte;
+use pocketmine\nbt\tag\IntArray;
+use pocketmine\nbt\tag\String;
 use pocketmine\Player;
 use pocketmine\Server;
 use touchit\SignManager;
@@ -12,16 +15,34 @@ class PortalSign extends TouchItSign{
     const PORTAL_SIGN_OPTION = "Option";
     const PORTAL_SIGN_PORTAL_NAME = "Name";
     const PORTAL_SIGN_DESCRIPTION = "Description";
+    const PORTAL_SIGN_TARGET_POS_CASH = "TargetCash";
 
     const OPTION_IS_ARRIVAL_ONLY = 0b0000001;
     const OPTION_IS_DEPARTURE_ONLY = 0b0000010;
     const OPTION_DEFAULT = 0b0000000;
 
+    private $loadChunk = false;
+
     public function doUpdate(SignManager $manager){
         $options = $manager->getConfig()->get("portal", []) + $manager->getConfig()->get("teleport");//Implement overrides
         $format = $options['format'];
+
+        $this->loadChunk = ($options['automatic-chunk-loading'] === true);
+
         if($this->isPaired()){
             if(($pair = $this->getPair()) instanceof PortalSign){
+                if($options['type-detection']){
+                    $this->setArrivalOnly($pair->isDepartureOnly());//Automatically set the type
+                    $this->setDepartureOnly($pair->isArrivalOnly());
+                }
+
+                if($this->isArrivalOnly() and $this->isDepartureOnly() and $options['repair-dead-sign']){//What the hell is this!?!?
+                    $this->setArrivalOnly(false);
+                    $this->setDepartureOnly(false);
+                    $pair->setArrivalOnly(false);
+                    $pair->setDepartureOnly(false);
+                }
+
                 $max = array_search($pair->getLevel()->getName(), $options['main-level']) ? $manager->getServer()->getMaxPlayers() : ($options['max-players'] > 0 ? $options['max-players'] : $manager->getServer()->getMaxPlayers());
                 $current = min(count($pair->getLevel()->getPlayers()), $max);
                 if(($current >= $max) and $options['show-full']){
@@ -65,7 +86,7 @@ class PortalSign extends TouchItSign{
                         $player->teleport($pair);
                     }
                 }else{
-                    $player->sendTip($manager->getTranslator()->translateString("touchit.event.unavailable"));
+                    $player->sendTip($manager->getTranslator()->translateString("touchit.event.unavailable", [$this->getPortalName()]));
                 }
             }else{
                 $player->sendTip($manager->getTranslator()->translateString("touchit.event.no-arrival"));
@@ -79,14 +100,30 @@ class PortalSign extends TouchItSign{
      * @return PortalSign
      */
     public function getPair(){
+        $cashedLevel = "";
+        if($this->loadChunk){
+            $this->getTargetChunkCash($chunkX, $chunkZ, $cashedLevel);
+
+            if($cashedLevel !== ""){//Fix unpaired sign
+                if(($cashedLevel = Server::getInstance()->getLevelByName($cashedLevel)) instanceof Level){
+                    $cashedLevel->loadChunk($chunkX, $chunkZ);
+                }
+            }
+        }
+
         foreach(Server::getInstance()->getLevels() as $level){
             foreach($level->getTiles() as $tile){
                 if($tile instanceof PortalSign and $tile !== $this){
                     if($tile->getPortalName() === $this->getPortalName()){
+                        $this->setTargetChunkCash($tile->getX() >> 4, $tile->getZ() >> 4, $level->getName());
                         return $tile;
                     }
                 }
             }
+        }
+
+        if($cashedLevel instanceof Level){//Destination sign externally removed
+            $this->cleanTargetChunkCash();
         }
         return null;
     }
@@ -95,7 +132,7 @@ class PortalSign extends TouchItSign{
      * @return bool
      */
     public function isPaired(){
-        return $this->getPair() instanceof PortalSign;
+        return ($this->getPair() instanceof PortalSign) or $this->isTargetCashed();
     }
 
     /**
@@ -103,6 +140,29 @@ class PortalSign extends TouchItSign{
      */
     public function getPortalName(){
         return (string) $this->getFunctionProperty(PortalSign::PORTAL_SIGN_PORTAL_NAME);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTargetCashed(){
+        return $this->getFunctionProperty(PortalSign::PORTAL_SIGN_TARGET_POS_CASH) !== null;
+    }
+
+    /**
+     * @param int &$chunkX
+     * @param int &$chunkZ
+     * @param string &$level
+     */
+    public function getTargetChunkCash(&$chunkX, &$chunkZ, &$level){
+        if($this->isTargetCashed()){
+            $compound = $this->getFunctionProperty(PortalSign::PORTAL_SIGN_TARGET_POS_CASH);
+            /** @var IntArray $chunk */
+            $chunk = $compound->Chunk;
+            $chunkX = $chunk->getValue()[0];
+            $chunkZ = $chunk->getValue()[1];
+            $level = trim((string) $compound->Level);
+        }
     }
 
     /**
@@ -168,5 +228,21 @@ class PortalSign extends TouchItSign{
      */
     public function setDepartureOnly($value){
         $this->setOption($value ? ($this->getOption() | PortalSign::OPTION_IS_DEPARTURE_ONLY) : ($this->getOption() & (~PortalSign::OPTION_IS_DEPARTURE_ONLY)));
+    }
+
+    public function cleanTargetChunkCash(){
+        $this->removeFunctionProperty(PortalSign::PORTAL_SIGN_TARGET_POS_CASH);
+    }
+
+    /**
+     * @param int $chunkX
+     * @param int $chunkZ
+     * @param string $level
+     */
+    public function setTargetChunkCash($chunkX, $chunkZ, $level){
+        $this->setFunctionProperty(PortalSign::PORTAL_SIGN_TARGET_POS_CASH, [
+            "Chunk" => new IntArray("Chunk", [$chunkX, $chunkZ]),
+            "Level" => new String("Level", $level)
+        ], TouchItSign::PROPERTY_COMPOUND);
     }
 }

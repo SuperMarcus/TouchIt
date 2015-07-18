@@ -20,6 +20,7 @@ abstract class TouchItSign extends Sign{
     const PROPERTY_STRING = String::class;
     const PROPERTY_INTEGER = Int::class;
     const PROPERTY_BYTE = Byte::class;
+    const PROPERTY_COMPOUND = Compound::class;
 
     /**
      * Method to call when update the sign
@@ -72,5 +73,12 @@ abstract class TouchItSign extends Sign{
      */
     protected function setFunctionProperty($key, $value, $tag = TouchItSign::PROPERTY_STRING){
         $this->getFunctionPropertiesCompound()->{$key} = new $tag($key, $value);
+    }
+
+    /**
+     * @param $key
+     */
+    protected function removeFunctionProperty($key){
+        unset($this->getFunctionPropertiesCompound()->{$key});
     }
 }
