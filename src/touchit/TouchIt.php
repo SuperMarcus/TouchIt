@@ -35,7 +35,7 @@ class TouchIt extends PluginBase{
         Tile::registerTile(CommandSign::class);
         Tile::registerTile(PortalSign::class);
 
-        $this->lang = new BaseLang($this->getServer()->getProperty("settings.language", BaseLang::FALLBACK_LANGUAGE), $this->getFile()."resources/language/");
+        $this->lang = new BaseLang(((trim($this->getConfig()->get("force-language", "")) === "") ? $this->getServer()->getProperty("settings.language", BaseLang::FALLBACK_LANGUAGE) : trim($this->getConfig()->get("force-language"))), $this->getFile()."resources/language/");
 
         $this->manager = new SignManager($this);
 

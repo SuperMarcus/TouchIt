@@ -85,5 +85,9 @@ command:
     # '{nam}' Commands store name (Only work with preloaded signs)
     body: ["----------", "{des}", ""]
 
+# To force plugin use a special language
+# If blank, TouchIt will use server language to be the default language
+force-language: ""
+
 # Check settings while creation (level, command, etc.)
 check-settings: true
