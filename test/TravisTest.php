@@ -12,7 +12,7 @@ $error = 0;
 
 while(!feof($pipes[1])){
     $line = fgets($pipes[1]);
-    echo "[Server] ".fgets($pipes[1]);
+    echo "[Server] ".$line;
     if(strpos($line, "[CRITICAL]") or strpos($line, "[EMERGENCY]") or strpos($line, "[FATAL]")){
         echo "[Test] Server output an error message.\n";
         ++$error;
