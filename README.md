@@ -1,4 +1,6 @@
 #TouchIt#
+![Build Status](https://api.travis-ci.org/SuperMarcus/TouchIt.svg)
+
 This is a multifunctional sign system.
 
 ###How to use###
