@@ -1,5 +1,7 @@
 #TouchIt#
-![Build Status](https://api.travis-ci.org/SuperMarcus/TouchIt.svg)
+[![Travis CI build status](https://travis-ci.org/SuperMarcus/TouchIt.svg)](https://travis-ci.org/SuperMarcus/TouchIt "Last build status on Travis CI")
+[![Average time to resolve an issue](http://isitmaintained.com/badge/resolution/SuperMarcus/TouchIt.svg)](http://isitmaintained.com/project/SuperMarcus/TouchIt "Average time to resolve an issue")
+[![Percentage of issues still open](http://isitmaintained.com/badge/open/SuperMarcus/TouchIt.svg)](http://isitmaintained.com/project/SuperMarcus/TouchIt "Percentage of issues still open")
 
 This is a multifunctional sign system.
 
