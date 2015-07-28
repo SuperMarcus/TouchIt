@@ -45,10 +45,10 @@ class TouchIt extends PluginBase{
             $this->getServer()->getScheduler()->scheduleRepeatingTask(new ProviderUpdaterTask($this, new OldProviderUpdater(new $class($this))), 20 * 60);
         }
 
-        $this->getServer()->getPluginManager()->registerEvents(new PlayerTouchListener($this->manager), $this);
+        $this->getServer()->getPluginManager()->registerEvents(($touchListener = new PlayerTouchListener($this->manager)), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SignCreateListener($this->manager), $this);
         $this->getServer()->getPluginManager()->registerEvents(new SignDestroyListener($this->manager), $this);
-        $this->getServer()->getCommandMap()->register("touchit", new TouchItCommand($this->manager));
+        $this->getServer()->getCommandMap()->register("touchit", new TouchItCommand($this->manager, $touchListener));
 
         $this->getServer()->getScheduler()->scheduleRepeatingTask(new SignUpdateTask($this), 20 * 5);
     }

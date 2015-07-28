@@ -189,7 +189,7 @@ class SignCreateListener implements Listener{
                     if($opts['preloaded']){
                         $this->manager->saveDefaultPreloadedFile($cmd);
                     }
-                    $event->getPlayer()->sendTip($this->manager->getTranslator()->translateString("touchit.build", [$this->manager->getTranslator()->translateString("type.command")]));
+                    $event->getPlayer()->sendTip($this->manager->getTranslator()->translateString("touchit.build", [$this->manager->getTranslator()->translateString("touchit.type.command")]));
                     $this->manager->createTile([
                             ["setDescription", [$description]],
                             [$opts['preloaded'] ? "setCommandStore" : "setCommand", [$cmd]],

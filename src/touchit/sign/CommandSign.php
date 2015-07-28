@@ -3,6 +3,7 @@ namespace touchit\sign;
 
 use pocketmine\nbt\tag\Byte;
 use pocketmine\Player;
+use pocketmine\utils\TextFormat;
 use touchit\command\OperatorCommandSender;
 use touchit\SignManager;
 
@@ -19,6 +20,106 @@ class CommandSign extends TouchItSign{
     const OPTION_RUN_AS_OPERATOR = 0b0000100;
     const OPTION_DEFAULT = 0b0000000;
 
+    public function doEdit(Player $player, $args, SignManager $manager){
+        if((count($args) > 0) and (($prefix = strtolower(trim(array_shift($args)))) !== "help")){
+            switch($prefix){
+                case "preloaded":
+                    if(count($args) > 0){
+                        switch(strtolower(trim(array_shift($args)))){
+                            case "edit":
+                            case "on":
+                                if(isset($args[0])){
+                                    $this->setPreloaded(true);
+                                    $this->setCommandStore(trim($args[0]));
+                                    $manager->saveDefaultPreloadedFile(trim($args[0]));
+                                    $player->sendMessage($manager->getTranslator()->translateString("touchit.command.edit.command.preloaded.on", [$this->getCommandStore()]));
+                                }else{
+                                    $player->sendMessage("Usage: '/touchit edit preloaded <on|edit> <preloaded name>'");
+                                }
+                                break;
+                            case "off":
+                                $this->setPreloaded(false);
+                                $player->sendMessage($manager->getTranslator()->translateString("touchit.command.edit.command.preloaded.off"));
+                                break;
+                            default:
+                                $player->sendMessage("Usage: '/touchit edit preloaded <on|off|edit> [preloaded name]'");
+                        }
+                    }else{
+                        $player->sendMessage("Usage: '/touchit edit preloaded <on|off|edit> [preloaded name]'");
+                    }
+                    break;
+                case "command":
+                    if(count($args) > 0){
+                        $command = join(' ', $args);
+                        $this->setCommand($command);
+                        $player->sendMessage($manager->getTranslator()->translateString("touchit.command.edit.command.command", [$command]));
+                    }else{
+                        $player->sendMessage("Usage: '/touchit edit command <command>'");
+                    }
+                    break;
+                case "oponly":
+                case "operatoronly":
+                    if(isset($args[0])){
+                        switch(strtolower(trim($args[0]))){
+                            case "on":
+                            case "true":
+                                $this->setOperatorOnly(true);
+                                $player->sendMessage($manager->getTranslator()->translateString("touchit.command.edit.command.operator_only.on"));
+                                break;
+                            case "off":
+                            case "false":
+                                $this->setOperatorOnly(false);
+                                $player->sendMessage($manager->getTranslator()->translateString("touchit.command.edit.command.operator_only.off"));
+                                break;
+                            default:
+                                $player->sendMessage("Usage: '/touchit edit <oponly|operatoronly> <on|true|off|false>'");
+                        }
+                    }else{
+                        $player->sendMessage("Usage: '/touchit edit <oponly|operatoronly> <on|true|off|false>'");
+                    }
+                    break;
+                case "runasop":
+                case "runasoperator":
+                    if(isset($args[0])){
+                        switch(strtolower(trim($args[0]))){
+                            case "on":
+                            case "true":
+                                $this->setRunAsOperator(true);
+                                $player->sendMessage($manager->getTranslator()->translateString("touchit.command.edit.command.run_as_operator.on"));
+                                break;
+                            case "off":
+                            case "false":
+                                $this->setRunAsOperator(false);
+                                $player->sendMessage($manager->getTranslator()->translateString("touchit.command.edit.command.run_as_operator.off"));
+                                break;
+                            default:
+                                $player->sendMessage("Usage: '/touchit edit <runasop|runasoperator> <on|true|off|false>'");
+                        }
+                    }else{
+                        $player->sendMessage("Usage: '/touchit edit <runasop|runasoperator> <on|true|off|false>'");
+                    }
+                    break;
+                case "description":
+                    if(count($args) > 0){
+                        $description = join(' ', $args);
+                        $this->setDescription($description);
+                        $player->sendMessage($manager->getTranslator()->translateString("touchit.command.edit.command.description", [$description]));
+                    }else{
+                        $player->sendMessage("Usage: '/touchit edit description <description>'");
+                    }
+                    break;
+                default:
+                    $player->sendMessage("Usage: '/touchit edit <help|preloaded|command|oponly|runasop|description>'");
+                    $player->sendTip(TextFormat::YELLOW."Warning: Different sign has different usage");
+                    $player->sendPopup(TextFormat::AQUA."Tap every sign to get there edit command");
+            }
+        }else{
+            $player->sendMessage("Usage: '/touchit edit <help|preloaded|command|oponly|runasop|description>'");
+            $player->sendTip(TextFormat::YELLOW."Warning: Different sign has different usage");
+            $player->sendPopup(TextFormat::AQUA."Tap every sign to get there edit command");
+        }
+    }
+
     public function doUpdate(SignManager $manager){
         $format = $manager->getConfig()->get("command")['format'];
         $this->setText(
@@ -34,7 +135,7 @@ class CommandSign extends TouchItSign{
     }
 
     public function onActive(Player $player, SignManager $manager){
-        if($player->hasPermission("touchit.sign.use.command")){
+        if($player->hasPermission("touchit.sign.use.command") and (!$this->isOperatorOnly() or $player->isOp())){
             if($manager->getConfig()->get("command")['notice']){
                 $player->sendTip($manager->getTranslator()->translateString("touchit.event.command.run"));
             }

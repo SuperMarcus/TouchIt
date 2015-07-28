@@ -32,6 +32,10 @@ class WorldTeleportSign extends TouchItSign{
         }
     }
 
+    public function doEdit(Player $player, $args, SignManager $manager){
+
+    }
+
     /**
      * @param SignManager $manager
      */

@@ -23,6 +23,10 @@ class PortalSign extends TouchItSign{
 
     private $loadChunk = false;
 
+    public function doEdit(Player $player, $args, SignManager $manager){
+
+    }
+
     public function doUpdate(SignManager $manager){
         $options = $manager->getConfig()->get("portal", []) + $manager->getConfig()->get("teleport");//Implement overrides
         $format = $options['format'];

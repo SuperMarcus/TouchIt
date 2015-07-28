@@ -7,41 +7,45 @@ api: [1.10.0]
 load: POSTWORLD
 author: Marcus
 authors: [Marcus]
-description: "This is a powerful sign plugin."
-website: https://github.com/SuperMarcus/TouchIt
+description: "An intelligent sign system."
+website: https://github.com/SuperMarcus/TouchIt/tree/stable
 
 permissions:
   touchit:
     default: operator
-    description: "TouchIt permissions"
+    description: "Parent of all TouchIt permissions"
     children:
       touchit.sign:
         default: true
-        description: "TouchIt sign permissions"
+        description: "Parent of all sign permissions"
         children:
           touchit.sign.create:
             default: operator
-            description: "TouchIt create sign permission"
+            description: "permission to create sign"
           touchit.sign.destroy:
             default: operator
-            description: "TouchIt delete sign permission"
+            description: "permission to delete sign"
           touchit.sign.use:
             default: true
-            description: "TouchIt use sign permission"
+            description: "Parent of all sign usage permissions"
             children:
               touchit.sign.use.world-teleport:
-                description: "TouchIt use world teleport sign permission"
+                description: "Permission to use world teleport sign"
                 default: true
                 children:
                   touchit.sign.use.world-teleport.force:
-                  description: "Permission to join level which is full"
-                  default: operator
+                    description: "Permission to join level which is full"
+                    default: operator
               touchit.sign.use.portal:
-                description: "TouchIt use portal sign permission"
+                description: "Permission to use portal sign"
                 default: true
               touchit.sign.use.command:
-                description: "TouchIt use command sign permission"
+                description: "Permission to use command sign"
                 default: true
       touchit.command:
         default: operator
         description: "TouchIt commands permission"
+        children:
+          touchit.command.edit:
+            description: "Permission to edit signs by command line"
+            default: operator

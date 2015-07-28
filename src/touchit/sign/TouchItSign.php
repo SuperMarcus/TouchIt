@@ -37,6 +37,15 @@ abstract class TouchItSign extends Sign{
      */
     abstract public function onActive(Player $player, SignManager $manager);
 
+    /**
+     * Method to call to apply a edit command line
+     *
+     * @param Player $player
+     * @param string[] $args
+     * @param SignManager $manager
+     */
+    abstract public function doEdit(Player $player, $args, SignManager $manager);
+
     public function __construct(FullChunk $chunk, Compound $nbt){
         if(!isset($nbt->FunctionSignData)){
             $nbt->FunctionSignData = new Compound("FunctionSignData", []);
