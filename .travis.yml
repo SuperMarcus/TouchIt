@@ -14,4 +14,4 @@ before_script:
  - echo | pecl install channel://pecl.php.net/yaml-1.1.1
 
 script:
- - echo -e "makeplugin TouchIt\nstop" | php ../PocketMine.phar --plugins ./ --no-wizard
+ - echo -e "makeplugin TouchIt\nstop" | php ../PocketMine.phar --plugins ../ --no-wizard
