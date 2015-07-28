@@ -7,11 +7,11 @@ branches:
  - stable
 
 before_script:
- - wget -O PocketMine.phar https://github.com/PocketMine/PocketMine-MP/releases/download/1.4.1/PocketMine-MP_1.4.1.phar
- - wget -O DevTools.phar https://github.com/PocketMine/DevTools/releases/download/v1.9.0/DevTools_v1.9.0.phar
+ - wget -O ../PocketMine.phar https://github.com/PocketMine/PocketMine-MP/releases/download/1.4.1/PocketMine-MP_1.4.1.phar
+ - wget -O ../DevTools.phar https://github.com/PocketMine/DevTools/releases/download/v1.9.0/DevTools_v1.9.0.phar
  - pecl install channel://pecl.php.net/pthreads-2.0.10
  - pecl install channel://pecl.php.net/weakref-0.2.6
  - echo | pecl install channel://pecl.php.net/yaml-1.1.1
 
 script:
- - php PocketMine.phar --plugins ./ --no-wizard
+ - echo -e "makeplugin TouchIt\nstop" | php ../PocketMine.phar --plugins ./ --no-wizard
