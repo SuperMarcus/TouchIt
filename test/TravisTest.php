@@ -37,7 +37,7 @@ echo "[Build] Travis CI Build started\n";
 
 $test = 0;
 $failed = 0;
-$build = 0;
+$buildCount = 0;
 
 foreach(scandir("server") as $serverBuild){
     if(strpos($serverBuild, ".phar")){
@@ -51,7 +51,7 @@ foreach(scandir("server") as $serverBuild){
             foreach($build as $b){
                 if(strpos($b, ".phar")){
                     echo "[Build] Found Phar: $b\n";
-                    file_put_contents("build/TouchIt_Build_".(++$build).".phar", file_get_contents($b));
+                    file_put_contents("build/TouchIt_Build_".(++$buildCount).".phar", file_get_contents($b));
                     unlink($b);
                 }
             }
