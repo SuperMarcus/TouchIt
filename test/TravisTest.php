@@ -17,9 +17,9 @@ function build($bin, $phar, $pluginDir){
 
     while(!feof($pipes[1])){
         $line = fgets($pipes[1]);
-        echo "[Server] ".$line;
         if(strpos($line, "[CRITICAL]") or strpos($line, "[EMERGENCY]") or strpos($line, "[FATAL]")){
             echo "[Test] Server output an error message\n";
+            echo "[Server] ".$line;
             ++$error;
         }
     }

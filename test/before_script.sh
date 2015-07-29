@@ -36,9 +36,9 @@ mkdir "plugins/TouchIt_Build"
 mkdir "server"
 mkdir "build"
 
-pecl install channel://pecl.php.net/pthreads-2.0.10
-pecl install channel://pecl.php.net/weakref-0.2.6
-echo | pecl install channel://pecl.php.net/yaml-1.1.1
+pecl install channel://pecl.php.net/pthreads-2.0.10 >> /dev/null 2>&1
+pecl install channel://pecl.php.net/weakref-0.2.6 >> /dev/null 2>&1
+echo | pecl install channel://pecl.php.net/yaml-1.1.1 >> /dev/null 2>&1
 
 echo "[Build] Moving files..."
 
