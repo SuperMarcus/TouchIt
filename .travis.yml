@@ -6,7 +6,7 @@ php:
 branches:
  - stable
 
-before_script: test/before_script.sh
+before_script: bash test/before_script.sh
 
 script:
  - php test/TravisTest.php
