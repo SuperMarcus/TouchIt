@@ -19,7 +19,7 @@ function build($bin, $phar, $pluginDir){
         $line = fgets($pipes[1]);
         if(strpos($line, "[CRITICAL]") or strpos($line, "[EMERGENCY]") or strpos($line, "[FATAL]")){
             echo "[Test] Server output an error message\n";
-            echo "[Server] ".$line;
+            echo "[Server] ".trim($line)."\n";
             ++$error;
         }
     }
@@ -28,7 +28,7 @@ function build($bin, $phar, $pluginDir){
     fclose($pipes[1]);
     fclose($pipes[2]);
 
-    echo "\n\n[Build] Return value: ". proc_close($server) ."\n";
+    echo "[Build] Return value: ". proc_close($server) ."\n";
 
     return $error;
 }
@@ -62,4 +62,15 @@ foreach(scandir("server") as $serverBuild){
             ++$failed;
         }
     }
+}
+
+if($failed >= $test){
+    echo "[Build] Build failed in all $test tests\n";
+    exit(1);
+}elseif($failed > 0){
+    echo "[Build] Build finished in $test tests but failed in $failed tests\n";
+    exit(0);
+}else{
+    echo "[Build] Build finished successfully in all $test tests\n";
+    exit(0);
 }
