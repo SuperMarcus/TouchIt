@@ -1,6 +1,6 @@
 <?php
 define("BINARY_PATH", PHP_BINARY);
-define("PLUGIN_DIR", getcwd()."/plugins");
+define("PLUGIN_DIR", "plugins");
 
 function build($bin, $phar, $pluginDir){
     echo "[Build] Building plugin with '$phar'\n";
