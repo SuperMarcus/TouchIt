@@ -8,7 +8,7 @@ load: POSTWORLD
 author: Marcus
 authors: [Marcus]
 description: "An intelligent sign system."
-website: https://github.com/SuperMarcus/TouchIt/tree/stable
+website: https://github.com/SuperMarcus/TouchIt
 
 permissions:
   touchit:
